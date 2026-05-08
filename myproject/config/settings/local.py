@@ -5,6 +5,7 @@ Overrides base settings for local development.
 """
 
 from .base import *
+from decouple import config
 
 # Development-specific settings
 DEBUG = True
@@ -12,13 +13,16 @@ DEBUG = True
 # Allow all hosts in development
 ALLOWED_HOSTS = ['*']
 
-# Use SQLite for local development instead of PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Use SQLite for local development by default.
+# Set USE_SQLITE_LOCAL=False to use PostgreSQL/Supabase from base settings.
+USE_SQLITE_LOCAL = config('USE_SQLITE_LOCAL', default=True, cast=bool)
+if USE_SQLITE_LOCAL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 # Email backend for development (prints to console)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -391,8 +391,13 @@
             </div>
             <div class="p-5 space-y-3">
               <input id="team-player-search" class="w-full border rounded-xl px-3 py-2" placeholder="Type player name to search..." />
+              <div class="flex items-center justify-between text-sm text-slate-600">
+                <span id="team-player-selected-count">0 selected</span>
+                <button type="button" id="team-player-clear" class="text-[#0d2c59] font-semibold hover:underline">Clear Selection</button>
+              </div>
               <div id="team-player-list" class="max-h-[340px] overflow-auto border border-slate-200 rounded-xl divide-y"></div>
-              <div class="flex justify-end">
+              <div class="flex justify-end gap-2">
+                <button type="button" id="team-player-add-selected" class="px-4 py-2 rounded-xl bg-[#0d2c59] text-white hover:bg-[#163d74] disabled:opacity-50 disabled:cursor-not-allowed" disabled>Add Selected</button>
                 <button type="button" id="team-player-close" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Close</button>
               </div>
             </div>
@@ -401,34 +406,80 @@
         document.body.appendChild(overlay);
         const listEl = overlay.querySelector('#team-player-list');
         const searchEl = overlay.querySelector('#team-player-search');
+        const countEl = overlay.querySelector('#team-player-selected-count');
+        const addSelectedBtn = overlay.querySelector('#team-player-add-selected');
+        const clearBtn = overlay.querySelector('#team-player-clear');
+        const selectedIds = new Set();
         const close = () => overlay.remove();
+        const updateSelectionUI = () => {
+          const selectedCount = selectedIds.size;
+          if (countEl) countEl.textContent = `${selectedCount} selected`;
+          if (addSelectedBtn) addSelectedBtn.disabled = selectedCount === 0;
+        };
         const renderList = (q = '') => {
           const filtered = eligiblePlayers.filter((p) => String(p.name || '').toLowerCase().includes(String(q).toLowerCase().trim()));
           listEl.innerHTML = filtered.map((p) => `
             <button type="button" data-assign-player="${p.id}" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-3">
-              <div>
+              <div class="flex items-start gap-3">
+                <input type="checkbox" data-player-checkbox="${p.id}" class="mt-1 w-4 h-4" ${selectedIds.has(String(p.id)) ? 'checked' : ''} />
                 <div class="font-semibold text-slate-900">${p.name}</div>
-                <div class="text-xs text-slate-500">${p.position || 'TBD'} • Jersey ${p.jerseyNumber || '-'} • ${p.team || 'Unassigned'}</div>
               </div>
-              <span class="text-xs font-semibold text-[#0d2c59]">Add</span>
+              <div class="text-xs text-slate-500">${p.position || 'TBD'} • Jersey ${p.jerseyNumber || '-'} • ${p.team || 'Unassigned'}</div>
             </button>
           `).join('') || '<div class="px-3 py-6 text-center text-slate-500 text-sm">No matching registered player.</div>';
           listEl.querySelectorAll('[data-assign-player]').forEach((btn) => {
-            btn.addEventListener('click', async () => {
-              const id = btn.getAttribute('data-assign-player');
-              const player = eligiblePlayers.find((x) => String(x.id) === String(id));
-              if (!player) return;
-              await sendJson(`${apiBase}/players/${id}/`, 'PUT', { ...player, team: team?.name || null });
-              close();
-              await uiAlert(`${player.name} added to ${team?.name || 'team'}.`, 'Player Added', 'success');
-              await loadPage();
+            btn.addEventListener('click', (e) => {
+              const id = String(btn.getAttribute('data-assign-player') || '');
+              if (!id) return;
+              const isCheckboxClick = e.target instanceof HTMLElement && e.target.matches('[data-player-checkbox]');
+              if (selectedIds.has(id)) selectedIds.delete(id);
+              else selectedIds.add(id);
+              const cb = btn.querySelector(`[data-player-checkbox="${id}"]`);
+              if (cb) cb.checked = selectedIds.has(id);
+              if (!isCheckboxClick) updateSelectionUI();
+              updateSelectionUI();
+            });
+          });
+          listEl.querySelectorAll('[data-player-checkbox]').forEach((cb) => {
+            cb.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+            cb.addEventListener('change', (e) => {
+              const id = String(cb.getAttribute('data-player-checkbox') || '');
+              if (!id) return;
+              if (e.target.checked) selectedIds.add(id);
+              else selectedIds.delete(id);
+              updateSelectionUI();
             });
           });
         };
+        addSelectedBtn?.addEventListener('click', async () => {
+          const ids = Array.from(selectedIds);
+          if (!ids.length) return;
+          addSelectedBtn.disabled = true;
+          try {
+            for (const id of ids) {
+              const player = eligiblePlayers.find((x) => String(x.id) === String(id));
+              if (!player) continue;
+              await sendJson(`${apiBase}/players/${id}/`, 'PUT', { ...player, team: team?.name || null });
+            }
+            close();
+            await uiAlert(`${ids.length} player(s) added to ${team?.name || 'team'}.`, 'Players Added', 'success');
+            await loadPage();
+          } finally {
+            addSelectedBtn.disabled = false;
+          }
+        });
+        clearBtn?.addEventListener('click', () => {
+          selectedIds.clear();
+          updateSelectionUI();
+          renderList(searchEl?.value || '');
+        });
         overlay.querySelector('#team-player-close')?.addEventListener('click', close);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
         searchEl?.addEventListener('input', () => renderList(searchEl.value));
         renderList('');
+        updateSelectionUI();
       });
 
       document.querySelectorAll('[data-roster-del]').forEach((btn) => {

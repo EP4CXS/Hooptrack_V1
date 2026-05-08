@@ -135,12 +135,12 @@
         return false;
       }
       if (!regionSel.value) {
-        showMsg('Please select a region');
+        showMsg('Please select a municipality');
         regionSel.focus();
         return false;
       }
       if (provinceSel.disabled || !provinceSel.value) {
-        showMsg('Please select a province');
+        showMsg('Please select a barangay');
         provinceSel.focus();
         return false;
       }
@@ -227,18 +227,18 @@
 
     async function loadRegions() {
       const regions = await fetchJsonSimple('/api/auth/locations/regions/');
-      setSelectOptions(regionSel, regions, 'Select Region');
+      setSelectOptions(regionSel, regions, 'Select Municipality');
     }
 
     regionSel?.addEventListener('change', async () => {
       const rid = regionSel.value;
       provinceSel.disabled = !rid;
       citySel.disabled = true;
-      setSelectOptions(provinceSel, [], 'Select Province');
+      setSelectOptions(provinceSel, [], 'Select Barangay');
       setSelectOptions(citySel, [], 'Select City');
       if (!rid) return;
       const provinces = await fetchJsonSimple(`/api/auth/locations/provinces/${rid}/`);
-      setSelectOptions(provinceSel, provinces, 'Select Province');
+      setSelectOptions(provinceSel, provinces, 'Select Barangay');
     });
 
     provinceSel?.addEventListener('change', async () => {

@@ -37,6 +37,11 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT', cast=int),
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=300, cast=int),
+        'OPTIONS': {
+            'sslmode': config('DB_SSLMODE', default='require'),
+            'connect_timeout': config('DB_CONNECT_TIMEOUT', default=10, cast=int),
+        },
     }
 }
 

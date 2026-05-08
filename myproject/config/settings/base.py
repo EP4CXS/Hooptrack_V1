@@ -79,6 +79,11 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD', default='postgres'),
         'HOST': config('DB_HOST', default='127.0.0.1'),
         'PORT': config('DB_PORT', default=5432, cast=int),
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
+        'OPTIONS': {
+            'sslmode': config('DB_SSLMODE', default='prefer'),
+            'connect_timeout': config('DB_CONNECT_TIMEOUT', default=10, cast=int),
+        },
     }
 }
 
