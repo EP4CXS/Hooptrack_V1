@@ -16,11 +16,21 @@ ALLOWED_HOSTS = config(
     default='',
     cast=Csv()
 )
+ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]
+
+# CSRF trusted origins for deployed domains (must include scheme)
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='',
+    cast=Csv()
+)
+CSRF_TRUSTED_ORIGINS = [o for o in CSRF_TRUSTED_ORIGINS if o]
 
 # Security settings - enable in production
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
@@ -45,9 +55,18 @@ DATABASES = {
     }
 }
 
-# Static files - use WhiteNoise or CDN in production
+# Static files - use WhiteNoise in production
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    *[m for m in MIDDLEWARE if m != 'django.middleware.security.SecurityMiddleware'],
+]
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Media files - use S3 or similar in production
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

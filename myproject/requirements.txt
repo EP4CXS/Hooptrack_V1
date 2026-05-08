@@ -27,3 +27,7 @@ django-filter>=24.2
 
 # Ollama Python client (AI predictions)
 ollama>=0.3
+
+# Production server + static files
+gunicorn>=21.2
+whitenoise>=6.6
