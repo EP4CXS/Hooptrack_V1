@@ -1,0 +1,259 @@
+<script>
+  function drfErrorMessage(body) {
+    if (!body || typeof body !== 'object') return 'Request failed';
+    if (typeof body.detail === 'string') return body.detail;
+    if (Array.isArray(body.detail)) return body.detail.map(String).join(', ');
+    if (typeof body.message === 'string') return body.message;
+    const parts = [];
+    Object.keys(body).forEach((k) => {
+      const v = body[k];
+      if (Array.isArray(v)) parts.push(`${k}: ${v.map(String).join(', ')}`);
+      else if (typeof v === 'string') parts.push(`${k}: ${v}`);
+    });
+    return parts.length ? parts.join(' | ') : 'Request failed';
+  }
+
+  async function sendJsonWithError(path, method, payload) {
+    const res = await fetch(path, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const text = await res.text();
+    let body = null;
+    if (text) {
+      try { body = JSON.parse(text); } catch { body = { detail: text }; }
+    }
+    if (!res.ok) throw new Error(drfErrorMessage(body));
+    if (res.status === 204) return null;
+    return body;
+  }
+
+  async function fetchJsonSimple(path) {
+    const res = await fetch(path);
+    const text = await res.text();
+    let body = null;
+    if (text) {
+      try { body = JSON.parse(text); } catch { body = null; }
+    }
+    if (!res.ok) throw new Error('Failed to load data');
+    return body;
+  }
+
+  {% if page_name == 'login' %}
+  (function () {
+    const form = document.getElementById('login-form');
+    const msg = document.getElementById('auth-msg');
+    const pw = document.getElementById('login-password');
+    const btn = document.getElementById('login-submit');
+    const btnLabel = document.getElementById('login-btn-label');
+    const eyeOpen = document.getElementById('login-eye-open');
+    const eyeOff = document.getElementById('login-eye-off');
+    document.getElementById('login-toggle-password')?.addEventListener('click', () => {
+      const show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      eyeOpen?.classList.toggle('hidden', show);
+      eyeOff?.classList.toggle('hidden', !show);
+    });
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.classList.add('hidden');
+      msg.textContent = '';
+      const fd = new FormData(form);
+      btn.disabled = true;
+      btnLabel.innerHTML = '<span class="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>';
+      try {
+        const data = await sendJsonWithError('/api/auth/login-email/', 'POST', {
+          email: fd.get('email'),
+          password: fd.get('password')
+        });
+        if (data.access) localStorage.setItem('accessToken', data.access);
+        if (data.refresh) localStorage.setItem('refreshToken', data.refresh);
+        window.location.href = '/dashboard/';
+      } catch (err) {
+        msg.textContent = err.message || 'Login failed';
+        msg.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btnLabel.innerHTML = 'Log In<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>';
+      }
+    });
+  })();
+  {% endif %}
+
+  {% if page_name == 'signup' %}
+  (function () {
+    const form = document.getElementById('signup-form');
+    const msg = document.getElementById('signup-msg');
+    const slider = document.getElementById('signup-slider');
+    const continueBtn = document.getElementById('signup-continue');
+    const backBtn = document.getElementById('signup-back');
+    const pw = document.getElementById('signup-password');
+    const confirmPw = document.getElementById('signup-confirm-password');
+    const terms = document.getElementById('terms');
+    const btn = document.getElementById('signup-submit');
+    const btnLabel = document.getElementById('signup-btn-label');
+    const pwToggle = document.getElementById('signup-toggle-password');
+    const eyeOpen = document.getElementById('signup-eye-open');
+    const eyeOff = document.getElementById('signup-eye-off');
+    const regionSel = document.getElementById('region-select');
+    const provinceSel = document.getElementById('province-select');
+    const citySel = document.getElementById('city-select');
+    let signupStep = 1;
+
+    function showMsg(text, ok = false) {
+      msg.textContent = text;
+      msg.classList.remove('hidden');
+      msg.classList.toggle('text-red-400', !ok);
+      msg.classList.toggle('text-emerald-400', ok);
+    }
+
+    function hideMsg() {
+      msg.classList.add('hidden');
+      msg.textContent = '';
+      msg.classList.remove('text-emerald-400', 'text-red-400');
+    }
+
+    function setStep2Interactable(on) {
+      [pw, confirmPw, terms, btn, pwToggle].forEach((el) => {
+        if (!el) return;
+        el.disabled = !on;
+        if (on) el.removeAttribute('tabindex'); else el.setAttribute('tabindex', '-1');
+      });
+    }
+
+    function validateStep1() {
+      hideMsg();
+      const username = form.elements.username;
+      const email = form.elements.email;
+      if (!username.checkValidity()) {
+        username.reportValidity();
+        return false;
+      }
+      if (!email.checkValidity()) {
+        email.reportValidity();
+        return false;
+      }
+      if (!regionSel.value) {
+        showMsg('Please select a region');
+        regionSel.focus();
+        return false;
+      }
+      if (provinceSel.disabled || !provinceSel.value) {
+        showMsg('Please select a province');
+        provinceSel.focus();
+        return false;
+      }
+      if (citySel.disabled || !citySel.value) {
+        showMsg('Please select a city');
+        citySel.focus();
+        return false;
+      }
+      return true;
+    }
+
+    continueBtn?.addEventListener('click', () => {
+      if (!validateStep1()) return;
+      signupStep = 2;
+      slider?.classList.remove('translate-x-0');
+      slider?.classList.add('-translate-x-1/2');
+      setStep2Interactable(true);
+      setTimeout(() => pw?.focus(), 380);
+    });
+
+    backBtn?.addEventListener('click', () => {
+      signupStep = 1;
+      slider?.classList.remove('-translate-x-1/2');
+      slider?.classList.add('translate-x-0');
+      setStep2Interactable(false);
+      hideMsg();
+    });
+
+    pwToggle?.addEventListener('click', () => {
+      if (!pw || pw.disabled) return;
+      const show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      eyeOpen?.classList.toggle('hidden', show);
+      eyeOff?.classList.toggle('hidden', !show);
+    });
+
+    form?.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || signupStep !== 1) return;
+      const step1Root = document.getElementById('signup-step-panel-1');
+      if (!step1Root || !e.target || typeof e.target.closest !== 'function') return;
+      if (step1Root.contains(e.target) && !(e.target instanceof HTMLButtonElement)) {
+        e.preventDefault();
+        continueBtn?.click();
+      }
+    });
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (signupStep !== 2) return;
+      hideMsg();
+      const fd = new FormData(form);
+      const p1 = String(fd.get('password') || '');
+      const p2 = String(fd.get('confirm_password') || '');
+      if (p1 !== p2) {
+        showMsg('Passwords do not match');
+        return;
+      }
+      btn.disabled = true;
+      pwToggle.disabled = true;
+      btnLabel.innerHTML = '<span class="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>';
+      try {
+        await sendJsonWithError('/api/auth/register/', 'POST', {
+          username: fd.get('username'),
+          email: fd.get('email'),
+          password: fd.get('password'),
+          region_id: fd.get('region_id') ? Number(fd.get('region_id')) : null,
+          province_id: fd.get('province_id') ? Number(fd.get('province_id')) : null,
+          city_id: fd.get('city_id') ? Number(fd.get('city_id')) : null
+        });
+        window.location.href = '/login/';
+      } catch (err) {
+        showMsg(err.message || 'Sign up failed');
+        btn.disabled = false;
+        pwToggle.disabled = false;
+      } finally {
+        btnLabel.innerHTML = 'Create Account<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>';
+      }
+    });
+
+    function setSelectOptions(select, items, placeholder) {
+      select.innerHTML = `<option value="">${placeholder}</option>` +
+        items.map((x) => `<option value="${x.id}">${x.name}</option>`).join('');
+    }
+
+    async function loadRegions() {
+      const regions = await fetchJsonSimple('/api/auth/locations/regions/');
+      setSelectOptions(regionSel, regions, 'Select Region');
+    }
+
+    regionSel?.addEventListener('change', async () => {
+      const rid = regionSel.value;
+      provinceSel.disabled = !rid;
+      citySel.disabled = true;
+      setSelectOptions(provinceSel, [], 'Select Province');
+      setSelectOptions(citySel, [], 'Select City');
+      if (!rid) return;
+      const provinces = await fetchJsonSimple(`/api/auth/locations/provinces/${rid}/`);
+      setSelectOptions(provinceSel, provinces, 'Select Province');
+    });
+
+    provinceSel?.addEventListener('change', async () => {
+      const pid = provinceSel.value;
+      citySel.disabled = !pid;
+      setSelectOptions(citySel, [], 'Select City');
+      if (!pid) return;
+      const cities = await fetchJsonSimple(`/api/auth/locations/cities/${pid}/`);
+      setSelectOptions(citySel, cities, 'Select City');
+    });
+
+    setStep2Interactable(false);
+    loadRegions().catch(() => {
+      showMsg('Could not load regions. Check that the API is running.');
+    });
+  })();
+  {% endif %}
+</script>

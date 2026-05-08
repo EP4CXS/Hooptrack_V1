@@ -24,3 +24,6 @@ drf-yasg>=1.21
 
 # Filtering
 django-filter>=24.2
+
+# Ollama Python client (AI predictions)
+ollama>=0.3

@@ -1,0 +1,15 @@
+{% comment %}Floating chatbot shown on authenticated pages.{% endcomment %}
+<div class="fixed bottom-5 right-5 z-50">
+  <button id="chatbot-toggle" class="w-14 h-14 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl text-2xl">💬</button>
+  <div id="chatbot-panel" class="hidden absolute bottom-16 right-0 w-80 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden">
+    <div class="bg-[#0d2c59] text-white px-4 py-3 font-semibold">HoopTrack Assistant</div>
+    <div id="chatbot-messages" class="h-72 overflow-y-auto p-3 space-y-2 text-sm bg-slate-50">
+      <div class="bg-white border rounded-lg px-3 py-2">Hi! Ask me about teams, rosters, brackets, or predictions.</div>
+    </div>
+    <form id="chatbot-form" class="p-2 border-t bg-white flex gap-2">
+      <input id="chatbot-input" class="flex-1 border rounded-lg px-3 py-2 text-sm" placeholder="Type a message..." />
+      <button class="bg-[#0d2c59] text-white rounded-lg px-3 py-2 text-sm">Send</button>
+    </form>
+  </div>
+</div>
+

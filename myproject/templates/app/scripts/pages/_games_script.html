@@ -1,0 +1,494 @@
+    async function renderGamesPage() {
+      const [brackets, teams, players, existingGames] = await Promise.all([
+        fetchJson(`${apiBase}/brackets/`),
+        fetchJson(`${apiBase}/teams/`),
+        fetchJson(`${apiBase}/players/`),
+        fetchJson(`${apiBase}/games/`).catch(() => []),
+      ]);
+
+      const playableBrackets = brackets.filter((b) => (b.matchups || []).some((m) => !m.isBye && m.team1 && m.team2 && m.status !== "completed"));
+      if (!playableBrackets.length) {
+        contentEl.innerHTML = '<p class="text-slate-500">No pending or in-progress games. Create or update brackets first.</p>';
+        return;
+      }
+
+      const logoByTeam = Object.fromEntries(teams.map((t) => [t.name, t.logo]));
+      const playersByTeam = players.reduce((acc, p) => {
+        if (!p.team) return acc;
+        acc[p.team] = acc[p.team] || [];
+        acc[p.team].push(p);
+        return acc;
+      }, {});
+
+      const toBaseStat = (p, teamName) => ({
+        player: p.id,
+        playerName: p.name,
+        teamName,
+        fgm2: 0, fga2: 0, fgm3: 0, fga3: 0,
+        ftm: 0, fta: 0, oreb: 0, dreb: 0,
+        assists: 0, steals: 0, blocks: 0, fouls: 0, turnovers: 0,
+        points: 0,
+        fouledOut: false,
+      });
+      const mergeStats = (base, saved = []) => base.map((row) => {
+        const hit = saved.find((s) => String(s.player) === String(row.player));
+        return hit ? { ...row, ...hit, playerName: row.playerName, teamName: row.teamName, fouledOut: Number(hit.fouls || 0) >= 6 } : row;
+      });
+      const firstFiveIndexes = (arr) => {
+        const out = [];
+        for (let i = 0; i < arr.length && out.length < 5; i += 1) out.push(i);
+        return out;
+      };
+      const sideData = (state, side) => (side === "home" ? { team: state.team1, roster: state.homeRoster, active: state.homeActive } : { team: state.team2, roster: state.awayRoster, active: state.awayActive });
+      const activeRows = (state, side) => {
+        const d = sideData(state, side);
+        return d.active.map((idx) => ({ idx, row: d.roster[idx] })).filter((x) => x.row);
+      };
+
+      let selectedBracketId = String(playableBrackets[0].id);
+      let selectedMatchupId = "";
+      const gameState = {};
+      let selectedPlayer = { side: "home", rosterIndex: 0 };
+      const actionHistory = [];
+
+      const getBracketById = (id) => playableBrackets.find((b) => String(b.id) === String(id)) || playableBrackets[0];
+      const getMatchupsForBracket = (bracketId) => {
+        const currentBracket = getBracketById(bracketId);
+        return (currentBracket.matchups || []).filter((m) => !m.isBye && m.team1 && m.team2 && m.status !== "completed");
+      };
+
+      const initialMatchups = getMatchupsForBracket(selectedBracketId);
+      selectedMatchupId = initialMatchups.length ? String(initialMatchups[0].id) : "";
+
+      contentEl.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-2xl font-extrabold text-slate-900">Game Tracking</p>
+              <p id="games-header-meta" class="text-slate-500 text-sm"></p>
+            </div>
+            <div class="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-200 rounded-full px-3 py-1">
+              Select player first, then tap contribution action
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Bracket</label>
+                <select id="games-bracket-filter" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 bg-white">
+                  ${playableBrackets.map((b) => `<option value="${b.id}">${b.name} (${b.status || "active"})</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Matchup</label>
+                <select id="games-matchup-filter" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 bg-white"></select>
+              </div>
+            </div>
+          </div>
+          <div class="grid lg:grid-cols-12 gap-4">
+            <div class="lg:col-span-3">
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-4 py-3 border-b bg-slate-50 text-sm font-semibold text-slate-700">Matchups</div>
+                <div id="games-match-list" class="p-3 space-y-2 max-h-[560px] overflow-y-auto"></div>
+              </div>
+            </div>
+            <div class="lg:col-span-9"><div id="game-tracker-panel"></div></div>
+          </div>
+        </div>
+      `;
+
+      const ensureGameState = async (bracket, matchup) => {
+        if (gameState[matchup.id]) return gameState[matchup.id];
+        let game = (existingGames || []).find((g) => String(g.matchup) === String(matchup.id));
+        if (!game) {
+          game = await sendJson(`${apiBase}/games/`, "POST", {
+            bracket: bracket.id,
+            matchup: matchup.id,
+            team1Name: matchup.team1,
+            team2Name: matchup.team2,
+            score1: matchup.score1 || 0,
+            score2: matchup.score2 || 0,
+            quarter: 1,
+            clock: "12:00",
+            status: "in-progress",
+          });
+        }
+
+        const homeBase = (playersByTeam[matchup.team1] || []).map((p) => toBaseStat(p, matchup.team1));
+        const awayBase = (playersByTeam[matchup.team2] || []).map((p) => toBaseStat(p, matchup.team2));
+        const homeRoster = mergeStats(homeBase, game.playerStats?.filter((x) => x.teamName === matchup.team1));
+        const awayRoster = mergeStats(awayBase, game.playerStats?.filter((x) => x.teamName === matchup.team2));
+        const homeActive = firstFiveIndexes(homeRoster);
+        const awayActive = firstFiveIndexes(awayRoster);
+
+        gameState[matchup.id] = {
+          gameId: game.id,
+          team1: matchup.team1,
+          team2: matchup.team2,
+          score1: Number(game.score1 || matchup.score1 || 0),
+          score2: Number(game.score2 || matchup.score2 || 0),
+          quarter: Number(game.quarter || 1),
+          clock: game.clock || "12:00",
+          homeRoster,
+          awayRoster,
+          homeActive,
+          awayActive,
+          events: game.events || [],
+        };
+        return gameState[matchup.id];
+      };
+
+      const pointsFor = (statKey) => (statKey === "fgm2" ? 2 : (statKey === "fgm3" ? 3 : (statKey === "ftm" ? 1 : 0)));
+      const applyStat = (state, side, rosterIndex, statKey, inc = 1) => {
+        const d = sideData(state, side);
+        const row = d.roster[rosterIndex];
+        if (!row || row.fouledOut) return;
+        row[statKey] = Number(row[statKey] || 0) + inc;
+        const pts = pointsFor(statKey) * inc;
+        if (pts) {
+          row.points = Number(row.points || 0) + pts;
+          if (side === "home") state.score1 += pts;
+          else state.score2 += pts;
+        }
+      };
+
+      const renderPlayerTable = (state, side) => {
+        const d = sideData(state, side);
+        const selectedId = `${selectedPlayer.side}|${selectedPlayer.rosterIndex}`;
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="px-4 py-3 border-b bg-slate-50 text-sm font-semibold text-slate-800">${d.team} Stats (Starters)</div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead class="bg-slate-50 text-slate-500">
+                  <tr>
+                    <th class="text-left px-2 py-2">Player</th>
+                    <th class="text-center px-2 py-2">2PT</th>
+                    <th class="text-center px-2 py-2">3PT</th>
+                    <th class="text-center px-2 py-2">FT</th>
+                    <th class="text-center px-2 py-2">REB</th>
+                    <th class="text-center px-2 py-2">AST</th>
+                    <th class="text-center px-2 py-2">STL</th>
+                    <th class="text-center px-2 py-2">BLK</th>
+                    <th class="text-center px-2 py-2">TO</th>
+                    <th class="text-center px-2 py-2">FOUL</th>
+                    <th class="text-center px-2 py-2">PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${activeRows(state, side).map(({ idx, row }) => {
+                    const rowId = `${side}|${idx}`;
+                    const selected = rowId === selectedId;
+                    return `
+                      <tr data-player-row="${rowId}" class="border-t cursor-pointer ${selected ? "bg-orange-50" : "hover:bg-slate-50"} ${row.fouledOut ? "opacity-60" : ""}">
+                        <td class="px-2 py-2 whitespace-nowrap font-medium">${row.playerName} ${row.fouledOut ? '<span class="text-[10px] text-red-600">FOUL OUT</span>' : ""}</td>
+                        <td class="px-2 py-2 text-center">${row.fgm2}/${row.fga2}</td>
+                        <td class="px-2 py-2 text-center">${row.fgm3}/${row.fga3}</td>
+                        <td class="px-2 py-2 text-center">${row.ftm}/${row.fta}</td>
+                        <td class="px-2 py-2 text-center">${Number(row.oreb || 0) + Number(row.dreb || 0)}</td>
+                        <td class="px-2 py-2 text-center">${row.assists || 0}</td>
+                        <td class="px-2 py-2 text-center">${row.steals || 0}</td>
+                        <td class="px-2 py-2 text-center">${row.blocks || 0}</td>
+                        <td class="px-2 py-2 text-center">${row.turnovers || 0}</td>
+                        <td class="px-2 py-2 text-center">${row.fouls || 0}</td>
+                        <td class="px-2 py-2 text-center font-semibold">${row.points || 0}</td>
+                      </tr>
+                    `;
+                  }).join("") || '<tr><td colspan="11" class="text-center py-4 text-slate-500">No players found for this team.</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      };
+
+      const ensureSelectedIsActive = (state) => {
+        const d = sideData(state, selectedPlayer.side);
+        if (!d.active.includes(selectedPlayer.rosterIndex) || !d.roster[selectedPlayer.rosterIndex]) {
+          const home = activeRows(state, "home")[0];
+          const away = activeRows(state, "away")[0];
+          const next = home || away;
+          selectedPlayer = next ? { side: home ? "home" : "away", rosterIndex: next.idx } : { side: "home", rosterIndex: 0 };
+        }
+      };
+
+      const pickSubPlayer = async (state, side, outIndex) => {
+        const d = sideData(state, side);
+        const candidates = d.roster
+          .map((row, idx) => ({ idx, row }))
+          .filter((x) => !d.active.includes(x.idx) && !x.row.fouledOut);
+        if (!candidates.length) {
+          await uiAlert("No available bench player for substitution.", "Substitution");
+          return;
+        }
+        const menu = candidates.map((x, i) => `${i + 1}. ${x.row.playerName}`).join("\n");
+        const answer = await uiPrompt(`Choose substitute player number:\n${menu}`, "", "Substitution");
+        if (answer === null) return;
+        const choice = Number(answer);
+        if (!choice || choice < 1 || choice > candidates.length) return;
+        const inIdx = candidates[choice - 1].idx;
+        const slot = d.active.findIndex((x) => x === outIndex);
+        if (slot >= 0) d.active[slot] = inIdx;
+        selectedPlayer = { side, rosterIndex: inIdx };
+        state.events.push({ description: `${d.roster[outIndex].playerName} out, ${d.roster[inIdx].playerName} in` });
+      };
+
+      const renderMatchList = (matchups) => {
+        const list = document.getElementById("games-match-list");
+        list.innerHTML = matchups.map((m) => `
+          <button type="button" data-select-game="${m.id}" class="w-full text-left rounded-xl border px-3 py-3 transition-colors ${String(m.id) === selectedMatchupId ? "border-orange-300 bg-orange-50" : "border-slate-200 bg-white hover:bg-slate-50"}">
+            <div class="text-xs text-slate-500">Round ${m.round} • Match #${m.matchNumber}</div>
+            <div class="font-semibold text-slate-900 truncate mt-1">${m.team1} vs ${m.team2}</div>
+          </button>
+        `).join("");
+        list.querySelectorAll("[data-select-game]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            selectedMatchupId = String(btn.getAttribute("data-select-game"));
+            const matchupFilter = document.getElementById("games-matchup-filter");
+            if (matchupFilter) matchupFilter.value = selectedMatchupId;
+            renderMatchList(matchups);
+            await renderTracker();
+          });
+        });
+      };
+
+      const renderTracker = async () => {
+        const bracket = getBracketById(selectedBracketId);
+        const matchups = getMatchupsForBracket(selectedBracketId);
+        if (!matchups.length) {
+          document.getElementById("game-tracker-panel").innerHTML = '<p class="text-slate-500">No pending or in-progress games for selected bracket.</p>';
+          return;
+        }
+        const matchup = matchups.find((m) => String(m.id) === selectedMatchupId) || matchups[0];
+        selectedMatchupId = String(matchup.id);
+        if (!matchup) return;
+        const state = await ensureGameState(bracket, matchup);
+        ensureSelectedIsActive(state);
+        const panel = document.getElementById("game-tracker-panel");
+        const meta = document.getElementById("games-header-meta");
+        if (meta) {
+          meta.textContent = `${bracket.name} • ${matchups.length} active matchup${matchups.length > 1 ? "s" : ""}`;
+        }
+        const homeLogo = logoByTeam[matchup.team1];
+        const awayLogo = logoByTeam[matchup.team2];
+        const selectedRow = sideData(state, selectedPlayer.side).roster[selectedPlayer.rosterIndex];
+
+        panel.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 max-w-5xl mx-auto">
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center">
+                    ${homeLogo ? `<img src="${homeLogo}" class="w-full h-full object-cover" alt="${matchup.team1}" />` : `<span class="text-slate-500 text-xs font-bold">${String(matchup.team1).slice(0, 2).toUpperCase()}</span>`}
+                  </div>
+                  <div>
+                    <div class="text-sm text-slate-500">${matchup.team1}</div>
+                    <div class="text-5xl font-black text-slate-900">${state.score1}</div>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <div class="text-slate-400 font-bold">VS</div>
+                  <div class="text-xs text-slate-500 mt-1">Q${state.quarter} • ${state.clock}</div>
+                  <div class="mt-2 flex gap-2">
+                    <button type="button" data-action="prevQuarter" class="rounded-lg px-3 py-1.5 text-xs border border-slate-300 bg-white">Prev Quarter</button>
+                    <button type="button" data-action="nextQuarter" class="rounded-lg px-3 py-1.5 text-xs border border-slate-300 bg-white">Next Quarter</button>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-sm text-slate-500">${matchup.team2}</div>
+                    <div class="text-5xl font-black text-slate-900">${state.score2}</div>
+                  </div>
+                  <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center">
+                    ${awayLogo ? `<img src="${awayLogo}" class="w-full h-full object-cover" alt="${matchup.team2}" />` : `<span class="text-slate-500 text-xs font-bold">${String(matchup.team2).slice(0, 2).toUpperCase()}</span>`}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-3">
+              <p class="text-xs text-slate-500 mb-2">Selected: <span class="font-semibold text-slate-700">${selectedRow ? `${selectedRow.playerName} (${selectedPlayer.side === "home" ? matchup.team1 : matchup.team2})` : "None"}</span></p>
+              <div class="flex flex-wrap gap-2">
+                ${[
+                  ["twoMade", "2PT Made"], ["twoMiss", "2PT Miss"],
+                  ["threeMade", "3PT Made"], ["threeMiss", "3PT Miss"],
+                  ["ftMade", "FT Made"], ["ftMiss", "FT Miss"],
+                  ["oreb", "OREB"], ["dreb", "DREB"], ["assist", "AST"],
+                  ["steal", "STL"], ["block", "BLK"], ["turnover", "TO"],
+                  ["foul", "Foul"], ["sub", "Substitution"], ["foulOut", "Foul Out"],
+                ].map(([id, label]) => `<button type="button" data-action="${id}" class="rounded-lg px-3 py-2 text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">${label}</button>`).join("")}
+                <button type="button" data-action="undo" class="rounded-lg px-3 py-2 text-xs font-semibold border border-orange-300 bg-orange-50 text-orange-700">Undo</button>
+              </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-4">
+              ${renderPlayerTable(state, "home")}
+              ${renderPlayerTable(state, "away")}
+            </div>
+
+            <form id="game-save-form" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
+              <button class="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-4 py-2 font-semibold">Save & End Game</button>
+              <span class="text-sm text-slate-500">This will finalize matchup result and persist player stats.</span>
+            </form>
+          </div>
+        `;
+
+        panel.querySelectorAll("[data-player-row]").forEach((rowEl) => {
+          rowEl.addEventListener("click", () => {
+            const [side, idx] = rowEl.getAttribute("data-player-row").split("|");
+            selectedPlayer = { side, rosterIndex: Number(idx) };
+            renderTracker();
+          });
+        });
+
+        const saveSnapshot = () => {
+          actionHistory.push({
+            matchupId: matchup.id,
+            snapshot: JSON.parse(JSON.stringify({ ...state, selectedPlayer })),
+          });
+        };
+
+        panel.querySelectorAll("[data-action]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const action = btn.getAttribute("data-action");
+            if (action === "undo") {
+              const last = actionHistory.pop();
+              if (!last || String(last.matchupId) !== String(matchup.id)) return;
+              Object.assign(state, last.snapshot);
+              selectedPlayer = last.snapshot.selectedPlayer;
+              renderTracker();
+              return;
+            }
+            if (action === "prevQuarter" || action === "nextQuarter") {
+              saveSnapshot();
+              state.quarter = action === "prevQuarter" ? Math.max(1, Number(state.quarter || 1) - 1) : Math.min(4, Number(state.quarter || 1) + 1);
+              renderTracker();
+              return;
+            }
+
+            const d = sideData(state, selectedPlayer.side);
+            const row = d.roster[selectedPlayer.rosterIndex];
+            if (!row) return;
+            saveSnapshot();
+
+            if (action === "twoMade") { applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fgm2"); applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga2"); }
+            if (action === "twoMiss") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga2");
+            if (action === "threeMade") { applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fgm3"); applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga3"); }
+            if (action === "threeMiss") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga3");
+            if (action === "ftMade") { applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "ftm"); applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fta"); }
+            if (action === "ftMiss") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fta");
+            if (action === "oreb") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "oreb");
+            if (action === "dreb") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "dreb");
+            if (action === "assist") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "assists");
+            if (action === "steal") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "steals");
+            if (action === "block") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "blocks");
+            if (action === "turnover") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "turnovers");
+            if (action === "foul") {
+              applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fouls");
+              if (Number(row.fouls || 0) >= 6) {
+                row.fouledOut = true;
+                pickSubPlayer(state, selectedPlayer.side, selectedPlayer.rosterIndex).then(() => renderTracker());
+              }
+            }
+            if (action === "sub") {
+              pickSubPlayer(state, selectedPlayer.side, selectedPlayer.rosterIndex).then(() => renderTracker());
+            }
+            if (action === "foulOut") {
+              row.fouls = Math.max(6, Number(row.fouls || 0));
+              row.fouledOut = true;
+              pickSubPlayer(state, selectedPlayer.side, selectedPlayer.rosterIndex).then(() => renderTracker());
+            }
+            renderTracker();
+          });
+        });
+
+        panel.querySelector("#game-save-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const fresh = await fetchJson(`${apiBase}/brackets/${bracket.id}/`);
+          const updatedMatchups = fresh.matchups.map((m) => (
+            String(m.id) === String(matchup.id)
+              ? { ...m, score1: state.score1, score2: state.score2, winner: state.score1 >= state.score2 ? m.team1 : m.team2, status: "completed" }
+              : m
+          ));
+          const allDone = updatedMatchups.filter((m) => !m.isBye).every((m) => m.status === "completed");
+          await sendJson(`${apiBase}/brackets/${bracket.id}/`, "PUT", { ...fresh, matchups: updatedMatchups, status: allDone ? "completed" : fresh.status });
+          await sendJson(`${apiBase}/games/${state.gameId}/`, "PUT", {
+            score1: state.score1,
+            score2: state.score2,
+            quarter: state.quarter,
+            clock: state.clock,
+            status: "completed",
+            team1Name: matchup.team1,
+            team2Name: matchup.team2,
+          });
+          await sendJson(`${apiBase}/games/${state.gameId}/sync_stats/`, "POST", {
+            playerStats: [...state.homeRoster, ...state.awayRoster].map((x) => ({
+              player: x.player,
+              playerName: x.playerName,
+              teamName: x.teamName,
+              fgm2: x.fgm2, fga2: x.fga2, fgm3: x.fgm3, fga3: x.fga3,
+              ftm: x.ftm, fta: x.fta, oreb: x.oreb, dreb: x.dreb,
+              assists: x.assists, steals: x.steals, blocks: x.blocks,
+              fouls: x.fouls, turnovers: x.turnovers, points: x.points,
+            })),
+          });
+          await loadPage();
+        });
+      };
+
+      const bracketFilter = document.getElementById("games-bracket-filter");
+      const matchupFilter = document.getElementById("games-matchup-filter");
+
+      const syncMatchupFilter = () => {
+        const rows = getMatchupsForBracket(selectedBracketId);
+        if (!rows.length) {
+          matchupFilter.innerHTML = '<option value="">No active matchups</option>';
+          selectedMatchupId = "";
+          return rows;
+        }
+        matchupFilter.innerHTML = rows.map((m) => `<option value="${m.id}">Round ${m.round} • Match #${m.matchNumber} • ${m.team1} vs ${m.team2}</option>`).join("");
+        const hasSelected = rows.some((m) => String(m.id) === String(selectedMatchupId));
+        selectedMatchupId = hasSelected ? selectedMatchupId : String(rows[0].id);
+        matchupFilter.value = selectedMatchupId;
+        return rows;
+      };
+
+      bracketFilter?.addEventListener("change", async () => {
+        selectedBracketId = String(bracketFilter.value);
+        const rows = syncMatchupFilter();
+        renderMatchList(rows);
+        await renderTracker();
+      });
+      matchupFilter?.addEventListener("change", async () => {
+        selectedMatchupId = String(matchupFilter.value || "");
+        const rows = getMatchupsForBracket(selectedBracketId);
+        renderMatchList(rows);
+        await renderTracker();
+      });
+
+      if (window.__gamesShortcutHandler) window.removeEventListener("keydown", window.__gamesShortcutHandler);
+      window.__gamesShortcutHandler = (e) => {
+        const map = {
+          "1": "twoMade", "2": "twoMiss", "3": "threeMade", "4": "threeMiss",
+          "5": "ftMade", "6": "ftMiss", r: "dreb", o: "oreb", a: "assist", s: "steal", b: "block", t: "turnover", f: "foul", x: "sub",
+        };
+        const key = String(e.key || "").toLowerCase();
+        if (map[key]) {
+          const btn = document.querySelector(`[data-action="${map[key]}"]`);
+          if (btn) { e.preventDefault(); btn.click(); }
+        }
+        if (key === "u") {
+          const btn = document.querySelector('[data-action="undo"]');
+          if (btn) { e.preventDefault(); btn.click(); }
+        }
+        if (key === "enter") {
+          const form = document.getElementById("game-save-form");
+          if (form) { e.preventDefault(); form.requestSubmit(); }
+        }
+      };
+      window.addEventListener("keydown", window.__gamesShortcutHandler);
+
+      const rows = syncMatchupFilter();
+      renderMatchList(rows);
+      await renderTracker();
+    }

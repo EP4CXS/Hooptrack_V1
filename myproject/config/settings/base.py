@@ -211,6 +211,11 @@ EMAIL_BACKEND = config(
 )
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@myproject.local')
 
+# Ollama (AI predictions) configuration
+OLLAMA_HOST = config('OLLAMA_HOST', default='http://localhost:11434')
+OLLAMA_MODEL = config('OLLAMA_MODEL', default='llama3.2')
+OLLAMA_TIMEOUT_SECONDS = config('OLLAMA_TIMEOUT_SECONDS', default=60, cast=int)
+
 # Logging configuration (basic)
 LOGGING = {
     'version': 1,

@@ -5,12 +5,15 @@ from django.utils import timezone
 class Player(models.Model):
     """Model for basketball players"""
     name = models.CharField(max_length=100)
-    height = models.CharField(max_length=10)  # e.g., "206" cm
-    weight = models.CharField(max_length=10)  # e.g., "113" kg
+    height = models.CharField(max_length=10, null=True, blank=True)  # e.g., "206" cm
+    weight = models.CharField(max_length=10, null=True, blank=True)  # e.g., "113" kg
     position = models.CharField(max_length=10)  # e.g., "SF", "PG", "C"
     jersey_number = models.CharField(max_length=10)  # e.g., "23"
     team = models.ForeignKey('Team', on_delete=models.SET_NULL, null=True, blank=True)
     age = models.CharField(max_length=10, null=True, blank=True)
+    address = models.CharField(max_length=255, null=True, blank=True)
+    contact_number = models.CharField(max_length=30, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
 
     class Meta:
         ordering = ['name']
@@ -27,12 +30,18 @@ class Team(models.Model):
     ]
 
     DIVISION_CHOICES = [
-        ('Atlantic', 'Atlantic'),
-        ('Central', 'Central'),
-        ('Southeast', 'Southeast'),
-        ('Northwest', 'Northwest'),
-        ('Pacific', 'Pacific'),
-        ('Southwest', 'Southwest'),
+        ('midget', 'Midget'),
+        ('senior', 'Senior'),
+        ('junior', 'Junior'),
+        ('U13', 'U13'),
+        ('U14', 'U14'),
+        ('U15', 'U15'),
+        ('U16', 'U16'),
+        ('U17', 'U17'),
+        ('U18', 'U18'),
+        ('U19', 'U19'),
+        ('U20', 'U20'),
+        ('U21', 'U21'),
     ]
 
     name = models.CharField(max_length=100, unique=True)
@@ -170,9 +179,18 @@ class TeamStanding(models.Model):
 
 class GamePrediction(models.Model):
     """Model for game predictions"""
+    GENERATED_BY_CHOICES = [
+        ('ai', 'AI'),
+        ('user', 'User'),
+    ]
+
     matchup = models.ForeignKey(Matchup, on_delete=models.CASCADE)
     predicted_winner = models.CharField(max_length=100)
     confidence = models.IntegerField()  # Percentage 0-100
+    reasoning = models.TextField(blank=True, default='')
+    factors = models.JSONField(null=True, blank=True)
+    generated_by = models.CharField(max_length=10, choices=GENERATED_BY_CHOICES, default='ai')
+    model_name = models.CharField(max_length=50, blank=True, default='')
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:

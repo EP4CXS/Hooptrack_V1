@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.urls import path
 
-from app.views_frontend import page_view
+from app.views.frontend import page_view
 
 
 def healthcheck(_request):

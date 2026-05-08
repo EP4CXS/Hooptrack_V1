@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 from app.models.basketball.models import Bracket, GamePrediction, Matchup, Player, Team, TeamStanding
 
@@ -106,10 +107,36 @@ class BasketballService:
         return bracket
 
     @staticmethod
-    def upsert_prediction(matchup_id, predicted_winner, confidence):
-        matchup = get_object_or_404(Matchup, matchup_id=matchup_id)
+    def upsert_prediction(matchup_id, predicted_winner, confidence, *, matchup=None, bracket_id=None, **extra):
+        """Create or update the prediction for a matchup.
+
+        Pass ``matchup`` when already resolved, or ``bracket_id`` with ``matchup_id`` (unique per bracket).
+        Optional fields supported via ``extra``: ``reasoning``, ``factors``,
+        ``generated_by``, ``model_name``. Unknown keys are ignored.
+        """
+        if matchup is None:
+            if bracket_id is not None and str(bracket_id).strip() != "":
+                matchup = get_object_or_404(Matchup, bracket_id=bracket_id, matchup_id=matchup_id)
+            else:
+                qs = Matchup.objects.filter(matchup_id=matchup_id)
+                n = qs.count()
+                if n == 0:
+                    matchup = get_object_or_404(Matchup, matchup_id=matchup_id)
+                elif n == 1:
+                    matchup = qs.first()
+                else:
+                    raise ValidationError(
+                        {"matchupId": "This matchup id exists in multiple brackets; include bracketId."}
+                    )
+        defaults = {
+            "predicted_winner": predicted_winner,
+            "confidence": confidence,
+        }
+        for key in ("reasoning", "factors", "generated_by", "model_name"):
+            if key in extra and extra[key] is not None:
+                defaults[key] = extra[key]
         prediction, _ = GamePrediction.objects.update_or_create(
             matchup=matchup,
-            defaults={"predicted_winner": predicted_winner, "confidence": confidence},
+            defaults=defaults,
         )
         return prediction

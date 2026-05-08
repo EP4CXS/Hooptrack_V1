@@ -23,10 +23,23 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class PlayerSerializer(serializers.ModelSerializer):
     team = serializers.CharField(source="team.name", allow_null=True, required=False)
+    contactNumber = serializers.CharField(source="contact_number", allow_null=True, required=False, allow_blank=True)
 
     class Meta:
         model = Player
-        fields = ["id", "name", "height", "weight", "position", "jerseyNumber", "team", "age"]
+        fields = [
+            "id",
+            "name",
+            "height",
+            "weight",
+            "position",
+            "jerseyNumber",
+            "team",
+            "age",
+            "address",
+            "contactNumber",
+            "email",
+        ]
 
     jerseyNumber = serializers.CharField(source="jersey_number")
 
@@ -113,11 +126,27 @@ class BracketSerializer(serializers.ModelSerializer):
 
 class GamePredictionSerializer(serializers.ModelSerializer):
     matchupId = serializers.CharField(source="matchup.matchup_id")
+    bracketId = serializers.IntegerField(source="matchup.bracket_id", read_only=True)
+    bracketName = serializers.CharField(source="matchup.bracket.name", read_only=True)
     predictedWinner = serializers.CharField(source="predicted_winner")
+    generatedBy = serializers.CharField(source="generated_by", required=False)
+    modelName = serializers.CharField(source="model_name", required=False, allow_blank=True)
 
     class Meta:
         model = GamePrediction
-        fields = ["id", "matchupId", "predictedWinner", "confidence", "created_at"]
+        fields = [
+            "id",
+            "matchupId",
+            "bracketId",
+            "bracketName",
+            "predictedWinner",
+            "confidence",
+            "reasoning",
+            "factors",
+            "generatedBy",
+            "modelName",
+            "created_at",
+        ]
 
 
 class PlayerGameStatSerializer(serializers.ModelSerializer):

@@ -1,0 +1,541 @@
+    function openTeamRegistrationModal({ onSave, onCancel } = {}) {
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
+      overlay.innerHTML = `
+        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+          <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white flex items-center justify-between">
+            <div class="font-bold text-xl">🛡 Add New Team</div>
+            <button type="button" data-close class="w-8 h-8 rounded-lg hover:bg-white/10">✕</button>
+          </div>
+          <form id="team-modal-form" class="p-5 space-y-4">
+            <div>
+              <label class="text-sm font-semibold text-slate-700 block mb-1">Team Name *</label>
+              <input name="name" required class="w-full border border-slate-300 rounded-xl px-3 py-2" placeholder="e.g., Golden State Warriors" />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-700 block mb-1">City *</label>
+              <input name="city" required class="w-full border border-slate-300 rounded-xl px-3 py-2" placeholder="e.g., San Francisco" />
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-semibold text-slate-700 block mb-1">Conference *</label>
+                <select name="conference" required class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                  <option value="">Select conference</option>
+                  <option value="Eastern">Eastern</option>
+                  <option value="Western">Western</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-slate-700 block mb-1">Division *</label>
+                <select name="division" required class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                  <option value="">Select division</option>
+                  <option value="midget">Midget</option>
+                  <option value="senior">Senior</option>
+                  <option value="junior">Junior</option>
+                  <option value="U13">U13</option>
+                  <option value="U14">U14</option>
+                  <option value="U15">U15</option>
+                  <option value="U16">U16</option>
+                  <option value="U17">U17</option>
+                  <option value="U18">U18</option>
+                  <option value="U19">U19</option>
+                  <option value="U20">U20</option>
+                  <option value="U21">U21</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-700 block mb-1">Team Picture URL (Optional)</label>
+              <input name="logo" class="w-full border border-slate-300 rounded-xl px-3 py-2" placeholder="https://example.com/logo.jpg" />
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" data-close class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
+              <button class="px-4 py-2 rounded-xl bg-[#0b264e] hover:bg-[#12386b] text-white font-semibold">Create Team</button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.remove();
+        if (typeof onCancel === 'function') onCancel();
+      };
+      overlay.querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', close));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+      const form = overlay.querySelector('#team-modal-form');
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        await sendJson(`${apiBase}/teams/`, 'POST', {
+          name: fd.get('name'),
+          city: fd.get('city'),
+          conference: fd.get('conference'),
+          division: fd.get('division'),
+          logo: fd.get('logo') || null
+        });
+        overlay.remove();
+        if (typeof onSave === 'function') await onSave();
+      });
+    }
+
+    function renderAddTeamPage() {
+      contentEl.innerHTML = `<p class="text-slate-500">Opening team creation...</p>`;
+      openTeamRegistrationModal({
+        onSave: () => { window.location.href = '/teams/'; },
+        onCancel: () => { window.location.href = '/teams/'; }
+      });
+    }
+
+    function openPlayerEditModal({ player, teams = [], lockTeam = false, fixedTeamName = null }) {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
+        const teamOptions = teams.map((t) => `<option value="${t.name}" ${player.team === t.name ? 'selected' : ''}>${t.name}</option>`).join('');
+        overlay.innerHTML = `
+          <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white">
+              <div class="font-bold text-xl">🏀 Update Player</div>
+            </div>
+            <form id="player-edit-form" class="p-5 space-y-4">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Name</label>
+                  <input name="name" class="w-full border rounded-xl px-3 py-2" value="${player.name || ''}" required />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Position</label>
+                  <select name="position" class="w-full border rounded-xl px-3 py-2">
+                    ${['PG','SG','SF','PF','C','TBD'].map((pos) => `<option value="${pos}" ${String(player.position || 'TBD') === pos ? 'selected' : ''}>${pos}</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Jersey Number</label>
+                  <input name="jerseyNumber" class="w-full border rounded-xl px-3 py-2" value="${player.jerseyNumber || ''}" />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Contact Number</label>
+                  <input name="contactNumber" class="w-full border rounded-xl px-3 py-2" value="${player.contactNumber || ''}" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Address</label>
+                  <input name="address" class="w-full border rounded-xl px-3 py-2" value="${player.address || ''}" />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Email (Optional)</label>
+                  <input name="email" type="email" class="w-full border rounded-xl px-3 py-2" value="${player.email || ''}" />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Team</label>
+                  <select name="team" class="w-full border rounded-xl px-3 py-2" ${lockTeam ? 'disabled' : ''}>
+                    <option value="">Unassigned</option>
+                    ${teamOptions}
+                  </select>
+                  ${lockTeam ? `<input type="hidden" name="teamLocked" value="${fixedTeamName || player.team || ''}" />` : ''}
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Height</label>
+                  <input name="height" class="w-full border rounded-xl px-3 py-2" value="${player.height || ''}" />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-700 block mb-1">Weight</label>
+                  <input name="weight" class="w-full border rounded-xl px-3 py-2" value="${player.weight || ''}" />
+                </div>
+              </div>
+              <div class="flex justify-end gap-2 pt-2">
+                <button type="button" data-cancel class="px-5 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-[#0d2c59] text-white hover:bg-[#163d74] font-semibold">Save</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        const close = (value) => {
+          overlay.remove();
+          resolve(value);
+        };
+        overlay.querySelector('[data-cancel]')?.addEventListener('click', () => close(null));
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(null); });
+        const form = overlay.querySelector('#player-edit-form');
+        form?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const fd = new FormData(form);
+          close({
+            name: String(fd.get('name') || '').trim(),
+            position: String(fd.get('position') || 'TBD').trim() || 'TBD',
+            jerseyNumber: String(fd.get('jerseyNumber') || '').trim(),
+            contactNumber: String(fd.get('contactNumber') || '').trim(),
+            address: String(fd.get('address') || '').trim(),
+            email: String(fd.get('email') || '').trim() || null,
+            height: String(fd.get('height') || '').trim(),
+            weight: String(fd.get('weight') || '').trim(),
+            team: lockTeam ? String(fd.get('teamLocked') || fixedTeamName || player.team || '').trim() : String(fd.get('team') || '').trim()
+          });
+        });
+        overlay.querySelector('input[name="name"]')?.focus();
+        overlay.querySelector('input[name="name"]')?.select();
+      });
+    }
+
+    function renderDashboardLikeUI(players, teams, brackets) {
+      const topPlayers = players.slice(0, 8);
+      const leader = topPlayers[0];
+      const totalGames = brackets.reduce((acc, b) => acc + (b.matchups?.length || 0), 0);
+      const activeGames = brackets.filter((b) => b.status === "active").length;
+      const nbaLiveCards = [];
+      brackets.forEach((b) => {
+        (b.matchups || []).forEach((m) => {
+          if (!m.team1 || !m.team2) return;
+          if (nbaLiveCards.length >= 3) return;
+          nbaLiveCards.push({
+            team1: m.team1,
+            team2: m.team2,
+            score1: Number(m.score1 || 0),
+            score2: Number(m.score2 || 0),
+            status: m.status || "pending",
+            round: m.round || 1,
+            quarter: m.status === "completed" ? "Final" : "Q3",
+          });
+        });
+      });
+
+      contentEl.innerHTML = `
+        <div class="space-y-5">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-4xl font-black tracking-tight text-slate-900">Dashboard</p>
+              <p class="text-slate-500 mt-1">Professional basketball analytics and live command center</p>
+            </div>
+            <div class="bg-[#132D57] text-white rounded-xl px-4 py-3 shadow border border-orange-300/40">
+              <div class="text-xs text-slate-300">Last Updated</div>
+              <div class="text-sm font-bold">Today, 3:45 PM</div>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="dashboard-pro-card text-white p-5 shadow bg-gradient-to-r from-[#102C57] to-[#163E72]">
+              <div class="text-xs text-slate-200 font-semibold tracking-wider">TOTAL PLAYERS</div>
+              <div class="text-4xl font-extrabold mt-2">${players.length}</div>
+              <div class="text-sm text-slate-200 mt-1">Active roster</div>
+            </div>
+            <div class="dashboard-pro-card text-white p-5 shadow bg-gradient-to-r from-[#102C57] to-[#163E72]">
+              <div class="text-xs text-slate-200 font-semibold tracking-wider">TOTAL GAMES</div>
+              <div class="text-4xl font-extrabold mt-2">${totalGames}</div>
+              <div class="text-sm text-slate-200 mt-1">This season</div>
+            </div>
+            <div class="dashboard-pro-card text-white p-5 shadow bg-gradient-to-r from-[#102C57] to-[#163E72]">
+              <div class="flex items-center justify-between">
+                <div class="text-xs text-slate-200 font-semibold tracking-wider">NBA LIVE</div>
+                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+                  ${Math.max(1, activeGames)} live
+                </div>
+              </div>
+              ${(() => {
+                const g = (nbaLiveCards.length ? nbaLiveCards[0] : { team1: "Lakers", team2: "Warriors", score1: 102, score2: 98, status: "in-progress", quarter: "Q4" });
+                return `
+                  <div class="mt-3 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                      <span class="font-semibold">${g.team1}</span>
+                      <span class="text-2xl font-black">${g.score1}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="font-semibold">${g.team2}</span>
+                      <span class="text-2xl font-black">${g.score2}</span>
+                    </div>
+                    <div class="text-xs text-slate-200 mt-1">${g.status === "completed" ? "Final" : g.quarter}</div>
+                  </div>
+                `;
+              })()}
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-3 gap-4">
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white flex items-center justify-between">
+                <div>
+                  <div class="text-xl font-bold">Top Performers</div>
+                  <div class="text-sm text-slate-200">Season Leaders 2024</div>
+                </div>
+                <div class="px-3 py-1 rounded-full bg-black/20 text-sm font-semibold">${topPlayers.length} Players</div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-slate-50 text-slate-600">
+                    <tr>
+                      <th class="text-left px-4 py-3">RANK</th>
+                      <th class="text-left px-4 py-3">PLAYER</th>
+                      <th class="text-left px-4 py-3">POS</th>
+                      <th class="text-left px-4 py-3">PPG</th>
+                      <th class="text-left px-4 py-3">RPG</th>
+                      <th class="text-left px-4 py-3">APG</th>
+                      <th class="text-left px-4 py-3">TREND</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${topPlayers.map((p, i) => `
+                      <tr class="border-t">
+                        <td class="px-4 py-3 font-bold text-orange-500">${i + 1}</td>
+                        <td class="px-4 py-3 font-semibold text-slate-900">${p.name}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs">${p.position || "SG"}</span></td>
+                        <td class="px-4 py-3 text-slate-400 font-bold">—</td>
+                        <td class="px-4 py-3 text-slate-400">—</td>
+                        <td class="px-4 py-3 text-slate-400">—</td>
+                        <td class="px-4 py-3 text-slate-400 font-semibold">—</td>
+                      </tr>
+                    `).join("") || `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-500">No player data yet.</td></tr>`}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-[#102C57] to-[#163E72] rounded-2xl p-5 text-white shadow relative overflow-hidden">
+              <div class="absolute -right-3 -top-5 text-[120px] font-black text-white/10">1</div>
+              <div class="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center text-3xl font-black">
+                ${leader?.name ? leader.name.split(" ").map((x) => x[0]).slice(0, 2).join("") : "MJ"}
+              </div>
+              <div class="mt-4 text-3xl font-extrabold">${leader?.name || "Michael Jordan"}</div>
+              <div class="text-slate-300">${leader?.team || "Chicago Bulls"}</div>
+              <div class="mt-5 grid grid-cols-2 gap-3">
+                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">PPG</div><div class="text-2xl font-bold">—</div></div>
+                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">RPG</div><div class="text-2xl font-bold">—</div></div>
+                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">APG</div><div class="text-2xl font-bold">—</div></div>
+                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">TREND</div><div class="text-2xl font-bold">—</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTeamRosterPage(team, roster) {
+      const guards = roster.filter(p => p.position === 'PG' || p.position === 'SG').length;
+      const forwards = roster.filter(p => p.position === 'SF' || p.position === 'PF').length;
+      const centers = roster.filter(p => p.position === 'C').length;
+      const undetermined = roster.length - guards - forwards - centers;
+      contentEl.innerHTML = `
+        <a href="/teams/" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-3">← Back to Teams</a>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-200">${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-cover" />` : ''}</div>
+                <div>
+                  <h3 class="text-4xl font-extrabold text-[#0d2c59]">${team?.name || 'Team Not Found'}</h3>
+                  <p class="text-slate-600">${team?.city || ''} • ${team?.conference || ''} Conference • ${team?.division || ''} Division</p>
+                </div>
+              </div>
+              ${team ? '<button id="add-roster-player" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-4 py-2 text-sm font-medium">Add Player</button>' : ''}
+            </div>
+          </div>
+          <div class="bg-[#eef3fb] p-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+              <div><div class="text-slate-500">Total Players</div><div class="text-3xl font-bold text-[#0d2c59]">${roster.length}<span class="text-base text-slate-500"> / 15</span></div></div>
+              <div><div class="text-slate-500">Guards</div><div class="text-2xl font-bold">${guards}</div></div>
+              <div><div class="text-slate-500">Forwards</div><div class="text-2xl font-bold">${forwards}</div></div>
+              <div><div class="text-slate-500">Centers</div><div class="text-2xl font-bold">${centers}</div></div>
+              <div><div class="text-slate-500">Undetermined</div><div class="text-2xl font-bold">${undetermined}</div></div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h4 class="text-xl font-bold text-[#0d2c59] mb-3">Team Players</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th class="text-left p-2">Name</th>
+                    <th class="text-left p-2">Position</th>
+                    <th class="text-left p-2">Jersey</th>
+                    <th class="text-left p-2">Height</th>
+                    <th class="text-left p-2">Weight</th>
+                    <th class="text-right p-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${roster.map((p) => `
+                    <tr class="border-b">
+                      <td class="p-2 font-semibold text-slate-900">${p.name}</td>
+                      <td class="p-2">${p.position || "TBD"}</td>
+                      <td class="p-2">${p.jerseyNumber || "-"}</td>
+                      <td class="p-2">${p.height || "-"}</td>
+                      <td class="p-2">${p.weight || "-"}</td>
+                      <td class="p-2 text-right space-x-2">
+                        <button data-roster-edit="${p.id}" class="text-blue-600 hover:text-blue-800">✎</button>
+                        <button data-roster-del="${p.id}" class="text-rose-600 hover:text-rose-800">🗑</button>
+                      </td>
+                    </tr>
+                  `).join("") || `<tr><td colspan="6" class="p-4 text-center text-slate-500">No players in this team yet.</td></tr>`}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('add-roster-player')?.addEventListener('click', async () => {
+        const allPlayers = await fetchJson(`${apiBase}/players/`);
+        const eligiblePlayers = allPlayers
+          .filter((p) => p.name && p.team !== team?.name)
+          .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        if (!eligiblePlayers.length) {
+          await uiAlert("No registered players available to add. Register players first in Player Management.", "Add Team Player", "warning");
+          return;
+        }
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
+        overlay.innerHTML = `
+          <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white">
+              <div class="font-bold text-lg">Add Registered Player to ${team?.name || 'Team'}</div>
+            </div>
+            <div class="p-5 space-y-3">
+              <input id="team-player-search" class="w-full border rounded-xl px-3 py-2" placeholder="Type player name to search..." />
+              <div id="team-player-list" class="max-h-[340px] overflow-auto border border-slate-200 rounded-xl divide-y"></div>
+              <div class="flex justify-end">
+                <button type="button" id="team-player-close" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Close</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        const listEl = overlay.querySelector('#team-player-list');
+        const searchEl = overlay.querySelector('#team-player-search');
+        const close = () => overlay.remove();
+        const renderList = (q = '') => {
+          const filtered = eligiblePlayers.filter((p) => String(p.name || '').toLowerCase().includes(String(q).toLowerCase().trim()));
+          listEl.innerHTML = filtered.map((p) => `
+            <button type="button" data-assign-player="${p.id}" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-3">
+              <div>
+                <div class="font-semibold text-slate-900">${p.name}</div>
+                <div class="text-xs text-slate-500">${p.position || 'TBD'} • Jersey ${p.jerseyNumber || '-'} • ${p.team || 'Unassigned'}</div>
+              </div>
+              <span class="text-xs font-semibold text-[#0d2c59]">Add</span>
+            </button>
+          `).join('') || '<div class="px-3 py-6 text-center text-slate-500 text-sm">No matching registered player.</div>';
+          listEl.querySelectorAll('[data-assign-player]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+              const id = btn.getAttribute('data-assign-player');
+              const player = eligiblePlayers.find((x) => String(x.id) === String(id));
+              if (!player) return;
+              await sendJson(`${apiBase}/players/${id}/`, 'PUT', { ...player, team: team?.name || null });
+              close();
+              await uiAlert(`${player.name} added to ${team?.name || 'team'}.`, 'Player Added', 'success');
+              await loadPage();
+            });
+          });
+        };
+        overlay.querySelector('#team-player-close')?.addEventListener('click', close);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        searchEl?.addEventListener('input', () => renderList(searchEl.value));
+        renderList('');
+      });
+
+      document.querySelectorAll('[data-roster-del]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-roster-del');
+          const ok = await uiConfirm('Delete this player from roster?', 'Delete Player');
+          if (!ok) return;
+          await fetch(`${apiBase}/players/${id}/`, { method: 'DELETE' });
+          await loadPage();
+        });
+      });
+
+      document.querySelectorAll('[data-roster-edit]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-roster-edit');
+          const current = roster.find((p) => String(p.id) === String(id));
+          if (!current) return;
+          const updates = await openPlayerEditModal({
+            player: current,
+            teams: [{ name: team?.name || current.team || '' }],
+            lockTeam: true,
+            fixedTeamName: team?.name || current.team || ''
+          });
+          if (!updates) return;
+          await sendJson(`${apiBase}/players/${id}/`, 'PUT', {
+            ...current,
+            ...updates,
+            team: updates.team || team?.name || current.team || null
+          });
+          await loadPage();
+        });
+      });
+    }
+
+    function renderPlayersPage(players, teams) {
+      const teamOptions = teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+      contentEl.innerHTML = `
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-3xl font-extrabold text-[#0d2c59]">Player Management</h2>
+          <button id="add-player-btn" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-4 py-2">Add Player</button>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+          <div class="grid md:grid-cols-3 gap-3 mb-4">
+            <input id="player-search" class="border rounded px-3 py-2" placeholder="Search players..." />
+            <select id="player-position" class="border rounded px-3 py-2">
+              <option value="">All Positions</option><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option><option>TBD</option>
+            </select>
+            <select id="player-team" class="border rounded px-3 py-2"><option value="">All Teams</option>${teamOptions}</select>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50 text-slate-600"><tr><th class="text-left p-2">ID</th><th class="text-left p-2">Name</th><th class="text-left p-2">Position</th><th class="text-left p-2">Jersey</th><th class="text-left p-2">Contact</th><th class="text-left p-2">Address</th><th class="text-left p-2">Email</th><th class="text-left p-2">Team</th><th class="text-right p-2">Actions</th></tr></thead>
+              <tbody id="players-body"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      const body = document.getElementById('players-body');
+      const renderRows = () => {
+        const q = (document.getElementById('player-search').value || '').toLowerCase();
+        const pos = document.getElementById('player-position').value;
+        const team = document.getElementById('player-team').value;
+        const filtered = players.filter(p => (!q || p.name.toLowerCase().includes(q)) && (!pos || p.position === pos) && (!team || p.team === team));
+        body.innerHTML = filtered.map(p => `
+          <tr class="border-b">
+            <td class="p-2">${p.id}</td>
+            <td class="p-2 font-semibold text-slate-900">${p.name}</td>
+            <td class="p-2">${p.position || 'TBD'}</td>
+            <td class="p-2">${p.jerseyNumber || '-'}</td>
+            <td class="p-2">${p.contactNumber || '-'}</td>
+            <td class="p-2">${p.address || '-'}</td>
+            <td class="p-2">${p.email || '-'}</td>
+            <td class="p-2">${p.team || ''}</td>
+            <td class="p-2 text-right space-x-2">
+              <button data-p-edit="${p.id}" class="text-blue-600 hover:text-blue-800">✎</button>
+              <button data-p-del="${p.id}" class="text-rose-600 hover:text-rose-800">🗑</button>
+            </td>
+          </tr>
+        `).join('') || `<tr><td colspan="9" class="p-4 text-center text-slate-500">No players found.</td></tr>`;
+
+        document.querySelectorAll('[data-p-del]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-p-del');
+            const ok = await uiConfirm('Delete this player?', 'Delete Player');
+            if (!ok) return;
+            await fetch(`${apiBase}/players/${id}/`, { method: 'DELETE' });
+            await loadPage();
+          });
+        });
+
+        document.querySelectorAll('[data-p-edit]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-p-edit');
+            const current = players.find((x) => String(x.id) === String(id));
+            if (!current) return;
+            const updates = await openPlayerEditModal({ player: current, teams, lockTeam: false });
+            if (!updates) return;
+            await sendJson(`${apiBase}/players/${id}/`, 'PUT', {
+              ...current,
+              ...updates,
+              team: updates.team || null
+            });
+            await loadPage();
+          });
+        });
+      };
+      ['player-search', 'player-position', 'player-team'].forEach(id => document.getElementById(id)?.addEventListener('input', renderRows));
+      document.getElementById('add-player-btn')?.addEventListener('click', () => openPlayerModal({ teams, defaultTeamName: null, onSave: loadPage }));
+      renderRows();
+    }

@@ -1,0 +1,18 @@
+<div class="min-h-screen flex bg-[#f3f6fb]">
+  {% if page_name != 'login' and page_name != 'signup' and page_name != 'home' %}
+    {% include "app/partials/_sidebar.html" %}
+  {% endif %}
+  <main class="flex-1 p-4 md:p-6">
+    {% if entity_id %}
+    <p class="text-xs text-slate-400 mb-3">Entity ID: {{ entity_id }}</p>
+    {% endif %}
+
+    <section class="app-shell-card rounded-2xl p-4 md:p-6">
+      <div id="status" class="mb-4 text-sm text-slate-600"></div>
+      <div id="content" class="space-y-4"></div>
+    </section>
+  </main>
+</div>
+{% if page_name != 'login' and page_name != 'signup' and page_name != 'home' %}
+  {% include "app/partials/_chatbot.html" %}
+{% endif %}

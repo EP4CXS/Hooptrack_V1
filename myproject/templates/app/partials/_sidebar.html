@@ -1,0 +1,43 @@
+{% comment %}Sidebar shown on authenticated (non-home/auth) pages.{% endcomment %}
+<aside class="w-64 sidebar-wrap text-white hidden md:flex md:flex-col md:min-h-screen px-3 pt-3 pb-4 border-r border-white/10 shadow-2xl">
+  <h1 class="text-lg font-extrabold pb-3 mb-2 border-b border-white/10 shrink-0 tracking-wide flex items-center gap-2">
+    <span class="inline-flex w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 items-center justify-center text-sm">🏀</span>
+    Hoop Track
+  </h1>
+  <nav class="flex-1 text-sm mt-2 space-y-4 overflow-y-auto min-h-0">
+    <div>
+      <div class="sidebar-section-label">Overview</div>
+      <div class="space-y-1">
+        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'dashboard' %}active{% endif %}" href="/dashboard/">Dashboard</a>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div>
+      <div class="sidebar-section-label">Management</div>
+      <div class="space-y-1">
+        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'players' or page_name == 'player-profile' %}active{% endif %}" href="/players/">Players</a>
+        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'teams' or page_name == 'team-roster' or page_name == 'add-team' %}active{% endif %}" href="/teams/">Teams</a>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div>
+      <div class="sidebar-section-label">Competition</div>
+      <div class="space-y-1">
+        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'bracket' %}active{% endif %}" href="/bracket/">Brackets</a>
+        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'games' %}active{% endif %}" href="/games/">Games</a>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div>
+      <div class="sidebar-section-label">Insights</div>
+      <div class="space-y-1">
+        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'predictions' %}active{% endif %}" href="/predictions/">Predictions</a>
+      </div>
+    </div>
+  </nav>
+  <div class="border-t border-white/10 pt-3 mt-auto space-y-1 shrink-0">
+    <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'settings' %}active{% endif %}" href="/settings/">Settings</a>
+    <button id="logout-btn" type="button" class="w-full bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2 text-sm text-left border border-transparent">Log Out</button>
+  </div>
+</aside>
+

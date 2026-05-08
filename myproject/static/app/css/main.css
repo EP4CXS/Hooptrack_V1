@@ -24,7 +24,9 @@
 }
 
 .sidebar-wrap {
-  background: linear-gradient(180deg, #0d2447 0%, #0a1a36 100%);
+  background:
+    radial-gradient(1200px 600px at -15% -20%, rgba(255, 122, 26, 0.22), transparent 55%),
+    linear-gradient(180deg, #0d2447 0%, #0a1a36 100%);
 }
 
 .nav-item {
@@ -50,6 +52,21 @@
 
 .team-banner {
   background: linear-gradient(135deg, #102c57 0%, #1d4a85 100%);
+}
+
+.app-shell-card {
+  border: 1px solid #e2e8f0;
+  background:
+    radial-gradient(900px 400px at 100% -30%, rgba(16, 44, 87, 0.04), transparent 60%),
+    #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.dashboard-pro-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(2px);
 }
 
 .sidebar-section-label {

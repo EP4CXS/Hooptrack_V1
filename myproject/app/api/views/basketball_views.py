@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -14,7 +15,9 @@ from app.api.serializers.basketball_serializers import (
     TeamSerializer,
 )
 from app.models.basketball.models import Bracket, Game, GameEvent, GamePrediction, Matchup, Player, PlayerGameStat, Team
-from app.services.basketball_service import BasketballService
+from app.controllers.basketball_controller import BasketballController
+from app.http.requests.basketball_requests import GeneratePredictionRequest, UpsertPredictionRequest
+from app.utils.debug_agent_log import agent_debug_log
 from app.utils.responses import success_response
 
 
@@ -40,7 +43,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        player = BasketballService.create_player(serializer.validated_data)
+        player = BasketballController.create_player(serializer.validated_data)
         return Response(PlayerSerializer(player).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -48,7 +51,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        player = BasketballService.update_player(instance, serializer.validated_data)
+        player = BasketballController.update_player(instance, serializer.validated_data)
         return Response(PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
 
@@ -60,7 +63,7 @@ class BracketViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         payload = request.data
-        bracket = BasketballService.create_bracket_with_relations(
+        bracket = BasketballController.create_bracket_with_relations(
             {
                 **payload,
                 "matchups": payload.get("matchups", []),
@@ -73,16 +76,7 @@ class BracketViewSet(viewsets.ModelViewSet):
         kwargs.pop("partial", False)
         instance = self.get_object()
         payload = request.data
-        normalized = BasketballService.normalize_bracket_payload(payload)
-        for key, value in normalized.items():
-            if value is not None:
-                setattr(instance, key, value)
-        instance.save()
-        BasketballService.replace_bracket_relations(
-            instance,
-            matchups=payload.get("matchups"),
-            standings=payload.get("standings"),
-        )
+        instance = BasketballController.update_bracket_with_relations(instance, payload)
         return Response(BracketSerializer(instance).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.AllowAny])
@@ -90,7 +84,10 @@ class BracketViewSet(viewsets.ModelViewSet):
         predicted_winner = request.data.get("predictedWinner")
         confidence = request.data.get("confidence")
         matchup_id = request.data.get("matchupId")
-        prediction = BasketballService.upsert_prediction(matchup_id, predicted_winner, confidence)
+        bracket_id = request.data.get("bracketId") or pk
+        prediction = BasketballService.upsert_prediction(
+            matchup_id, predicted_winner, confidence, bracket_id=bracket_id
+        )
         return success_response(GamePredictionSerializer(prediction).data, "Prediction saved")
 
 
@@ -108,12 +105,79 @@ class GamePredictionViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     def create(self, request, *args, **kwargs):
-        prediction = BasketballService.upsert_prediction(
-            request.data.get("matchupId"),
-            request.data.get("predictedWinner"),
-            request.data.get("confidence"),
+        dto = UpsertPredictionRequest.from_request_data(request.data)
+        prediction = BasketballController.upsert_prediction(
+            dto.matchup_id,
+            dto.predicted_winner,
+            dto.confidence,
+            bracket_id=dto.bracket_id,
+            generated_by=dto.generated_by,
         )
         return Response(GamePredictionSerializer(prediction).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"], url_path="generate", permission_classes=[permissions.AllowAny])
+    def generate(self, request):
+        # #region agent log
+        try:
+            _keys = sorted(str(k) for k in request.data.keys())
+        except Exception as _e:
+            _keys = [f"_keys_error:{type(_e).__name__}"]
+        agent_debug_log(
+            hypothesis_id="0",
+            message="generate_entry",
+            data={"method": request.method, "path": getattr(request, "path", ""), "data_keys": _keys},
+            location="basketball_views.GamePredictionViewSet.generate",
+        )
+        # #endregion
+        dto = GeneratePredictionRequest.from_request_data(request.data)
+        matchup_id = dto.matchup_id
+        bracket_id = dto.bracket_id
+        # #region agent log
+        _dup = Matchup.objects.filter(matchup_id=matchup_id).count() if matchup_id else 0
+        agent_debug_log(
+            hypothesis_id="A",
+            message="generate_request",
+            data={
+                "data_keys": sorted(str(k) for k in request.data.keys()),
+                "matchup_id": str(matchup_id),
+                "bracket_id_raw": bracket_id,
+                "bracket_id_nonempty": bool(bracket_id is not None and str(bracket_id).strip() != ""),
+                "matchup_rows_with_this_id": _dup,
+            },
+            location="basketball_views.GamePredictionViewSet.generate",
+        )
+        # #endregion
+        resolved = BasketballController.resolve_matchup(matchup_id=matchup_id, bracket_id=bracket_id)
+        matchup = resolved.matchup
+        # #region agent log
+        agent_debug_log(
+            hypothesis_id="B",
+            message="matchup_resolved",
+            data={"matchup_pk": matchup.pk, "bracket_id": matchup.bracket_id, "matchup_id": matchup.matchup_id},
+            location="basketball_views.GamePredictionViewSet.generate",
+        )
+        # #endregion
+        try:
+            prediction = BasketballController.generate_ai_prediction(matchup_id=matchup_id, bracket_id=bracket_id)
+        except Exception as exc:
+            # #region agent log
+            agent_debug_log(
+                hypothesis_id="C",
+                message="predict_match_exception",
+                data={"exc_type": type(exc).__name__, "exc_msg": str(exc)[:500]},
+                location="basketball_views.GamePredictionViewSet.generate",
+            )
+            # #endregion
+            raise
+        # #region agent log
+        agent_debug_log(
+            hypothesis_id="C",
+            message="generate_ok",
+            data={"prediction_id": prediction.pk},
+            location="basketball_views.GamePredictionViewSet.generate",
+        )
+        # #endregion
+        return Response(GamePredictionSerializer(prediction).data, status=status.HTTP_200_OK)
 
 
 class GameViewSet(viewsets.ModelViewSet):

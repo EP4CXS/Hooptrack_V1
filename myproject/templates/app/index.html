@@ -13,482 +13,16 @@
 </head>
 <body class="{% if page_name == 'home' or page_name == 'login' or page_name == 'signup' %}min-h-screen bg-[#0a0e1a] text-white overflow-x-hidden selection:bg-[#ff6b35] selection:text-white{% else %}bg-slate-50 text-slate-900{% endif %}">
 {% if page_name == 'home' %}
-<div class="min-h-screen overflow-hidden relative font-sans">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0f1424] to-[#0a0e1a] z-0"></div>
-  <div class="absolute inset-0 pointer-events-none z-0 opacity-10" style="background-image: linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%,#000),linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%,#000); background-size:20px 20px; background-position:0 0,10px 10px;"></div>
-  <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    <div class="absolute inset-0 w-full h-full" style="transform:perspective(1000px) rotateX(20deg) scale(1.2); transform-origin:center 80%;">
-      <svg class="w-full h-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <rect x="5" y="5" width="90" height="90" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-        <circle cx="50" cy="50" r="10" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <line x1="5" y1="50" x2="95" y2="50" stroke="#00d9ff" stroke-width="0.5" />
-        <path d="M35,5 L35,25 L65,25 L65,5" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <path d="M10,5 Q10,35 50,35 Q90,35 90,5" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-        <path d="M35,95 L35,75 L65,75 L65,95" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <path d="M10,95 Q10,65 50,65 Q90,65 90,95" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-      </svg>
-    </div>
-    <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-[#00d9ff] rounded-full blur-[100px] opacity-10 hoop-glow-cyan"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#ff6b35] rounded-full blur-[100px] opacity-10 hoop-glow-orange"></div>
-  </div>
-
-  <nav class="relative z-50 px-6 py-6 border-b border-white/5 backdrop-blur-sm">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <div class="relative group">
-          <div class="absolute inset-0 bg-[#ff6b35] blur-md opacity-50 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-          <div class="relative w-12 h-12 rounded-xl bg-black/50 border border-[#ff6b35]/50 flex items-center justify-center backdrop-blur-md">
-            <svg class="h-6 w-6 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
-              <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
-              <path d="M18 9h1.5a1 1 0 0 0 0-5H18" />
-              <path d="M4 22h16" />
-              <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
-              <path d="M6 9H4.5a1 1 0 0 1 0-5H6" />
-            </svg>
-          </div>
-        </div>
-        <div>
-          <h1 class="text-2xl font-black tracking-tighter italic" style="font-family:Orbitron, sans-serif">HOOP<span class="text-[#ff6b35]">TRACK</span></h1>
-          <p class="text-[10px] font-bold tracking-widest text-[#00d9ff] uppercase">Next-Gen Analytics</p>
-        </div>
-      </a>
-      <div class="flex items-center gap-4">
-        <a href="/login/" class="hidden md:block px-6 py-2.5 rounded-lg border border-[#00d9ff]/30 text-[#00d9ff] hover:bg-[#00d9ff]/10 hover:border-[#00d9ff] transition-all font-bold uppercase tracking-wide text-sm">Log In</a>
-        <a href="/signup/" class="px-6 py-2.5 rounded-lg bg-[#ff6b35] text-black font-black uppercase tracking-wide text-sm hover:bg-[#ff8555] hover:shadow-[0_0_20px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5">Sign Up</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32">
-    <div class="flex flex-col items-center text-center mb-24">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00d9ff]/10 border border-[#00d9ff]/50 mb-8 backdrop-blur-md">
-        <svg class="h-3 w-3 text-[#00d9ff] animate-pulse" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.09 3.26L16 7l-3.26 1.09L12 11l-1.09-2.91L8 7l2.91-1.09L12 2zm7 5l.68 2.05L21 10l-2.05.68L18 13l-.68-2.27L15 10l2.32-.77L19 7zm-2 11l1.64 1.64L21 21l-2.36-.36L17 19l-.64-2.05L15 17l2-1zm-11 1l1.09 3.26L12 22l1.91-2.74L16 17l-3.26-1.09L12 13l-1.09 2.91L8 17l2.91 1.09L8 19z"/></svg>
-        <span class="text-xs font-bold tracking-wider text-[#00d9ff] uppercase">AI-Powered Basketball Analytics</span>
-      </div>
-
-      <div class="relative mb-8">
-        <h1 class="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter italic uppercase" style="font-family:Orbitron, sans-serif">
-          <span class="block text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50 drop-shadow-lg">Dominate</span>
-          <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff6b35] to-[#ff9e7d] drop-shadow-[0_0_15px_rgba(255,107,53,0.5)]">The Court</span>
-        </h1>
-        <div class="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#ff6b35]/5 blur-3xl rounded-full"></div>
-      </div>
-
-      <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl font-light leading-relaxed">
-        Advanced AI predictions and real-time analytics for the modern game.
-        <span class="text-[#00d9ff] font-medium"> Elevate your basketball IQ.</span>
-      </p>
-
-      <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-        <a href="/signup/" class="group relative px-8 py-4 w-full sm:w-auto rounded-xl bg-[#00d9ff] text-black font-black text-lg uppercase tracking-wide overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(0,217,255,0.4)]">
-          <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-          <span class="relative flex items-center justify-center gap-2">
-            Get Started Free
-            <svg class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-          </span>
-        </a>
-      </div>
-    </div>
-
-    <div class="relative p-1 rounded-3xl bg-gradient-to-b from-white/10 to-transparent">
-      <div class="absolute inset-0 bg-[#00d9ff]/5 blur-3xl rounded-3xl"></div>
-      <div class="relative bg-[#0a0e1a]/80 backdrop-blur-xl rounded-[22px] border border-white/5 p-8 md:p-12">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 transition-all hover:-translate-y-1">
-            <div class="w-12 h-12 rounded-lg bg-[#00d9ff]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg class="h-6 w-6 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2 text-white font-mono uppercase tracking-tight">AI Predictions</h3>
-            <p class="text-gray-400 text-sm leading-relaxed">85%+ accuracy on game outcomes using advanced ML models.</p>
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          </div>
-          <div class="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 transition-all hover:-translate-y-1">
-            <div class="w-12 h-12 rounded-lg bg-[#ff6b35]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg class="h-6 w-6 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2 text-white font-mono uppercase tracking-tight">Team Analytics</h3>
-            <p class="text-gray-400 text-sm leading-relaxed">Deep dive into shooting efficiency, rebounding, and pace metrics.</p>
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          </div>
-          <div class="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-white/20 transition-all hover:-translate-y-1">
-            <div class="w-12 h-12 rounded-lg bg-[#39ff14]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg class="h-6 w-6 text-[#39ff14]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2 text-white font-mono uppercase tracking-tight">Real-Time Data</h3>
-            <p class="text-gray-400 text-sm leading-relaxed">Live tracking and instant updates for every possession.</p>
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          </div>
-        </div>
-
-        <div class="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-12"></div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div class="text-center group">
-            <div class="flex items-center justify-center mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
-              <svg class="h-5 w-5 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div class="text-3xl md:text-4xl font-black text-white mb-1 tracking-tighter" style="font-family:Orbitron, sans-serif">85%</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Accuracy</div>
-          </div>
-          <div class="text-center group">
-            <div class="flex items-center justify-center mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
-              <svg class="h-5 w-5 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            </div>
-            <div class="text-3xl md:text-4xl font-black text-white mb-1 tracking-tighter" style="font-family:Orbitron, sans-serif">500+</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Teams</div>
-          </div>
-          <div class="text-center group">
-            <div class="flex items-center justify-center mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
-              <svg class="h-5 w-5 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            </div>
-            <div class="text-3xl md:text-4xl font-black text-white mb-1 tracking-tighter" style="font-family:Orbitron, sans-serif">10K+</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Games</div>
-          </div>
-          <div class="text-center group">
-            <div class="flex items-center justify-center mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
-              <svg class="h-5 w-5 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            </div>
-            <div class="text-3xl md:text-4xl font-black text-white mb-1 tracking-tighter" style="font-family:Orbitron, sans-serif">24/7</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Live</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="relative z-10 max-w-4xl mx-auto px-6 pb-24 text-center">
-    <h2 class="text-3xl md:text-5xl font-black mb-6 italic uppercase" style="font-family:Orbitron, sans-serif">
-      Ready to <span class="text-[#00d9ff] drop-shadow-[0_0_10px_rgba(0,217,255,0.5)]">Level Up?</span>
-    </h2>
-    <p class="text-gray-400 mb-8 max-w-xl mx-auto">Join the community of data-driven players and coaches transforming the game.</p>
-    <a href="/signup/" class="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-[#ff6b35] text-black font-black uppercase tracking-wide hover:bg-[#ff8555] hover:shadow-[0_0_30px_rgba(255,107,53,0.4)] transition-all transform hover:scale-105">
-      Start Free Trial
-      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-    </a>
-  </div>
-
-  <footer class="relative z-10 border-t border-white/5 py-8 text-center text-gray-600 text-sm">
-    <p>© 2024 HoopTrack Analytics. All rights reserved.</p>
-  </footer>
-</div>
+  {% include "app/pages/_home.html" %}
 
 {% elif page_name == 'login' %}
-<div class="min-h-screen overflow-hidden relative font-sans flex items-center justify-center p-6">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0f1424] to-[#0a0e1a] z-0"></div>
-  <div class="absolute inset-0 pointer-events-none z-0 opacity-10" style="background-image: linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%,#000),linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%,#000); background-size:20px 20px; background-position:0 0,10px 10px;"></div>
-  <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    <div class="absolute inset-0 w-full h-full" style="transform:perspective(1000px) rotateX(20deg) scale(1.2); transform-origin:center 80%;">
-      <svg class="w-full h-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <rect x="5" y="5" width="90" height="90" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-        <circle cx="50" cy="50" r="10" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <line x1="5" y1="50" x2="95" y2="50" stroke="#00d9ff" stroke-width="0.5" />
-        <path d="M35,5 L35,25 L65,25 L65,5" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <path d="M10,5 Q10,35 50,35 Q90,35 90,5" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-        <path d="M35,95 L35,75 L65,75 L65,95" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <path d="M10,95 Q10,65 50,65 Q90,65 90,95" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-      </svg>
-    </div>
-    <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-[#00d9ff] rounded-full blur-[100px] opacity-10 hoop-glow-cyan"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#ff6b35] rounded-full blur-[100px] opacity-10 hoop-glow-orange"></div>
-  </div>
-
-  <div class="relative z-10 w-full max-w-md">
-    <a href="/" class="flex items-center justify-center gap-3 mb-8">
-      <div class="relative group">
-        <div class="absolute inset-0 bg-[#ff6b35] blur-md opacity-50 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-        <div class="relative w-12 h-12 rounded-xl bg-black/50 border border-[#ff6b35]/50 flex items-center justify-center backdrop-blur-md">
-          <svg class="h-6 w-6 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
-            <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
-            <path d="M18 9h1.5a1 1 0 0 0 0-5H18" />
-            <path d="M4 22h16" />
-            <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
-            <path d="M6 9H4.5a1 1 0 0 1 0-5H6" />
-          </svg>
-        </div>
-      </div>
-      <div>
-        <h1 class="text-2xl font-black tracking-tighter italic" style="font-family:Orbitron, sans-serif">HOOP<span class="text-[#ff6b35]">TRACK</span></h1>
-        <p class="text-[10px] font-bold tracking-widest text-[#00d9ff] uppercase">Next-Gen Analytics</p>
-      </div>
-    </a>
-
-    <div class="relative p-8 rounded-3xl bg-black/30 backdrop-blur-xl border border-white/10 shadow-2xl shadow-[#00d9ff]/10">
-      <div id="auth-msg" class="hidden mb-4 text-sm text-red-400 text-center" role="alert"></div>
-      <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold mb-2 text-white italic" style="font-family:Orbitron, sans-serif">Welcome Back</h2>
-        <p class="text-gray-400">Log in to access your analytics dashboard</p>
-      </div>
-
-      <form id="login-form" class="space-y-6">
-        <div>
-          <label class="block text-sm font-medium mb-2 text-gray-300 uppercase tracking-wider">Email</label>
-          <div class="relative">
-            <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-            <input name="email" type="email" required class="w-full pl-12 pr-4 py-3 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white placeholder-gray-500" placeholder="you@example.com" autocomplete="username" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-2 text-gray-300 uppercase tracking-wider">Password</label>
-          <div class="relative">
-            <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            <input id="login-password" name="password" type="password" required class="w-full pl-12 pr-12 py-3 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white placeholder-gray-500" placeholder="••••••••" autocomplete="current-password" />
-            <button type="button" id="login-toggle-password" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#00d9ff] transition-colors" aria-label="Show password">
-              <svg id="login-eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-              <svg id="login-eye-off" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.956 9.956 0 012.293-3.95M6.228 6.228A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.953 9.953 0 01-4.293 5.042M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" /></svg>
-            </button>
-          </div>
-        </div>
-        <div class="flex items-center justify-between text-sm">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input name="remember" type="checkbox" class="w-4 h-4 rounded border-2 border-white/20 bg-white/10 text-[#ff6b35] focus:ring-[#ff6b35]" />
-            <span class="text-gray-400">Remember me</span>
-          </label>
-          <span class="text-[#00d9ff]/80 text-sm">Forgot password?</span>
-        </div>
-        <button type="submit" id="login-submit" class="w-full py-3 rounded-lg bg-[#ff6b35] text-black font-black uppercase tracking-wide hover:bg-[#ff8555] hover:shadow-[0_0_20px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50">
-          <span id="login-btn-label" class="flex items-center gap-2">Log In<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg></span>
-        </button>
-      </form>
-
-      <div class="mt-8 text-center">
-        <p class="text-gray-400">Don't have an account? <a href="/signup/" class="text-[#00d9ff] hover:text-white transition-colors font-medium">Sign up</a></p>
-      </div>
-    </div>
-    <div class="mt-6 text-center">
-      <a href="/" class="text-gray-400 hover:text-white transition-colors text-sm">← Back to home</a>
-    </div>
-  </div>
-</div>
+  {% include "app/pages/_login.html" %}
 
 {% elif page_name == 'signup' %}
-<div class="min-h-screen overflow-hidden relative font-sans flex items-center justify-center p-6">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0f1424] to-[#0a0e1a] z-0"></div>
-  <div class="absolute inset-0 pointer-events-none z-0 opacity-10" style="background-image: linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%,#000),linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%,#000); background-size:20px 20px; background-position:0 0,10px 10px;"></div>
-  <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-    <div class="absolute inset-0 w-full h-full" style="transform:perspective(1000px) rotateX(20deg) scale(1.2); transform-origin:center 80%;">
-      <svg class="w-full h-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <rect x="5" y="5" width="90" height="90" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-        <circle cx="50" cy="50" r="10" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <line x1="5" y1="50" x2="95" y2="50" stroke="#00d9ff" stroke-width="0.5" />
-        <path d="M35,5 L35,25 L65,25 L65,5" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <path d="M10,5 Q10,35 50,35 Q90,35 90,5" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-        <path d="M35,95 L35,75 L65,75 L65,95" fill="none" stroke="#ff6b35" stroke-width="0.5" />
-        <path d="M10,95 Q10,65 50,65 Q90,65 90,95" fill="none" stroke="#00d9ff" stroke-width="0.5" />
-      </svg>
-    </div>
-    <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-[#00d9ff] rounded-full blur-[100px] opacity-10 hoop-glow-cyan"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#ff6b35] rounded-full blur-[100px] opacity-10 hoop-glow-orange"></div>
-  </div>
-
-  <div class="relative z-10 w-full max-w-md overflow-hidden px-1">
-    <a href="/" class="flex items-center justify-center gap-3 mb-5">
-      <div class="relative group">
-        <div class="absolute inset-0 bg-[#ff6b35] blur-md opacity-50 group-hover:opacity-100 transition-opacity rounded-xl"></div>
-        <div class="relative w-12 h-12 rounded-xl bg-black/50 border border-[#ff6b35]/50 flex items-center justify-center backdrop-blur-md">
-          <svg class="h-6 w-6 text-[#ff6b35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
-            <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
-            <path d="M18 9h1.5a1 1 0 0 0 0-5H18" />
-            <path d="M4 22h16" />
-            <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
-            <path d="M6 9H4.5a1 1 0 0 1 0-5H6" />
-          </svg>
-        </div>
-      </div>
-      <div>
-        <h1 class="text-2xl font-black tracking-tighter italic" style="font-family:Orbitron, sans-serif">HOOP<span class="text-[#ff6b35]">TRACK</span></h1>
-        <p class="text-[10px] font-bold tracking-widest text-[#00d9ff] uppercase">Next-Gen Analytics</p>
-      </div>
-    </a>
-
-    <div class="relative p-6 md:p-8 rounded-3xl bg-black/30 backdrop-blur-xl border border-white/10 shadow-2xl shadow-[#00d9ff]/10">
-      <div id="signup-msg" class="hidden mb-4 text-sm text-center" role="alert"></div>
-      <div class="text-center mb-6">
-        <h2 class="text-3xl font-bold mb-2 text-white italic" style="font-family:Orbitron, sans-serif">Create Account</h2>
-        <p class="text-gray-400 text-sm">Start your journey with next-gen analytics</p>
-      </div>
-
-      <form id="signup-form">
-        <div class="relative w-full overflow-hidden">
-          <div id="signup-slider" class="signup-steps-track flex w-[200%] translate-x-0">
-            <!-- Step 1: profile & location -->
-            <div id="signup-step-panel-1" class="w-1/2 shrink-0 pr-1.5 box-border space-y-4">
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Full Name</label>
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  <input name="username" required class="signup-step1-field w-full pl-12 pr-4 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white placeholder-gray-500 text-sm" placeholder="johndoe" autocomplete="username" />
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Email</label>
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  <input name="email" type="email" required class="signup-step1-field w-full pl-12 pr-4 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white placeholder-gray-500 text-sm" placeholder="you@example.com" autocomplete="email" />
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Region</label>
-                <div class="relative">
-                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  <select id="region-select" name="region_id" required class="signup-step1-field w-full pl-11 pr-10 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white appearance-none text-sm">
-                    <option value="">Select Region</option>
-                  </select>
-                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Province</label>
-                <div class="relative">
-                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  <select id="province-select" name="province_id" required class="signup-step1-field w-full pl-11 pr-10 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white appearance-none text-sm" disabled>
-                    <option value="">Select Province</option>
-                  </select>
-                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">City</label>
-                <div class="relative">
-                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  <select id="city-select" name="city_id" required class="signup-step1-field w-full pl-11 pr-10 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white appearance-none text-sm" disabled>
-                    <option value="">Select City</option>
-                  </select>
-                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-              </div>
-              <button type="button" id="signup-continue" class="w-full py-3 rounded-lg bg-[#00d9ff] text-black font-black uppercase tracking-wide hover:shadow-[0_0_20px_rgba(0,217,255,0.35)] transition-all transform hover:-translate-y-0.5 text-sm">
-                Continue →
-              </button>
-            </div>
-
-            <!-- Step 2: password & agreement -->
-            <div id="signup-step-panel-2" class="w-1/2 shrink-0 pl-1.5 box-border space-y-4">
-              <div class="text-left mb-1">
-                <h3 class="text-xl font-bold text-white italic" style="font-family:Orbitron, sans-serif">Create Password</h3>
-                <p class="text-gray-500 text-xs mt-1">At least 8 characters. Keep your account secure.</p>
-              </div>
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Password</label>
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                  <input id="signup-password" name="password" type="password" required minlength="8" tabindex="-1" class="signup-step2-field w-full pl-12 pr-12 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white placeholder-gray-500 text-sm disabled:opacity-40" placeholder="••••••••" autocomplete="new-password" disabled />
-                  <button type="button" id="signup-toggle-password" tabindex="-1" disabled class="signup-step2-field absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#00d9ff] transition-colors disabled:pointer-events-none" aria-label="Show password">
-                    <svg id="signup-eye-open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    <svg id="signup-eye-off" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.956 9.956 0 012.293-3.95M6.228 6.228A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.953 9.953 0 01-4.293 5.042M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L9.88 9.88" /></svg>
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Confirm Password</label>
-                <div class="relative">
-                  <svg class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#00d9ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                  <input id="signup-confirm-password" name="confirm_password" type="password" required minlength="8" tabindex="-1" class="signup-step2-field w-full pl-12 pr-4 py-2.5 rounded-lg bg-white/5 border-2 border-transparent focus:border-[#00d9ff] focus:bg-black/20 focus:outline-none transition-all text-white placeholder-gray-500 text-sm disabled:opacity-40" placeholder="••••••••" autocomplete="new-password" disabled />
-                </div>
-              </div>
-
-              <div class="flex items-start gap-2 pt-1">
-                <input id="terms" type="checkbox" required tabindex="-1" class="signup-step2-field w-4 h-4 mt-0.5 rounded border-2 border-white/20 bg-white/10 text-[#ff6b35] focus:ring-[#ff6b35] disabled:opacity-40" disabled />
-                <label for="terms" class="text-xs text-gray-400 leading-snug">
-                  I agree to the <span class="text-[#00d9ff]">Terms of Service</span> and <span class="text-[#00d9ff]">Privacy Policy</span>
-                </label>
-              </div>
-
-              <button type="submit" id="signup-submit" tabindex="-1" disabled class="signup-step2-field w-full py-3 rounded-lg bg-[#ff6b35] text-black font-black uppercase tracking-wide hover:bg-[#ff8555] hover:shadow-[0_0_20px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 text-sm cursor-not-allowed enabled:cursor-pointer">
-                <span id="signup-btn-label" class="flex items-center gap-2">
-                  Create Account
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                </span>
-              </button>
-              <button type="button" id="signup-back" class="w-full pt-2 text-center text-sm text-gray-400 hover:text-white transition-colors">
-                ← Back
-              </button>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <div class="mt-8 text-center">
-        <p class="text-gray-400">Already have an account? <a href="/login/" class="text-[#00d9ff] hover:text-white transition-colors font-medium">Log in</a></p>
-      </div>
-    </div>
-    <div class="mt-6 text-center">
-      <a href="/" class="text-gray-400 hover:text-white transition-colors text-sm">← Back to home</a>
-    </div>
-  </div>
-</div>
+  {% include "app/pages/_signup.html" %}
 
 {% else %}
-  <div class="min-h-screen flex">
-    {% if page_name != 'login' and page_name != 'signup' and page_name != 'home' %}
-    <aside class="w-64 sidebar-wrap text-white hidden md:flex md:flex-col md:min-h-screen px-3 pt-3 pb-4">
-      <h1 class="text-lg font-bold pb-3 mb-2 border-b border-white/10 shrink-0">Hoop Track</h1>
-      <nav class="flex-1 text-sm mt-2 space-y-4 overflow-y-auto min-h-0">
-        <div>
-          <div class="sidebar-section-label">Overview</div>
-          <div class="space-y-1">
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'dashboard' %}active{% endif %}" href="/dashboard/">Dashboard</a>
-          </div>
-        </div>
-        <div class="sidebar-divider"></div>
-        <div>
-          <div class="sidebar-section-label">Management</div>
-          <div class="space-y-1">
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'players' or page_name == 'player-profile' %}active{% endif %}" href="/players/">Players</a>
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'teams' or page_name == 'team-roster' or page_name == 'add-team' %}active{% endif %}" href="/teams/">Teams</a>
-          </div>
-        </div>
-        <div class="sidebar-divider"></div>
-        <div>
-          <div class="sidebar-section-label">Competition</div>
-          <div class="space-y-1">
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'bracket' %}active{% endif %}" href="/bracket/">Brackets</a>
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'games' %}active{% endif %}" href="/games/">Games</a>
-          </div>
-        </div>
-        <div class="sidebar-divider"></div>
-        <div>
-          <div class="sidebar-section-label">Insights</div>
-          <div class="space-y-1">
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'predictions' %}active{% endif %}" href="/predictions/">Predictions</a>
-            <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'reports' %}active{% endif %}" href="/reports/">Reports</a>
-          </div>
-        </div>
-      </nav>
-      <div class="border-t border-white/10 pt-3 mt-auto space-y-1 shrink-0">
-        <a class="nav-item block px-3 py-2 rounded-lg {% if page_name == 'settings' %}active{% endif %}" href="/settings/">Settings</a>
-        <button id="logout-btn" type="button" class="w-full bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2 text-sm text-left border border-transparent">Log Out</button>
-      </div>
-    </aside>
-    {% endif %}
-    <main class="flex-1 p-4 md:p-6">
-      {% if entity_id %}
-      <p class="text-xs text-slate-400 mb-3">Entity ID: {{ entity_id }}</p>
-      {% endif %}
-
-      <section class="bg-white border border-slate-200 rounded-lg p-4 md:p-6">
-        <div id="status" class="mb-4 text-sm text-slate-600"></div>
-        <div id="content" class="space-y-4"></div>
-      </section>
-    </main>
-  </div>
-  {% if page_name != 'login' and page_name != 'signup' and page_name != 'home' %}
-  <div class="fixed bottom-5 right-5 z-50">
-    <button id="chatbot-toggle" class="w-14 h-14 rounded-full bg-orange-500 hover:bg-orange-600 text-white shadow-xl text-2xl">💬</button>
-    <div id="chatbot-panel" class="hidden absolute bottom-16 right-0 w-80 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden">
-      <div class="bg-[#0d2c59] text-white px-4 py-3 font-semibold">HoopTrack Assistant</div>
-      <div id="chatbot-messages" class="h-72 overflow-y-auto p-3 space-y-2 text-sm bg-slate-50">
-        <div class="bg-white border rounded-lg px-3 py-2">Hi! Ask me about teams, rosters, brackets, or predictions.</div>
-      </div>
-      <form id="chatbot-form" class="p-2 border-t bg-white flex gap-2">
-        <input id="chatbot-input" class="flex-1 border rounded-lg px-3 py-2 text-sm" placeholder="Type a message..." />
-        <button class="bg-[#0d2c59] text-white rounded-lg px-3 py-2 text-sm">Send</button>
-      </form>
-    </div>
-  </div>
-  {% endif %}
+  {% include "app/pages/_app_shell.html" %}
 {% endif %}
 
   <script src="{% static 'app/js/main.js' %}"></script>
@@ -520,6 +54,99 @@
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       if (res.status === 204) return null;
       return res.json();
+    }
+
+    function openSystemModal({ title, message, mode = 'alert', defaultValue = '', confirmText = 'OK', cancelText = 'Cancel', tone = 'info', promptOptions = [] }) {
+      return new Promise((resolve) => {
+        const toneStyles = {
+          info: {
+            ring: 'border-[#1f4f94]',
+            chip: 'bg-[#0d2c59] text-white',
+            icon: '🏀',
+          },
+          success: {
+            ring: 'border-emerald-500',
+            chip: 'bg-emerald-600 text-white',
+            icon: '✅',
+          },
+          warning: {
+            ring: 'border-orange-500',
+            chip: 'bg-orange-500 text-white',
+            icon: '⚠️',
+          },
+          danger: {
+            ring: 'border-rose-500',
+            chip: 'bg-rose-600 text-white',
+            icon: '🗑️',
+          }
+        };
+        const theme = toneStyles[tone] || toneStyles.info;
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
+        overlay.innerHTML = `
+          <div class="w-full max-w-lg rounded-2xl bg-white border-2 ${theme.ring} shadow-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-200 bg-gradient-to-r from-[#0d2c59] to-[#163d74] text-white">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full ${theme.chip} flex items-center justify-center text-base">${theme.icon}</div>
+                <p class="text-lg font-bold">${title}</p>
+              </div>
+            </div>
+            <div class="p-5 space-y-4">
+              <p class="text-sm text-slate-700 whitespace-pre-line">${message || ''}</p>
+              ${mode === 'prompt' ? (Array.isArray(promptOptions) && promptOptions.length
+                ? `<select id="system-modal-input" class="w-full border border-slate-300 rounded-xl px-3 py-2">
+                    ${promptOptions.map((opt) => {
+                      const value = String(opt?.value ?? '');
+                      const label = String(opt?.label ?? value);
+                      const selected = value === String(defaultValue ?? '') ? 'selected' : '';
+                      return `<option value="${value.replace(/"/g, '&quot;')}" ${selected}>${label}</option>`;
+                    }).join('')}
+                  </select>`
+                : `<input id="system-modal-input" class="w-full border border-slate-300 rounded-xl px-3 py-2" value="${String(defaultValue ?? '').replace(/"/g, '&quot;')}" />`)
+              : ''}
+              <div class="flex justify-end gap-2 pt-2">
+                ${mode !== 'alert' ? `<button type="button" data-modal-cancel class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">${cancelText}</button>` : ''}
+                <button type="button" data-modal-confirm class="px-4 py-2 rounded-lg bg-[#0d2c59] text-white hover:bg-[#163d74]">${confirmText}</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const cleanup = (value) => {
+          overlay.remove();
+          resolve(value);
+        };
+        overlay.querySelector('[data-modal-confirm]')?.addEventListener('click', () => {
+          if (mode === 'prompt') {
+            const value = overlay.querySelector('#system-modal-input')?.value ?? '';
+            cleanup(value);
+            return;
+          }
+          cleanup(true);
+        });
+        overlay.querySelector('[data-modal-cancel]')?.addEventListener('click', () => cleanup(mode === 'prompt' ? null : false));
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) cleanup(mode === 'prompt' ? null : false);
+        });
+        if (mode === 'prompt') {
+          const input = overlay.querySelector('#system-modal-input');
+          input?.focus();
+          input?.select();
+        }
+      });
+    }
+
+    async function uiAlert(message, title = 'Notice', tone = 'info') {
+      await openSystemModal({ title, message, mode: 'alert', confirmText: 'OK', tone });
+    }
+
+    async function uiConfirm(message, title = 'Confirm', tone = 'warning') {
+      return openSystemModal({ title, message, mode: 'confirm', confirmText: 'OK', cancelText: 'Cancel', tone });
+    }
+
+    async function uiPrompt(message, defaultValue = '', title = 'Input', tone = 'info', promptOptions = []) {
+      return openSystemModal({ title, message, mode: 'prompt', defaultValue, confirmText: 'Save', cancelText: 'Cancel', tone, promptOptions });
     }
 
     function renderList(title, items, fields) {
@@ -555,22 +182,47 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
+                <label class="text-sm font-semibold text-slate-700 block mb-1">Jersey Number</label>
+                <input name="jerseyNumber" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 23" required />
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-slate-700 block mb-1">Contact Number</label>
+                <input name="contactNumber" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., +63 9XX XXX XXXX" required />
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-700 block mb-1">Position</label>
+              <select name="position" class="w-full border rounded-xl px-3 py-2" required>
+                <option value="">Select position</option>
+                <option value="PG">PG (Point Guard)</option>
+                <option value="SG">SG (Shooting Guard)</option>
+                <option value="SF">SF (Small Forward)</option>
+                <option value="PF">PF (Power Forward)</option>
+                <option value="C">C (Center)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-slate-700 block mb-1">Address</label>
+              <input name="address" class="w-full border rounded-xl px-3 py-2" placeholder="Street, Barangay, City" required />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-semibold text-slate-700 block mb-1">Email (Optional)</label>
+                <input name="email" type="email" class="w-full border rounded-xl px-3 py-2" placeholder="player@email.com" />
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-slate-700 block mb-1">Age (Optional)</label>
+                <input name="age" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 28" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
                 <label class="text-sm font-semibold text-slate-700 block mb-1">Height (cm)</label>
                 <input name="height" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 201" required />
               </div>
               <div>
                 <label class="text-sm font-semibold text-slate-700 block mb-1">Weight (kg)</label>
                 <input name="weight" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 104" required />
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Jersey Number</label>
-                <input name="jerseyNumber" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 23" />
-              </div>
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Age</label>
-                <input name="age" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 28" />
               </div>
             </div>
             <div>
@@ -582,7 +234,7 @@
               ${defaultTeamName ? `<input type="hidden" name="teamLocked" value="${defaultTeamName}" />` : ''}
             </div>
             <div class="bg-blue-50 text-blue-900 rounded-xl p-3 text-sm">
-              <span class="font-semibold">Note:</span> Player position can be updated later based on performance data.
+              <span class="font-semibold">Player Registration:</span> Name, position, jersey number, address, and contact number are required.
             </div>
             <div class="flex items-center justify-end gap-2 pt-2">
               <button type="button" data-modal-close class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
@@ -613,7 +265,10 @@
           weight: fd.get('weight'),
           jerseyNumber: fd.get('jerseyNumber') || '',
           age: fd.get('age') || null,
-          position: 'TBD',
+          position: fd.get('position') || 'TBD',
+          address: fd.get('address') || '',
+          contactNumber: fd.get('contactNumber') || '',
+          email: fd.get('email') || null,
           team: teamName || null
         });
         close();
@@ -677,1134 +332,12 @@
       return firstRound;
     }
 
-    async function renderBracketPage() {
-      const [teams, brackets] = await Promise.all([
-        fetchJson(`${apiBase}/teams/`),
-        fetchJson(`${apiBase}/brackets/`)
-      ]);
+    {% include "app/scripts/pages/_brackets_script.html" %}
+    {% include "app/scripts/pages/_games_script.html" %}
 
-      const formatLabel = (f) => ({
-        "single-elimination": "Single Elimination",
-        "double-elimination": "Double Elimination",
-        "round-robin": "Round Robin",
-      }[f] || f);
+    {% include "app/scripts/pages/_predictions_script.html" %}
 
-      const formatDesc = (f) => ({
-        "single-elimination": "One loss eliminates a team. Fast and simple tournament format.",
-        "double-elimination": "Teams get a second chance. Winners and losers brackets with grand final.",
-        "round-robin": "Every team plays all others. Points-based ranking system.",
-      }[f] || "");
-
-      const renderStandingsTable = (rows) => `
-        <div class="overflow-x-auto border border-slate-200 rounded-xl">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 text-slate-600">
-              <tr>
-                <th class="text-left px-3 py-2">#</th>
-                <th class="text-left px-3 py-2">Team</th>
-                <th class="text-right px-3 py-2">W</th>
-                <th class="text-right px-3 py-2">L</th>
-                <th class="text-right px-3 py-2">PTS</th>
-                <th class="text-right px-3 py-2">MP</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map((s, i) => `
-                <tr class="border-t">
-                  <td class="px-3 py-2 font-semibold text-slate-500">${i + 1}</td>
-                  <td class="px-3 py-2 font-semibold text-slate-900">${s.team}</td>
-                  <td class="px-3 py-2 text-right">${s.wins ?? 0}</td>
-                  <td class="px-3 py-2 text-right">${s.losses ?? 0}</td>
-                  <td class="px-3 py-2 text-right font-semibold text-slate-900">${s.points ?? 0}</td>
-                  <td class="px-3 py-2 text-right text-slate-600">${s.matchesPlayed ?? s.matches_played ?? 0}</td>
-                </tr>
-              `).join("") || `<tr><td colspan="6" class="px-3 py-4 text-center text-slate-500">No standings yet.</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      const computeStandingsFromMatchups = (b) => {
-        const out = {};
-        (b.teams || []).forEach((t) => { out[t] = { team: t, wins: 0, losses: 0, points: 0, matchesPlayed: 0 }; });
-        (b.matchups || []).forEach((m) => {
-          if (!m.team1 || !m.team2) return;
-          if (m.status !== "completed") return;
-          if (!out[m.team1]) out[m.team1] = { team: m.team1, wins: 0, losses: 0, points: 0, matchesPlayed: 0 };
-          if (!out[m.team2]) out[m.team2] = { team: m.team2, wins: 0, losses: 0, points: 0, matchesPlayed: 0 };
-          out[m.team1].matchesPlayed += 1;
-          out[m.team2].matchesPlayed += 1;
-          const winner = m.winner || (m.score1 >= m.score2 ? m.team1 : m.team2);
-          const loser = winner === m.team1 ? m.team2 : m.team1;
-          out[winner].wins += 1;
-          out[loser].losses += 1;
-          out[winner].points += 2;
-        });
-        return Object.values(out).sort((a, c) => (c.points - a.points) || (c.wins - a.wins) || (a.losses - c.losses) || a.team.localeCompare(c.team));
-      };
-
-      contentEl.innerHTML = `
-        <div class="flex flex-col gap-6">
-          <div>
-            <p class="text-2xl font-extrabold text-slate-900">Brackets</p>
-            <p class="text-slate-500 mt-1">Create and manage tournament brackets with standings and matchups.</p>
-          </div>
-
-          <div class="grid lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-7">
-              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-200">
-                  <p class="text-lg font-bold text-slate-900">Create New Bracket</p>
-                  <p class="text-sm text-slate-500 mt-0.5">Fill out the details, pick teams, then save.</p>
-                </div>
-                <form id="bracket-form" class="p-5 space-y-5">
-                  <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Bracket Name <span class="text-rose-500">*</span></label>
-                      <input name="name" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="e.g., Spring Championship 2024" required />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Number of Teams</label>
-                      <input id="bracket-team-count" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 bg-slate-50 text-slate-600" value="0" readonly />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Start Date (Optional)</label>
-                      <input name="startDate" type="date" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-300" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Location (Optional)</label>
-                      <input name="location" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="e.g., City Sports Arena" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Bracket Format <span class="text-rose-500">*</span></label>
-                    <div class="grid md:grid-cols-3 gap-3">
-                      ${["single-elimination","double-elimination","round-robin"].map((f, idx) => `
-                        <label class="cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-300 transition-colors">
-                          <input type="radio" name="format" value="${f}" class="sr-only" ${idx === 0 ? "checked" : ""} />
-                          <div class="font-bold text-slate-900">${formatLabel(f)}</div>
-                          <div class="text-xs text-slate-500 mt-1 leading-snug">${formatDesc(f)}</div>
-                        </label>
-                      `).join("")}
-                    </div>
-                  </div>
-
-                  <label class="flex items-start gap-3 p-4 rounded-2xl bg-blue-50 border border-blue-100">
-                    <input name="includeBronzeMatch" type="checkbox" class="mt-1 w-4 h-4" />
-                    <div>
-                      <div class="font-semibold text-slate-900">Include Bronze Match</div>
-                      <div class="text-sm text-slate-600">Add a 3rd place match between semifinal losers.</div>
-                    </div>
-                  </label>
-
-                  <div>
-                    <div class="flex items-center justify-between">
-                      <label class="block text-sm font-semibold text-slate-700">Select Teams <span class="text-rose-500">*</span></label>
-                      <div id="selected-count" class="text-sm text-slate-500">0 selected</div>
-                    </div>
-                    <div class="mt-3 grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      ${teams.map((t) => `
-                        <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors cursor-pointer">
-                          <input type="checkbox" name="team" value="${t.name}" class="w-4 h-4" />
-                          <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
-                            ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-cover" alt="${t.name}" />` : `<span class="text-slate-500 text-xs font-bold">${String(t.name || "").slice(0,2).toUpperCase()}</span>`}
-                          </div>
-                          <div class="min-w-0">
-                            <div class="font-semibold text-slate-900 text-sm truncate">${t.name}</div>
-                            <div class="text-xs text-slate-500 truncate">${t.city || ""}</div>
-                          </div>
-                        </label>
-                      `).join("")}
-                    </div>
-                  </div>
-
-                  <div class="pt-2">
-                    <button type="submit" class="w-full bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-xl px-4 py-3 font-bold">Save Bracket</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <div class="lg:col-span-5 space-y-4">
-              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-200">
-                  <p class="text-lg font-bold text-slate-900">Your Brackets</p>
-                  <p class="text-sm text-slate-500 mt-0.5">Click a bracket to view structure and standings.</p>
-                </div>
-                <div class="p-4 space-y-3">
-                  ${brackets.map((b) => `
-                    <button type="button" data-bracket-select="${b.id}" class="text-left w-full group rounded-2xl border border-slate-200 bg-white p-4 hover:shadow-md transition-shadow">
-                      <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                          <div class="font-semibold text-slate-900 truncate">${b.name}</div>
-                          <div class="text-xs text-slate-500 mt-0.5">${formatLabel(b.format)} • ${(b.teams || []).length} teams</div>
-                        </div>
-                        <div class="text-xs px-2 py-1 rounded-full ${b.status === "completed" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-orange-50 text-orange-700 border border-orange-200"}">
-                          ${b.status === "completed" ? "Completed" : "Active"}
-                        </div>
-                      </div>
-                    </button>
-                  `).join("") || `<p class="text-slate-500 text-sm">No brackets yet.</p>`}
-                </div>
-              </div>
-
-              <div id="bracket-detail" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-200">
-                  <p class="text-lg font-bold text-slate-900">Bracket Details</p>
-                  <p class="text-sm text-slate-500 mt-0.5">Select a bracket from the list.</p>
-                </div>
-                <div class="p-5 text-slate-500 text-sm">No bracket selected.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      const form = document.getElementById("bracket-form");
-      const countEl = document.getElementById("bracket-team-count");
-      const selectedCountEl = document.getElementById("selected-count");
-      const updateSelectedCount = () => {
-        const selectedTeams = Array.from(form.querySelectorAll('input[name="team"]:checked')).map((x) => x.value);
-        countEl.value = String(selectedTeams.length);
-        selectedCountEl.textContent = `${selectedTeams.length} selected`;
-      };
-      form?.querySelectorAll('input[name="team"]').forEach((cb) => cb.addEventListener("change", updateSelectedCount));
-      updateSelectedCount();
-
-      const syncFormatCards = () => {
-        form.querySelectorAll('input[name="format"]').forEach((r) => {
-          const card = r.closest("label");
-          card.classList.toggle("ring-2", r.checked);
-          card.classList.toggle("ring-orange-300", r.checked);
-          card.classList.toggle("border-slate-300", r.checked);
-        });
-      };
-      form?.querySelectorAll('input[name="format"]').forEach((r) => r.addEventListener("change", syncFormatCards));
-      syncFormatCards();
-
-      form?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const fd = new FormData(form);
-        const selectedTeams = fd.getAll("team").map(String);
-        if (selectedTeams.length < 2) {
-          alert("Select at least two teams.");
-          return;
-        }
-        const format = String(fd.get("format") || "single-elimination");
-        const matchups = generateSimpleMatchups(format, selectedTeams);
-        const payload = {
-          name: String(fd.get("name")),
-          format,
-          teams: selectedTeams,
-          startDate: fd.get("startDate") || null,
-          location: String(fd.get("location") || "") || null,
-          includeBronzeMatch: Boolean(fd.get("includeBronzeMatch")),
-          matchups,
-          standings: format === "round-robin"
-            ? selectedTeams.map((team) => ({ team, wins: 0, losses: 0, points: 0, matchesPlayed: 0 }))
-            : [],
-          currentRound: 1,
-          totalRounds: calculateTotalRounds(format, selectedTeams.length),
-          status: "active",
-        };
-        await sendJson(`${apiBase}/brackets/`, "POST", payload);
-        await loadPage();
-      });
-
-      document.querySelectorAll("[data-bracket-select]").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-bracket-select");
-          const b = await fetchJson(`${apiBase}/brackets/${id}/`);
-          const standings = (b.standings && b.standings.length) ? b.standings : computeStandingsFromMatchups(b);
-          const byRound = {};
-          (b.matchups || []).forEach((m) => {
-            byRound[m.round] = byRound[m.round] || [];
-            byRound[m.round].push(m);
-          });
-          const rounds = Object.keys(byRound).map(Number).sort((a, c) => a - c);
-          rounds.forEach((r) => byRound[r].sort((a, c) => (a.matchNumber || 0) - (c.matchNumber || 0)));
-
-          const detail = document.getElementById("bracket-detail");
-          detail.innerHTML = `
-            <div class="p-5 border-b border-slate-200">
-              <p class="text-lg font-bold text-slate-900">${b.name}</p>
-              <p class="text-sm text-slate-500 mt-0.5">${formatLabel(b.format)} • ${(b.teams || []).length} teams</p>
-            </div>
-            <div class="p-5 space-y-5">
-              <div>
-                <p class="font-bold text-slate-900 mb-3">Standings</p>
-                ${renderStandingsTable(standings)}
-              </div>
-              <div>
-                <p class="font-bold text-slate-900 mb-3">Bracket Structure</p>
-                ${rounds.length ? `
-                  <div class="overflow-x-auto">
-                    <div class="min-w-[720px] grid gap-4" style="grid-template-columns: repeat(${rounds.length}, minmax(220px, 1fr));">
-                      ${rounds.map((r) => `
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                          <div class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Round ${r}</div>
-                          <div class="space-y-2">
-                            ${byRound[r].map((m) => `
-                              <div class="rounded-xl bg-white border border-slate-200 p-3">
-                                <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
-                                  <div>Match #${m.matchNumber}</div>
-                                  <div class="${m.status === "completed" ? "text-emerald-700" : m.status === "in-progress" ? "text-orange-700" : "text-slate-500"}">${m.status}</div>
-                                </div>
-                                <div class="space-y-1 text-sm">
-                                  <div class="flex items-center justify-between">
-                                    <span class="font-semibold ${m.winner === m.team1 ? "text-emerald-700" : "text-slate-900"}">${m.team1 || "TBD"}</span>
-                                    <span class="text-slate-700">${m.score1 ?? ""}</span>
-                                  </div>
-                                  <div class="flex items-center justify-between">
-                                    <span class="font-semibold ${m.winner === m.team2 ? "text-emerald-700" : "text-slate-900"}">${m.team2 || "TBD"}</span>
-                                    <span class="text-slate-700">${m.score2 ?? ""}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            `).join("")}
-                          </div>
-                        </div>
-                      `).join("")}
-                    </div>
-                  </div>
-                ` : `<p class="text-slate-500 text-sm">No matchups yet.</p>`}
-              </div>
-            </div>
-          `;
-        });
-      });
-    }
-
-    async function renderGamesPage() {
-      const [brackets, teams, players, existingGames] = await Promise.all([
-        fetchJson(`${apiBase}/brackets/`),
-        fetchJson(`${apiBase}/teams/`),
-        fetchJson(`${apiBase}/players/`),
-        fetchJson(`${apiBase}/games/`).catch(() => []),
-      ]);
-
-      const activeBrackets = brackets.filter((b) => b.status === "active");
-      if (!activeBrackets.length) {
-        contentEl.innerHTML = '<p class="text-slate-500">No active bracket. Create one in Bracket page.</p>';
-        return;
-      }
-
-      const bracket = activeBrackets[0];
-      const matchups = (bracket.matchups || []).filter((m) => !m.isBye && m.team1 && m.team2 && m.status !== "completed");
-      if (!matchups.length) {
-        contentEl.innerHTML = '<p class="text-slate-500">No pending or in-progress games.</p>';
-        return;
-      }
-
-      const logoByTeam = Object.fromEntries(teams.map((t) => [t.name, t.logo]));
-      const playersByTeam = players.reduce((acc, p) => {
-        if (!p.team) return acc;
-        acc[p.team] = acc[p.team] || [];
-        acc[p.team].push(p);
-        return acc;
-      }, {});
-
-      const toBaseStat = (p, teamName) => ({
-        player: p.id,
-        playerName: p.name,
-        teamName,
-        fgm2: 0, fga2: 0, fgm3: 0, fga3: 0,
-        ftm: 0, fta: 0, oreb: 0, dreb: 0,
-        assists: 0, steals: 0, blocks: 0, fouls: 0, turnovers: 0,
-        points: 0,
-        fouledOut: false,
-      });
-      const mergeStats = (base, saved = []) => base.map((row) => {
-        const hit = saved.find((s) => String(s.player) === String(row.player));
-        return hit ? { ...row, ...hit, playerName: row.playerName, teamName: row.teamName, fouledOut: Number(hit.fouls || 0) >= 6 } : row;
-      });
-      const firstFiveIndexes = (arr) => {
-        const out = [];
-        for (let i = 0; i < arr.length && out.length < 5; i += 1) out.push(i);
-        return out;
-      };
-      const sideData = (state, side) => (side === "home" ? { team: state.team1, roster: state.homeRoster, active: state.homeActive } : { team: state.team2, roster: state.awayRoster, active: state.awayActive });
-      const activeRows = (state, side) => {
-        const d = sideData(state, side);
-        return d.active.map((idx) => ({ idx, row: d.roster[idx] })).filter((x) => x.row);
-      };
-
-      let selectedMatchupId = String(matchups[0].id);
-      const gameState = {};
-      let selectedPlayer = { side: "home", rosterIndex: 0 };
-      const actionHistory = [];
-
-      contentEl.innerHTML = `
-        <div class="space-y-4">
-          <div class="flex items-center justify-between gap-3">
-            <div>
-              <p class="text-2xl font-extrabold text-slate-900">Game Tracking</p>
-              <p class="text-slate-500 text-sm">${bracket.name} • ${matchups.length} active matchup${matchups.length > 1 ? "s" : ""}</p>
-            </div>
-            <div class="text-xs text-slate-500 bg-slate-100 rounded-full px-3 py-1">
-              Select player first, then tap contribution action
-            </div>
-          </div>
-          <div class="grid lg:grid-cols-12 gap-4">
-            <div class="lg:col-span-3">
-              <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="px-4 py-3 border-b bg-slate-50 text-sm font-semibold text-slate-700">Matchups</div>
-                <div id="games-match-list" class="p-3 space-y-2 max-h-[560px] overflow-y-auto"></div>
-              </div>
-            </div>
-            <div class="lg:col-span-9"><div id="game-tracker-panel"></div></div>
-          </div>
-        </div>
-      `;
-
-      const ensureGameState = async (matchup) => {
-        if (gameState[matchup.id]) return gameState[matchup.id];
-        let game = (existingGames || []).find((g) => String(g.matchup) === String(matchup.id));
-        if (!game) {
-          game = await sendJson(`${apiBase}/games/`, "POST", {
-            bracket: bracket.id,
-            matchup: matchup.id,
-            team1Name: matchup.team1,
-            team2Name: matchup.team2,
-            score1: matchup.score1 || 0,
-            score2: matchup.score2 || 0,
-            quarter: 1,
-            clock: "12:00",
-            status: "in-progress",
-          });
-        }
-
-        const homeBase = (playersByTeam[matchup.team1] || []).map((p) => toBaseStat(p, matchup.team1));
-        const awayBase = (playersByTeam[matchup.team2] || []).map((p) => toBaseStat(p, matchup.team2));
-        const homeRoster = mergeStats(homeBase, game.playerStats?.filter((x) => x.teamName === matchup.team1));
-        const awayRoster = mergeStats(awayBase, game.playerStats?.filter((x) => x.teamName === matchup.team2));
-        const homeActive = firstFiveIndexes(homeRoster);
-        const awayActive = firstFiveIndexes(awayRoster);
-
-        gameState[matchup.id] = {
-          gameId: game.id,
-          team1: matchup.team1,
-          team2: matchup.team2,
-          score1: Number(game.score1 || matchup.score1 || 0),
-          score2: Number(game.score2 || matchup.score2 || 0),
-          quarter: Number(game.quarter || 1),
-          clock: game.clock || "12:00",
-          homeRoster,
-          awayRoster,
-          homeActive,
-          awayActive,
-          events: game.events || [],
-        };
-        return gameState[matchup.id];
-      };
-
-      const pointsFor = (statKey) => (statKey === "fgm2" ? 2 : (statKey === "fgm3" ? 3 : (statKey === "ftm" ? 1 : 0)));
-      const applyStat = (state, side, rosterIndex, statKey, inc = 1) => {
-        const d = sideData(state, side);
-        const row = d.roster[rosterIndex];
-        if (!row || row.fouledOut) return;
-        row[statKey] = Number(row[statKey] || 0) + inc;
-        const pts = pointsFor(statKey) * inc;
-        if (pts) {
-          row.points = Number(row.points || 0) + pts;
-          if (side === "home") state.score1 += pts;
-          else state.score2 += pts;
-        }
-      };
-
-      const renderPlayerTable = (state, side) => {
-        const d = sideData(state, side);
-        const selectedId = `${selectedPlayer.side}|${selectedPlayer.rosterIndex}`;
-        return `
-          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            <div class="px-4 py-3 border-b bg-slate-50 text-sm font-semibold text-slate-800">${d.team} Stats (Starters)</div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs">
-                <thead class="bg-slate-50 text-slate-500">
-                  <tr>
-                    <th class="text-left px-2 py-2">Player</th>
-                    <th class="text-center px-2 py-2">2PT</th>
-                    <th class="text-center px-2 py-2">3PT</th>
-                    <th class="text-center px-2 py-2">FT</th>
-                    <th class="text-center px-2 py-2">REB</th>
-                    <th class="text-center px-2 py-2">AST</th>
-                    <th class="text-center px-2 py-2">STL</th>
-                    <th class="text-center px-2 py-2">BLK</th>
-                    <th class="text-center px-2 py-2">TO</th>
-                    <th class="text-center px-2 py-2">FOUL</th>
-                    <th class="text-center px-2 py-2">PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${activeRows(state, side).map(({ idx, row }) => {
-                    const rowId = `${side}|${idx}`;
-                    const selected = rowId === selectedId;
-                    return `
-                      <tr data-player-row="${rowId}" class="border-t cursor-pointer ${selected ? "bg-orange-50" : "hover:bg-slate-50"} ${row.fouledOut ? "opacity-60" : ""}">
-                        <td class="px-2 py-2 whitespace-nowrap font-medium">${row.playerName} ${row.fouledOut ? '<span class="text-[10px] text-red-600">FOUL OUT</span>' : ""}</td>
-                        <td class="px-2 py-2 text-center">${row.fgm2}/${row.fga2}</td>
-                        <td class="px-2 py-2 text-center">${row.fgm3}/${row.fga3}</td>
-                        <td class="px-2 py-2 text-center">${row.ftm}/${row.fta}</td>
-                        <td class="px-2 py-2 text-center">${Number(row.oreb || 0) + Number(row.dreb || 0)}</td>
-                        <td class="px-2 py-2 text-center">${row.assists || 0}</td>
-                        <td class="px-2 py-2 text-center">${row.steals || 0}</td>
-                        <td class="px-2 py-2 text-center">${row.blocks || 0}</td>
-                        <td class="px-2 py-2 text-center">${row.turnovers || 0}</td>
-                        <td class="px-2 py-2 text-center">${row.fouls || 0}</td>
-                        <td class="px-2 py-2 text-center font-semibold">${row.points || 0}</td>
-                      </tr>
-                    `;
-                  }).join("") || '<tr><td colspan="11" class="text-center py-4 text-slate-500">No players found for this team.</td></tr>'}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      };
-
-      const ensureSelectedIsActive = (state) => {
-        const d = sideData(state, selectedPlayer.side);
-        if (!d.active.includes(selectedPlayer.rosterIndex) || !d.roster[selectedPlayer.rosterIndex]) {
-          const home = activeRows(state, "home")[0];
-          const away = activeRows(state, "away")[0];
-          const next = home || away;
-          selectedPlayer = next ? { side: home ? "home" : "away", rosterIndex: next.idx } : { side: "home", rosterIndex: 0 };
-        }
-      };
-
-      const pickSubPlayer = (state, side, outIndex) => {
-        const d = sideData(state, side);
-        const candidates = d.roster
-          .map((row, idx) => ({ idx, row }))
-          .filter((x) => !d.active.includes(x.idx) && !x.row.fouledOut);
-        if (!candidates.length) {
-          alert("No available bench player for substitution.");
-          return;
-        }
-        const menu = candidates.map((x, i) => `${i + 1}. ${x.row.playerName}`).join("\n");
-        const answer = prompt(`Choose substitute player number:\n${menu}`);
-        const choice = Number(answer);
-        if (!choice || choice < 1 || choice > candidates.length) return;
-        const inIdx = candidates[choice - 1].idx;
-        const slot = d.active.findIndex((x) => x === outIndex);
-        if (slot >= 0) d.active[slot] = inIdx;
-        selectedPlayer = { side, rosterIndex: inIdx };
-        state.events.push({ description: `${d.roster[outIndex].playerName} out, ${d.roster[inIdx].playerName} in` });
-      };
-
-      const renderMatchList = () => {
-        const list = document.getElementById("games-match-list");
-        list.innerHTML = matchups.map((m) => `
-          <button type="button" data-select-game="${m.id}" class="w-full text-left rounded-xl border px-3 py-3 transition-colors ${String(m.id) === selectedMatchupId ? "border-orange-300 bg-orange-50" : "border-slate-200 bg-white hover:bg-slate-50"}">
-            <div class="text-xs text-slate-500">Round ${m.round} • Match #${m.matchNumber}</div>
-            <div class="font-semibold text-slate-900 truncate mt-1">${m.team1} vs ${m.team2}</div>
-          </button>
-        `).join("");
-        list.querySelectorAll("[data-select-game]").forEach((btn) => {
-          btn.addEventListener("click", async () => {
-            selectedMatchupId = String(btn.getAttribute("data-select-game"));
-            renderMatchList();
-            await renderTracker();
-          });
-        });
-      };
-
-      const renderTracker = async () => {
-        const matchup = matchups.find((m) => String(m.id) === selectedMatchupId) || matchups[0];
-        if (!matchup) return;
-        const state = await ensureGameState(matchup);
-        ensureSelectedIsActive(state);
-        const panel = document.getElementById("game-tracker-panel");
-        const homeLogo = logoByTeam[matchup.team1];
-        const awayLogo = logoByTeam[matchup.team2];
-        const selectedRow = sideData(state, selectedPlayer.side).roster[selectedPlayer.rosterIndex];
-
-        panel.innerHTML = `
-          <div class="space-y-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-              <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center">
-                    ${homeLogo ? `<img src="${homeLogo}" class="w-full h-full object-cover" alt="${matchup.team1}" />` : `<span class="text-slate-500 text-xs font-bold">${String(matchup.team1).slice(0, 2).toUpperCase()}</span>`}
-                  </div>
-                  <div>
-                    <div class="text-sm text-slate-500">${matchup.team1}</div>
-                    <div class="text-5xl font-black text-slate-900">${state.score1}</div>
-                  </div>
-                </div>
-                <div class="text-center">
-                  <div class="text-slate-400 font-bold">VS</div>
-                  <div class="text-xs text-slate-500 mt-1">Q${state.quarter} • ${state.clock}</div>
-                  <div class="mt-2 flex gap-2">
-                    <button type="button" data-action="prevQuarter" class="rounded-lg px-3 py-1.5 text-xs border border-slate-300 bg-white">Prev Quarter</button>
-                    <button type="button" data-action="nextQuarter" class="rounded-lg px-3 py-1.5 text-xs border border-slate-300 bg-white">Next Quarter</button>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <div class="text-right">
-                    <div class="text-sm text-slate-500">${matchup.team2}</div>
-                    <div class="text-5xl font-black text-slate-900">${state.score2}</div>
-                  </div>
-                  <div class="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center">
-                    ${awayLogo ? `<img src="${awayLogo}" class="w-full h-full object-cover" alt="${matchup.team2}" />` : `<span class="text-slate-500 text-xs font-bold">${String(matchup.team2).slice(0, 2).toUpperCase()}</span>`}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-3">
-              <p class="text-xs text-slate-500 mb-2">Selected: <span class="font-semibold text-slate-700">${selectedRow ? `${selectedRow.playerName} (${selectedPlayer.side === "home" ? matchup.team1 : matchup.team2})` : "None"}</span></p>
-              <div class="flex flex-wrap gap-2">
-                ${[
-                  ["twoMade", "2PT Made"], ["twoMiss", "2PT Miss"],
-                  ["threeMade", "3PT Made"], ["threeMiss", "3PT Miss"],
-                  ["ftMade", "FT Made"], ["ftMiss", "FT Miss"],
-                  ["oreb", "OREB"], ["dreb", "DREB"], ["assist", "AST"],
-                  ["steal", "STL"], ["block", "BLK"], ["turnover", "TO"],
-                  ["foul", "Foul"], ["sub", "Substitution"], ["foulOut", "Foul Out"],
-                ].map(([id, label]) => `<button type="button" data-action="${id}" class="rounded-lg px-3 py-2 text-xs font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">${label}</button>`).join("")}
-                <button type="button" data-action="undo" class="rounded-lg px-3 py-2 text-xs font-semibold border border-orange-300 bg-orange-50 text-orange-700">Undo</button>
-              </div>
-            </div>
-
-            <div class="grid lg:grid-cols-2 gap-4">
-              ${renderPlayerTable(state, "home")}
-              ${renderPlayerTable(state, "away")}
-            </div>
-
-            <form id="game-save-form" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex items-center gap-3">
-              <button class="bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-4 py-2 font-semibold">Save & End Game</button>
-              <span class="text-sm text-slate-500">This will finalize matchup result and persist player stats.</span>
-            </form>
-          </div>
-        `;
-
-        panel.querySelectorAll("[data-player-row]").forEach((rowEl) => {
-          rowEl.addEventListener("click", () => {
-            const [side, idx] = rowEl.getAttribute("data-player-row").split("|");
-            selectedPlayer = { side, rosterIndex: Number(idx) };
-            renderTracker();
-          });
-        });
-
-        const saveSnapshot = () => {
-          actionHistory.push({
-            matchupId: matchup.id,
-            snapshot: JSON.parse(JSON.stringify({ ...state, selectedPlayer })),
-          });
-        };
-
-        panel.querySelectorAll("[data-action]").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const action = btn.getAttribute("data-action");
-            if (action === "undo") {
-              const last = actionHistory.pop();
-              if (!last || String(last.matchupId) !== String(matchup.id)) return;
-              Object.assign(state, last.snapshot);
-              selectedPlayer = last.snapshot.selectedPlayer;
-              renderTracker();
-              return;
-            }
-            if (action === "prevQuarter" || action === "nextQuarter") {
-              saveSnapshot();
-              state.quarter = action === "prevQuarter" ? Math.max(1, Number(state.quarter || 1) - 1) : Math.min(4, Number(state.quarter || 1) + 1);
-              renderTracker();
-              return;
-            }
-
-            const d = sideData(state, selectedPlayer.side);
-            const row = d.roster[selectedPlayer.rosterIndex];
-            if (!row) return;
-            saveSnapshot();
-
-            if (action === "twoMade") { applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fgm2"); applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga2"); }
-            if (action === "twoMiss") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga2");
-            if (action === "threeMade") { applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fgm3"); applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga3"); }
-            if (action === "threeMiss") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fga3");
-            if (action === "ftMade") { applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "ftm"); applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fta"); }
-            if (action === "ftMiss") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fta");
-            if (action === "oreb") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "oreb");
-            if (action === "dreb") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "dreb");
-            if (action === "assist") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "assists");
-            if (action === "steal") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "steals");
-            if (action === "block") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "blocks");
-            if (action === "turnover") applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "turnovers");
-            if (action === "foul") {
-              applyStat(state, selectedPlayer.side, selectedPlayer.rosterIndex, "fouls");
-              if (Number(row.fouls || 0) >= 6) {
-                row.fouledOut = true;
-                pickSubPlayer(state, selectedPlayer.side, selectedPlayer.rosterIndex);
-              }
-            }
-            if (action === "sub") pickSubPlayer(state, selectedPlayer.side, selectedPlayer.rosterIndex);
-            if (action === "foulOut") {
-              row.fouls = Math.max(6, Number(row.fouls || 0));
-              row.fouledOut = true;
-              pickSubPlayer(state, selectedPlayer.side, selectedPlayer.rosterIndex);
-            }
-            renderTracker();
-          });
-        });
-
-        panel.querySelector("#game-save-form").addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const fresh = await fetchJson(`${apiBase}/brackets/${bracket.id}/`);
-          const updatedMatchups = fresh.matchups.map((m) => (
-            String(m.id) === String(matchup.id)
-              ? { ...m, score1: state.score1, score2: state.score2, winner: state.score1 >= state.score2 ? m.team1 : m.team2, status: "completed" }
-              : m
-          ));
-          const allDone = updatedMatchups.filter((m) => !m.isBye).every((m) => m.status === "completed");
-          await sendJson(`${apiBase}/brackets/${bracket.id}/`, "PUT", { ...fresh, matchups: updatedMatchups, status: allDone ? "completed" : fresh.status });
-          await sendJson(`${apiBase}/games/${state.gameId}/`, "PUT", {
-            score1: state.score1,
-            score2: state.score2,
-            quarter: state.quarter,
-            clock: state.clock,
-            status: "completed",
-            team1Name: matchup.team1,
-            team2Name: matchup.team2,
-          });
-          await sendJson(`${apiBase}/games/${state.gameId}/sync_stats/`, "POST", {
-            playerStats: [...state.homeRoster, ...state.awayRoster].map((x) => ({
-              player: x.player,
-              playerName: x.playerName,
-              teamName: x.teamName,
-              fgm2: x.fgm2, fga2: x.fga2, fgm3: x.fgm3, fga3: x.fga3,
-              ftm: x.ftm, fta: x.fta, oreb: x.oreb, dreb: x.dreb,
-              assists: x.assists, steals: x.steals, blocks: x.blocks,
-              fouls: x.fouls, turnovers: x.turnovers, points: x.points,
-            })),
-          });
-          await loadPage();
-        });
-      };
-
-      if (window.__gamesShortcutHandler) window.removeEventListener("keydown", window.__gamesShortcutHandler);
-      window.__gamesShortcutHandler = (e) => {
-        const map = {
-          "1": "twoMade", "2": "twoMiss", "3": "threeMade", "4": "threeMiss",
-          "5": "ftMade", "6": "ftMiss", r: "dreb", o: "oreb", a: "assist", s: "steal", b: "block", t: "turnover", f: "foul", x: "sub",
-        };
-        const key = String(e.key || "").toLowerCase();
-        if (map[key]) {
-          const btn = document.querySelector(`[data-action="${map[key]}"]`);
-          if (btn) { e.preventDefault(); btn.click(); }
-        }
-        if (key === "u") {
-          const btn = document.querySelector('[data-action="undo"]');
-          if (btn) { e.preventDefault(); btn.click(); }
-        }
-        if (key === "enter") {
-          const form = document.getElementById("game-save-form");
-          if (form) { e.preventDefault(); form.requestSubmit(); }
-        }
-      };
-      window.addEventListener("keydown", window.__gamesShortcutHandler);
-
-      renderMatchList();
-      await renderTracker();
-    }
-
-    async function renderPredictionsPage() {
-      const [brackets, predictions] = await Promise.all([
-        fetchJson(`${apiBase}/brackets/`),
-        fetchJson(`${apiBase}/predictions/`)
-      ]);
-      const active = brackets.find(b => b.status === 'active');
-      if (!active) {
-        contentEl.innerHTML = '<p class="text-slate-500">No active bracket for predictions.</p>';
-        return;
-      }
-      const pending = active.matchups.filter(m => m.status === 'pending' && m.team1 && m.team2);
-      contentEl.innerHTML = `
-        <h3 class="font-semibold mb-3">Upcoming Game Predictions</h3>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-          ${pending.map(m => {
-            const p = predictions.find(x => x.matchupId === m.id);
-            return `
-              <div class="border rounded p-3">
-                <div class="text-sm text-slate-500 mb-2">Match #${m.matchNumber} - Round ${m.round}</div>
-                <div class="space-y-2">
-                  <button data-predict="${m.id}|${m.team1}" class="w-full border rounded px-3 py-2 text-left ${p?.predictedWinner === m.team1 ? 'border-orange-500 bg-orange-50' : ''}">${m.team1}</button>
-                  <button data-predict="${m.id}|${m.team2}" class="w-full border rounded px-3 py-2 text-left ${p?.predictedWinner === m.team2 ? 'border-orange-500 bg-orange-50' : ''}">${m.team2}</button>
-                </div>
-                <div class="mt-2 text-xs text-slate-600">${p ? `Predicted: ${p.predictedWinner}` : 'No prediction yet'}</div>
-              </div>
-            `;
-          }).join('') || '<p class="text-slate-500">No upcoming games.</p>'}
-        </div>
-      `;
-      document.querySelectorAll('[data-predict]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const [matchupId, winner] = btn.getAttribute('data-predict').split('|');
-          await sendJson(`${apiBase}/predictions/`, 'POST', { matchupId, predictedWinner: winner, confidence: 75 });
-          await loadPage();
-        });
-      });
-    }
-
-    function renderAddTeamPage() {
-      contentEl.innerHTML = `
-        <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-7 md:p-8">
-          <div class="flex items-start gap-4 mb-7">
-            <div class="w-14 h-14 rounded-xl bg-blue-50 text-[#0f2f5c] flex items-center justify-center text-2xl">🛡</div>
-            <div>
-              <h3 class="text-4xl font-extrabold text-[#0b264e] tracking-tight">Add New Team</h3>
-              <p class="text-slate-600 mt-1 text-xl">Create a new team for your league</p>
-            </div>
-          </div>
-
-          <form id="add-team-page-form" class="space-y-6">
-            <div>
-              <label class="block text-lg font-semibold text-[#0b264e] mb-2">Team Name *</label>
-              <input name="name" required class="w-full border border-slate-300 rounded-xl px-4 py-3 text-lg" placeholder="e.g., Golden State Warriors" />
-            </div>
-
-            <div>
-              <label class="block text-lg font-semibold text-[#0b264e] mb-2">City *</label>
-              <input name="city" required class="w-full border border-slate-300 rounded-xl px-4 py-3 text-lg" placeholder="e.g., San Francisco" />
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-5">
-              <div>
-                <label class="block text-lg font-semibold text-[#0b264e] mb-2">Conference *</label>
-                <select name="conference" required class="w-full border border-slate-300 rounded-xl px-4 py-3 text-lg bg-white">
-                  <option value="">Select conference</option>
-                  <option value="Eastern">Eastern</option>
-                  <option value="Western">Western</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-lg font-semibold text-[#0b264e] mb-2">Division *</label>
-                <select name="division" required class="w-full border border-slate-300 rounded-xl px-4 py-3 text-lg bg-white">
-                  <option value="">Select division</option>
-                  <option value="Atlantic">Atlantic</option>
-                  <option value="Central">Central</option>
-                  <option value="Southeast">Southeast</option>
-                  <option value="Northwest">Northwest</option>
-                  <option value="Pacific">Pacific</option>
-                  <option value="Southwest">Southwest</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-lg font-semibold text-[#0b264e] mb-2">Team Logo URL (Optional)</label>
-              <input name="logo" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-lg" placeholder="https://example.com/logo.jpg" />
-              <p class="text-slate-500 mt-2">Provide a URL to an image for the team logo</p>
-            </div>
-
-            <div class="bg-[#eef3fb] border border-[#dbe5f5] rounded-xl p-5">
-              <h4 class="text-2xl font-bold text-[#0b264e] mb-2">Team Information</h4>
-              <ul class="list-disc pl-6 space-y-1 text-[#0f2f5c] text-lg">
-                <li>Teams will start with 0 players</li>
-                <li>You can add players to the team after creation</li>
-                <li>Teams can be edited or deleted later</li>
-              </ul>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-4 pt-2">
-              <a href="/teams/" class="text-center border border-slate-300 rounded-xl px-4 py-3 text-2xl font-semibold text-[#0b264e] hover:bg-slate-50">Cancel</a>
-              <button class="bg-[#0b264e] hover:bg-[#12386b] text-white rounded-xl px-4 py-3 text-2xl font-semibold">Create Team</button>
-            </div>
-          </form>
-        </div>
-      `;
-
-      const form = document.getElementById('add-team-page-form');
-      form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(form);
-        await sendJson(`${apiBase}/teams/`, 'POST', {
-          name: fd.get('name'),
-          city: fd.get('city'),
-          conference: fd.get('conference'),
-          division: fd.get('division'),
-          logo: fd.get('logo') || null
-        });
-        window.location.href = '/teams/';
-      });
-    }
-
-    function renderDashboardLikeUI(players, teams, brackets) {
-      const topPlayers = players.slice(0, 5);
-      const leader = topPlayers[0];
-      contentEl.innerHTML = `
-        <div class="space-y-5">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-2xl font-extrabold tracking-tight text-slate-900">Welcome back</p>
-              <p class="text-slate-500 mt-1">Here's your performance overview</p>
-            </div>
-            <div class="bg-[#132D57] text-white rounded-xl px-4 py-3 shadow">
-              <div class="text-xs text-slate-300">Last Updated</div>
-              <div class="text-sm font-bold">Today, 3:45 PM</div>
-            </div>
-          </div>
-
-          <div class="rounded-2xl bg-gradient-to-r from-[#102C57] to-[#163E72] p-6 text-white shadow">
-            <div class="text-lg font-bold mb-4">Season Highlights</div>
-            <div class="grid md:grid-cols-3 gap-4">
-              <div class="rounded-xl bg-white/10 border border-white/10 p-4">
-                <div class="text-xs text-slate-300">Season Leader</div>
-                <div class="text-2xl font-bold">${leader?.name || 'No data'}</div>
-                <div class="text-sm text-slate-300">32.5 PPG</div>
-              </div>
-              <div class="rounded-xl bg-white/10 border border-white/10 p-4">
-                <div class="text-xs text-slate-300">League Average</div>
-                <div class="text-2xl font-bold">28.9 PPG</div>
-                <div class="text-sm text-emerald-300">+2.3 from last season</div>
-              </div>
-              <div class="rounded-xl bg-white/10 border border-white/10 p-4">
-                <div class="text-xs text-slate-300">Active Games</div>
-                <div class="text-2xl font-bold">${Math.max(1, brackets.filter(b => b.status === 'active').length)} Live</div>
-                <div class="text-sm text-slate-300">In progress now</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-              <div class="flex justify-between items-center">
-                <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">P</div>
-                <span class="text-emerald-600 text-sm font-semibold">+12%</span>
-              </div>
-              <div class="mt-4 text-xs text-slate-500 font-semibold">TOTAL PLAYERS</div>
-              <div class="text-4xl font-extrabold text-slate-900">${players.length}</div>
-              <div class="text-sm text-slate-500">Active roster</div>
-              <div class="h-1 rounded bg-slate-200 mt-3"><div class="h-1 rounded bg-orange-500" style="width:72%"></div></div>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-              <div class="flex justify-between items-center">
-                <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">G</div>
-                <span class="text-emerald-600 text-sm font-semibold">+5%</span>
-              </div>
-              <div class="mt-4 text-xs text-slate-500 font-semibold">TOTAL GAMES</div>
-              <div class="text-4xl font-extrabold text-slate-900">${brackets.reduce((acc, b) => acc + (b.matchups?.length || 0), 0)}</div>
-              <div class="text-sm text-slate-500">This season</div>
-              <div class="h-1 rounded bg-slate-200 mt-3"><div class="h-1 rounded bg-orange-500" style="width:68%"></div></div>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-              <div class="flex justify-between items-center">
-                <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">S</div>
-                <span class="text-rose-600 text-sm font-semibold">-1</span>
-              </div>
-              <div class="mt-4 text-xs text-slate-500 font-semibold">ACTIVE SCOUTS</div>
-              <div class="text-4xl font-extrabold text-slate-900">8</div>
-              <div class="text-sm text-slate-500">Currently online</div>
-              <div class="h-1 rounded bg-slate-200 mt-3"><div class="h-1 rounded bg-orange-500" style="width:74%"></div></div>
-            </div>
-          </div>
-
-          <div class="grid lg:grid-cols-3 gap-4">
-            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-              <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white flex items-center justify-between">
-                <div>
-                  <div class="text-xl font-bold">Top Performers</div>
-                  <div class="text-sm text-slate-200">Season Leaders 2024</div>
-                </div>
-                <div class="px-3 py-1 rounded-full bg-black/20 text-sm font-semibold">${topPlayers.length} Players</div>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-slate-50 text-slate-600">
-                    <tr>
-                      <th class="text-left px-4 py-3">RANK</th>
-                      <th class="text-left px-4 py-3">PLAYER</th>
-                      <th class="text-left px-4 py-3">POS</th>
-                      <th class="text-left px-4 py-3">PPG</th>
-                      <th class="text-left px-4 py-3">RPG</th>
-                      <th class="text-left px-4 py-3">APG</th>
-                      <th class="text-left px-4 py-3">TREND</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${topPlayers.map((p, i) => `
-                      <tr class="border-t">
-                        <td class="px-4 py-3 font-bold text-orange-500">${i + 1}</td>
-                        <td class="px-4 py-3 font-semibold text-slate-900">${p.name}</td>
-                        <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs">${p.position || 'SG'}</span></td>
-                        <td class="px-4 py-3 text-orange-600 font-bold">${(32.5 - i * 1.4).toFixed(1)}</td>
-                        <td class="px-4 py-3 text-blue-700">${(6.2 - i * 0.4).toFixed(1)}</td>
-                        <td class="px-4 py-3 text-emerald-700">${(5.8 - i * 0.3).toFixed(1)}</td>
-                        <td class="px-4 py-3 text-emerald-600 font-semibold">+${(2.3 - i * 0.2).toFixed(1)}</td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="bg-gradient-to-br from-[#102C57] to-[#163E72] rounded-2xl p-5 text-white shadow relative overflow-hidden">
-              <div class="absolute -right-3 -top-5 text-[120px] font-black text-white/10">1</div>
-              <div class="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center text-3xl font-black">${leader?.name ? leader.name.split(' ').map(x => x[0]).slice(0,2).join('') : 'MJ'}</div>
-              <div class="mt-4 text-3xl font-extrabold">${leader?.name || 'Michael Jordan'}</div>
-              <div class="text-slate-300">Chicago Bulls</div>
-              <div class="mt-5 grid grid-cols-2 gap-3">
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">PPG</div><div class="text-2xl font-bold">32.5</div></div>
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">RPG</div><div class="text-2xl font-bold">6.2</div></div>
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">APG</div><div class="text-2xl font-bold">5.8</div></div>
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">TREND</div><div class="text-2xl font-bold text-emerald-300">+2.3</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderTeamRosterPage(team, roster) {
-      const guards = roster.filter(p => p.position === 'PG' || p.position === 'SG').length;
-      const forwards = roster.filter(p => p.position === 'SF' || p.position === 'PF').length;
-      const centers = roster.filter(p => p.position === 'C').length;
-      const undetermined = roster.length - guards - forwards - centers;
-      contentEl.innerHTML = `
-        <a href="/teams/" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-3">← Back to Teams</a>
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="p-4 border-b">
-            <div class="flex items-start justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-200">${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-cover" />` : ''}</div>
-                <div>
-                  <h3 class="text-4xl font-extrabold text-[#0d2c59]">${team?.name || 'Team Not Found'}</h3>
-                  <p class="text-slate-600">${team?.city || ''} • ${team?.conference || ''} Conference • ${team?.division || ''} Division</p>
-                </div>
-              </div>
-              ${team ? '<button id="add-roster-player" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-4 py-2 text-sm font-medium">Add Player</button>' : ''}
-            </div>
-          </div>
-          <div class="bg-[#eef3fb] p-4">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-              <div><div class="text-slate-500">Total Players</div><div class="text-3xl font-bold text-[#0d2c59]">${roster.length}<span class="text-base text-slate-500"> / 15</span></div></div>
-              <div><div class="text-slate-500">Guards</div><div class="text-2xl font-bold">${guards}</div></div>
-              <div><div class="text-slate-500">Forwards</div><div class="text-2xl font-bold">${forwards}</div></div>
-              <div><div class="text-slate-500">Centers</div><div class="text-2xl font-bold">${centers}</div></div>
-              <div><div class="text-slate-500">Undetermined</div><div class="text-2xl font-bold">${undetermined}</div></div>
-            </div>
-          </div>
-          <div class="p-4">
-            <h4 class="text-2xl font-bold text-[#0d2c59] mb-3">Team Roster</h4>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="text-slate-500 border-b">
-                  <tr>
-                    <th class="text-left py-2">Player</th>
-                    <th class="text-left py-2">Jersey #</th>
-                    <th class="text-left py-2">Position</th>
-                    <th class="text-left py-2">Height</th>
-                    <th class="text-left py-2">Weight</th>
-                    <th class="text-right py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${roster.map(p => `
-                    <tr class="border-b">
-                      <td class="py-2 font-medium">${p.name}</td>
-                      <td class="py-2">${p.jerseyNumber || '-'}</td>
-                      <td class="py-2"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs">${p.position || 'TBD'}</span></td>
-                      <td class="py-2">${p.height || '-'} cm</td>
-                      <td class="py-2">${p.weight || '-'} kg</td>
-                      <td class="py-2 text-right space-x-2">
-                        <button data-player-edit="${p.id}" class="text-blue-600 hover:text-blue-800">✎</button>
-                        <button data-player-delete="${p.id}" class="text-rose-500 hover:text-rose-700">🗑</button>
-                      </td>
-                    </tr>
-                  `).join('') || '<tr><td colspan="6" class="py-5 text-center text-slate-500">No players in this roster yet.</td></tr>'}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('add-roster-player')?.addEventListener('click', async () => {
-        const teams = await fetchJson(`${apiBase}/teams/`);
-        openPlayerModal({ teams, defaultTeamName: team?.name || null, onSave: loadPage });
-      });
-
-      document.querySelectorAll('[data-player-delete]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          await fetch(`${apiBase}/players/${btn.getAttribute('data-player-delete')}/`, { method: 'DELETE' });
-          await loadPage();
-        });
-      });
-
-      document.querySelectorAll('[data-player-edit]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const playerId = btn.getAttribute('data-player-edit');
-          const current = roster.find(p => String(p.id) === String(playerId));
-          if (!current) return;
-          const name = prompt('Player name:', current.name) ?? current.name;
-          const jerseyNumber = prompt('Jersey #:', current.jerseyNumber || '') ?? current.jerseyNumber;
-          const position = prompt('Position:', current.position || 'TBD') ?? current.position;
-          const height = prompt('Height (cm):', current.height || '') ?? current.height;
-          const weight = prompt('Weight (kg):', current.weight || '') ?? current.weight;
-          await sendJson(`${apiBase}/players/${playerId}/`, 'PUT', { ...current, name, jerseyNumber, position, height, weight, team: team.name });
-          await loadPage();
-        });
-      });
-    }
-
-    function renderPlayersPage(players, teams) {
-      const teamOptions = teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-      contentEl.innerHTML = `
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-3xl font-extrabold text-[#0d2c59]">Player Management</h2>
-          <button id="add-player-btn" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-4 py-2">Add Player</button>
-        </div>
-        <div class="bg-blue-50 p-4 rounded-xl mb-5 text-blue-900">
-          <div class="font-semibold mb-1">About Player Positions</div>
-          <p class="text-sm">Positions are tracked from player records and can be edited anytime.</p>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
-          <div class="grid md:grid-cols-3 gap-3 mb-4">
-            <input id="player-search" class="border rounded px-3 py-2" placeholder="Search players..." />
-            <select id="player-position" class="border rounded px-3 py-2">
-              <option value="">All Positions</option><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option><option>TBD</option>
-            </select>
-            <select id="player-team" class="border rounded px-3 py-2"><option value="">All Teams</option>${teamOptions}</select>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-50 text-slate-600"><tr><th class="text-left p-2">ID</th><th class="text-left p-2">Name</th><th class="text-left p-2">Height</th><th class="text-left p-2">Weight</th><th class="text-left p-2">Position</th><th class="text-left p-2">Jersey</th><th class="text-left p-2">Team</th><th class="text-right p-2">Actions</th></tr></thead>
-              <tbody id="players-body"></tbody>
-            </table>
-          </div>
-        </div>
-      `;
-
-      const body = document.getElementById('players-body');
-      const renderRows = () => {
-        const q = (document.getElementById('player-search').value || '').toLowerCase();
-        const pos = document.getElementById('player-position').value;
-        const team = document.getElementById('player-team').value;
-        const filtered = players.filter(p => (!q || p.name.toLowerCase().includes(q)) && (!pos || p.position === pos) && (!team || p.team === team));
-        body.innerHTML = filtered.map(p => `
-          <tr class="border-b hover:bg-blue-50">
-            <td class="p-2">${p.id}</td>
-            <td class="p-2 font-medium text-[#0d2c59]"><a href="/players/${p.id}/" class="hover:underline">${p.name}</a></td>
-            <td class="p-2">${p.height}</td>
-            <td class="p-2">${p.weight}</td>
-            <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs ${p.position === 'TBD' ? 'bg-gray-100 text-gray-700' : 'bg-blue-100 text-blue-700'}">${p.position}</span></td>
-            <td class="p-2">${p.jerseyNumber}</td>
-            <td class="p-2">${p.team || 'Not assigned'}</td>
-            <td class="p-2 text-right space-x-2"><button data-p-edit="${p.id}" class="text-blue-600">✎</button><button data-p-del="${p.id}" class="text-rose-500">🗑</button></td>
-          </tr>
-        `).join('') || `<tr><td colspan="8" class="p-4 text-center text-slate-500">No players found.</td></tr>`;
-        document.querySelectorAll('[data-p-del]').forEach(btn => btn.addEventListener('click', async () => { await fetch(`${apiBase}/players/${btn.getAttribute('data-p-del')}/`, { method: 'DELETE' }); await loadPage(); }));
-        document.querySelectorAll('[data-p-edit]').forEach(btn => btn.addEventListener('click', async () => {
-          const p = players.find(x => String(x.id) === String(btn.getAttribute('data-p-edit'))); if (!p) return;
-          const name = prompt('Name', p.name) ?? p.name; const position = prompt('Position', p.position || 'TBD') ?? p.position; const jerseyNumber = prompt('Jersey #', p.jerseyNumber || '') ?? p.jerseyNumber;
-          await sendJson(`${apiBase}/players/${p.id}/`, 'PUT', { ...p, name, position, jerseyNumber, team: p.team || null }); await loadPage();
-        }));
-      };
-      ['player-search', 'player-position', 'player-team'].forEach(id => document.getElementById(id)?.addEventListener('input', renderRows));
-      document.getElementById('add-player-btn')?.addEventListener('click', () => {
-        openPlayerModal({ teams, defaultTeamName: null, onSave: loadPage });
-      });
-      renderRows();
-    }
+    {% include "app/scripts/pages/_teams_players_dashboard_script.html" %}
 
     function renderAnalyticsPage() {
       contentEl.innerHTML = `
@@ -1828,44 +361,108 @@
     }
 
     function renderReportsPage() {
-      const reports = [
-        ['Player Performance Summary','player'],['Team Statistics Report','team'],['Specialty Trends Analysis','specialty'],['Scouting Effectiveness Report','specialty'],['Opponent Analysis','team'],['Rookie Development Tracker','player']
-      ];
-      contentEl.innerHTML = `
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-          <div>
-            <p class="text-xl font-semibold text-slate-800">Downloads & summaries</p>
-            <p class="text-sm text-slate-500 mt-0.5">Filter by timeframe, team, and competition.</p>
+      Promise.all([
+        fetchJson(`${apiBase}/teams/`),
+        fetchJson(`${apiBase}/players/`),
+        fetchJson(`${apiBase}/brackets/`)
+      ]).then(([teams, players, brackets]) => {
+        const totalGames = brackets.reduce((sum, b) => sum + ((b.matchups || []).length), 0);
+        const activeBrackets = brackets.filter((b) => b.status === "active").length;
+        const playersByTeam = players.reduce((acc, p) => {
+          const key = p.team || "Unassigned";
+          acc[key] = Number(acc[key] || 0) + 1;
+          return acc;
+        }, {});
+        const topTeams = Object.entries(playersByTeam)
+          .filter(([name]) => name !== "Unassigned")
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+
+        contentEl.innerHTML = `
+          <div class="space-y-5">
+            <div class="rounded-2xl bg-gradient-to-r from-[#102C57] to-[#163E72] text-white p-6 shadow">
+              <p class="text-xs uppercase tracking-wider text-slate-200">Reports Center</p>
+              <h2 class="text-3xl font-black mt-1">Analytics Report Overview</h2>
+              <p class="text-slate-200 mt-1">Measure team performance, player depth, and overall competition health.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="bg-white rounded-xl border border-slate-200 p-4">
+                <div class="text-xs font-semibold text-slate-500 uppercase">Teams</div>
+                <div class="text-3xl font-extrabold text-slate-900 mt-1">${teams.length}</div>
+                <div class="text-sm text-slate-500">Tracked organizations</div>
+              </div>
+              <div class="bg-white rounded-xl border border-slate-200 p-4">
+                <div class="text-xs font-semibold text-slate-500 uppercase">Players</div>
+                <div class="text-3xl font-extrabold text-slate-900 mt-1">${players.length}</div>
+                <div class="text-sm text-slate-500">Registered in system</div>
+              </div>
+              <div class="bg-white rounded-xl border border-slate-200 p-4">
+                <div class="text-xs font-semibold text-slate-500 uppercase">Games</div>
+                <div class="text-3xl font-extrabold text-slate-900 mt-1">${totalGames}</div>
+                <div class="text-sm text-slate-500">${activeBrackets} active brackets</div>
+              </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-4">
+              <div class="bg-white rounded-xl border border-slate-200 p-5">
+                <h3 class="text-lg font-bold text-slate-900">Team Report</h3>
+                <p class="text-sm text-slate-500 mb-3">Roster depth and team coverage.</p>
+                <div class="space-y-2">
+                  ${topTeams.map(([teamName, count], i) => `
+                    <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+                      <div class="font-semibold text-slate-800">${i + 1}. ${teamName}</div>
+                      <div class="text-sm font-bold text-[#0d2c59]">${count} players</div>
+                    </div>
+                  `).join("") || `<p class="text-sm text-slate-500">No team data available.</p>`}
+                </div>
+              </div>
+
+              <div class="bg-white rounded-xl border border-slate-200 p-5">
+                <h3 class="text-lg font-bold text-slate-900">System Report</h3>
+                <p class="text-sm text-slate-500 mb-3">Overall platform analytics.</p>
+                <ul class="space-y-2 text-sm text-slate-700">
+                  <li class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">Average players per team: <b>${teams.length ? (players.length / teams.length).toFixed(1) : "0.0"}</b></li>
+                  <li class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">Average games per bracket: <b>${brackets.length ? (totalGames / brackets.length).toFixed(1) : "0.0"}</b></li>
+                  <li class="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">Data completeness: <b>${players.length && teams.length ? "Healthy" : "Needs Setup"}</b></li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <button type="button" class="bg-[#0d2c59] text-white rounded-lg px-4 py-2 shrink-0 font-medium">Create Report</button>
-        </div>
-        <div class="bg-white rounded-xl border p-4 mb-4">
-          <div class="grid md:grid-cols-3 gap-3">
-            <select class="border rounded px-3 py-2"><option>Last 7 Days</option><option selected>Last 30 Days</option><option>Last 90 Days</option></select>
-            <select class="border rounded px-3 py-2"><option>All Teams</option></select>
-            <select class="border rounded px-3 py-2"><option>All Competitions</option></select>
-          </div>
-        </div>
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-          ${reports.map((r,i)=>`<div class="bg-white rounded-xl border p-4"><div class="text-xs uppercase text-slate-500">${r[1]}</div><div class="font-bold text-slate-900 mt-1">${r[0]}</div><p class="text-sm text-slate-600 mt-2">Comprehensive analysis for selected period.</p><button data-r-view="${i}" class="mt-3 text-blue-700 text-sm">View Report →</button></div>`).join('')}
-        </div>
-      `;
+        `;
+      }).catch((err) => {
+        setStatus(`Failed to load reports: ${err.message}`, true);
+      });
     }
 
     function renderSettingsPage() {
       contentEl.innerHTML = `
-        <p class="text-slate-600 mb-6">Manage your account, notifications, appearance, and security.</p>
-        <div class="grid lg:grid-cols-3 gap-4">
-          <div class="bg-white rounded-xl border p-2">
-            ${['Profile','Notifications','Privacy & Security','Appearance'].map((x,i)=>`<button class="w-full text-left px-4 py-3 rounded-lg ${i===0?'bg-gradient-to-r from-orange-500 to-orange-600 text-white':'hover:bg-slate-50'}">${x}</button>`).join('')}
+        <div class="space-y-5">
+          <div class="rounded-2xl bg-gradient-to-r from-[#102C57] to-[#163E72] text-white p-6 shadow">
+            <p class="text-xs uppercase tracking-wider text-slate-200">Settings</p>
+            <h2 class="text-3xl font-black mt-1">Profile</h2>
+            <p class="text-slate-200 mt-1">Manage your coaching identity and account profile.</p>
           </div>
-          <div class="lg:col-span-2 bg-white rounded-xl border p-6">
-            <h3 class="text-2xl font-bold mb-4">Profile Settings</h3>
-            <div class="space-y-4">
-              <div><label class="text-sm font-semibold block mb-1">Full Name</label><input class="w-full border-2 rounded-xl px-3 py-2" value="Hoop Track User" /></div>
-              <div><label class="text-sm font-semibold block mb-1">Email Address</label><input class="w-full border-2 rounded-xl px-3 py-2" value="user@hooptrack.com" /></div>
-              <div><label class="text-sm font-semibold block mb-1">Role</label><select class="w-full border-2 rounded-xl px-3 py-2"><option>Administrator</option><option>Scout</option><option>Coach</option></select></div>
-              <button class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-5 py-2 font-bold">Save Changes</button>
+
+          <div class="grid lg:grid-cols-3 gap-4">
+            <div class="bg-gradient-to-br from-[#102C57] to-[#163E72] rounded-2xl p-5 text-white shadow relative overflow-hidden">
+              <div class="absolute -right-3 -top-5 text-[100px] font-black text-white/10">23</div>
+              <div class="w-16 h-16 rounded-full bg-orange-500 text-white flex items-center justify-center text-2xl font-black">HT</div>
+              <div class="mt-4 text-2xl font-extrabold">Hoop Track User</div>
+              <div class="text-slate-200">Administrator</div>
+              <div class="mt-4 text-sm text-slate-200">Basketball operations profile</div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <h3 class="text-2xl font-bold mb-4 text-[#0d2c59]">Profile Settings</h3>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div><label class="text-sm font-semibold block mb-1">Full Name</label><input class="w-full border rounded-xl px-3 py-2" value="Hoop Track User" /></div>
+                <div><label class="text-sm font-semibold block mb-1">Role</label><select class="w-full border rounded-xl px-3 py-2"><option>Administrator</option><option>Scout</option><option>Coach</option></select></div>
+                <div class="md:col-span-2"><label class="text-sm font-semibold block mb-1">Email Address</label><input class="w-full border rounded-xl px-3 py-2" value="user@hooptrack.com" /></div>
+                <div><label class="text-sm font-semibold block mb-1">Organization</label><input class="w-full border rounded-xl px-3 py-2" value="HoopTrack League Ops" /></div>
+                <div><label class="text-sm font-semibold block mb-1">Timezone</label><input class="w-full border rounded-xl px-3 py-2" value="UTC+8" /></div>
+              </div>
+              <button class="mt-5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-5 py-2.5 font-bold">Save Profile</button>
             </div>
           </div>
         </div>
@@ -1914,11 +511,22 @@
           } else {
             contentEl.innerHTML = `
               <h3 class="text-lg font-medium mb-2">Players</h3>
-              <form id="player-form" class="grid md:grid-cols-6 gap-2 mb-4">
+              <form id="player-form" class="grid md:grid-cols-9 gap-2 mb-4">
                 <input name="name" class="border rounded px-2 py-1" placeholder="Name" required />
-                <input name="height" class="border rounded px-2 py-1" placeholder="Height" required />
-                <input name="weight" class="border rounded px-2 py-1" placeholder="Weight" required />
+                <select name="position" class="border rounded px-2 py-1" required>
+                  <option value="">Position</option>
+                  <option value="PG">PG</option>
+                  <option value="SG">SG</option>
+                  <option value="SF">SF</option>
+                  <option value="PF">PF</option>
+                  <option value="C">C</option>
+                </select>
                 <input name="jerseyNumber" class="border rounded px-2 py-1" placeholder="Jersey #" required />
+                <input name="contactNumber" class="border rounded px-2 py-1" placeholder="Contact #" required />
+                <input name="address" class="border rounded px-2 py-1" placeholder="Address" required />
+                <input name="email" type="email" class="border rounded px-2 py-1" placeholder="Email (optional)" />
+                <input name="height" class="border rounded px-2 py-1" placeholder="Height (optional)" />
+                <input name="weight" class="border rounded px-2 py-1" placeholder="Weight (optional)" />
                 <input name="team" class="border rounded px-2 py-1" placeholder="Team" />
                 <button class="bg-slate-900 text-white rounded px-3 py-1">Add Player</button>
               </form>
@@ -1937,10 +545,13 @@
               const formData = new FormData(playerForm);
               await sendJson(`${apiBase}/players/`, 'POST', {
                 name: formData.get('name'),
-                height: formData.get('height'),
-                weight: formData.get('weight'),
-                position: 'TBD',
+                height: formData.get('height') || null,
+                weight: formData.get('weight') || null,
+                position: formData.get('position') || 'TBD',
                 jerseyNumber: formData.get('jerseyNumber'),
+                address: formData.get('address') || '',
+                contactNumber: formData.get('contactNumber') || '',
+                email: formData.get('email') || null,
                 team: formData.get('team') || null
               });
               await loadPage();
@@ -1965,7 +576,7 @@
             contentEl.innerHTML = `
               <div class="flex items-center justify-between mb-4">
                 <input id="team-search" class="w-full max-w-md border border-slate-300 rounded-lg px-3 py-2" placeholder="Search teams..." />
-                <a href="/teams/new/" class="ml-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-semibold">Add Team</a>
+                <button id="add-team-open-modal" type="button" class="ml-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-semibold">Add Team</button>
               </div>
               <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 ${teams.map(t => `
@@ -1997,9 +608,15 @@
             });
             document.querySelectorAll('[data-team-delete]').forEach(btn => {
               btn.addEventListener('click', async () => {
+                const ok = await uiConfirm('Delete this team? This may affect related players and bracket data.', 'Delete Team', 'danger');
+                if (!ok) return;
                 await fetch(`${apiBase}/teams/${btn.getAttribute('data-team-delete')}/`, { method: 'DELETE' });
+                await uiAlert('Team deleted successfully.', 'Team Deleted', 'success');
                 await loadPage();
               });
+            });
+            document.getElementById('add-team-open-modal')?.addEventListener('click', () => {
+              openTeamRegistrationModal({ onSave: loadPage });
             });
           }
         } else if (page === 'bracket') {
@@ -2018,7 +635,8 @@
         } else if (page === 'analytics') {
           renderAnalyticsPage();
         } else if (page === 'reports') {
-          renderReportsPage();
+          window.location.href = '/dashboard/';
+          return;
         } else if (page === 'settings') {
           renderSettingsPage();
         } else if (page === 'help') {
@@ -2084,265 +702,7 @@
   {% endif %}
 
   {% if page_name == 'login' or page_name == 'signup' %}
-  <script>
-    function drfErrorMessage(body) {
-      if (!body || typeof body !== 'object') return 'Request failed';
-      if (typeof body.detail === 'string') return body.detail;
-      if (Array.isArray(body.detail)) return body.detail.map(String).join(', ');
-      if (typeof body.message === 'string') return body.message;
-      const parts = [];
-      Object.keys(body).forEach((k) => {
-        const v = body[k];
-        if (Array.isArray(v)) parts.push(`${k}: ${v.map(String).join(', ')}`);
-        else if (typeof v === 'string') parts.push(`${k}: ${v}`);
-      });
-      return parts.length ? parts.join(' | ') : 'Request failed';
-    }
-
-    async function sendJsonWithError(path, method, payload) {
-      const res = await fetch(path, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const text = await res.text();
-      let body = null;
-      if (text) {
-        try { body = JSON.parse(text); } catch { body = { detail: text }; }
-      }
-      if (!res.ok) throw new Error(drfErrorMessage(body));
-      if (res.status === 204) return null;
-      return body;
-    }
-
-    async function fetchJsonSimple(path) {
-      const res = await fetch(path);
-      const text = await res.text();
-      let body = null;
-      if (text) {
-        try { body = JSON.parse(text); } catch { body = null; }
-      }
-      if (!res.ok) throw new Error('Failed to load data');
-      return body;
-    }
-
-    {% if page_name == 'login' %}
-    (function () {
-      const form = document.getElementById('login-form');
-      const msg = document.getElementById('auth-msg');
-      const pw = document.getElementById('login-password');
-      const btn = document.getElementById('login-submit');
-      const btnLabel = document.getElementById('login-btn-label');
-      const eyeOpen = document.getElementById('login-eye-open');
-      const eyeOff = document.getElementById('login-eye-off');
-      document.getElementById('login-toggle-password')?.addEventListener('click', () => {
-        const show = pw.type === 'password';
-        pw.type = show ? 'text' : 'password';
-        eyeOpen?.classList.toggle('hidden', show);
-        eyeOff?.classList.toggle('hidden', !show);
-      });
-      form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        msg.classList.add('hidden');
-        msg.textContent = '';
-        const fd = new FormData(form);
-        btn.disabled = true;
-        btnLabel.innerHTML = '<span class="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>';
-        try {
-          const data = await sendJsonWithError('/api/auth/login-email/', 'POST', {
-            email: fd.get('email'),
-            password: fd.get('password')
-          });
-          if (data.access) localStorage.setItem('accessToken', data.access);
-          if (data.refresh) localStorage.setItem('refreshToken', data.refresh);
-          window.location.href = '/dashboard/';
-        } catch (err) {
-          msg.textContent = err.message || 'Login failed';
-          msg.classList.remove('hidden');
-        } finally {
-          btn.disabled = false;
-          btnLabel.innerHTML = 'Log In<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>';
-        }
-      });
-    })();
-    {% endif %}
-
-    {% if page_name == 'signup' %}
-    (function () {
-      const form = document.getElementById('signup-form');
-      const msg = document.getElementById('signup-msg');
-      const slider = document.getElementById('signup-slider');
-      const continueBtn = document.getElementById('signup-continue');
-      const backBtn = document.getElementById('signup-back');
-      const pw = document.getElementById('signup-password');
-      const confirmPw = document.getElementById('signup-confirm-password');
-      const terms = document.getElementById('terms');
-      const btn = document.getElementById('signup-submit');
-      const btnLabel = document.getElementById('signup-btn-label');
-      const pwToggle = document.getElementById('signup-toggle-password');
-      const eyeOpen = document.getElementById('signup-eye-open');
-      const eyeOff = document.getElementById('signup-eye-off');
-      const regionSel = document.getElementById('region-select');
-      const provinceSel = document.getElementById('province-select');
-      const citySel = document.getElementById('city-select');
-      let signupStep = 1;
-
-      function showMsg(text, ok = false) {
-        msg.textContent = text;
-        msg.classList.remove('hidden');
-        msg.classList.toggle('text-red-400', !ok);
-        msg.classList.toggle('text-emerald-400', ok);
-      }
-
-      function hideMsg() {
-        msg.classList.add('hidden');
-        msg.textContent = '';
-        msg.classList.remove('text-emerald-400', 'text-red-400');
-      }
-
-      function setStep2Interactable(on) {
-        [pw, confirmPw, terms, btn, pwToggle].forEach((el) => {
-          if (!el) return;
-          el.disabled = !on;
-          if (on) el.removeAttribute('tabindex'); else el.setAttribute('tabindex', '-1');
-        });
-      }
-
-      function validateStep1() {
-        hideMsg();
-        const username = form.elements.username;
-        const email = form.elements.email;
-        if (!username.checkValidity()) {
-          username.reportValidity();
-          return false;
-        }
-        if (!email.checkValidity()) {
-          email.reportValidity();
-          return false;
-        }
-        if (!regionSel.value) {
-          showMsg('Please select a region');
-          regionSel.focus();
-          return false;
-        }
-        if (provinceSel.disabled || !provinceSel.value) {
-          showMsg('Please select a province');
-          provinceSel.focus();
-          return false;
-        }
-        if (citySel.disabled || !citySel.value) {
-          showMsg('Please select a city');
-          citySel.focus();
-          return false;
-        }
-        return true;
-      }
-
-      continueBtn?.addEventListener('click', () => {
-        if (!validateStep1()) return;
-        signupStep = 2;
-        slider?.classList.remove('translate-x-0');
-        slider?.classList.add('-translate-x-1/2');
-        setStep2Interactable(true);
-        setTimeout(() => pw?.focus(), 380);
-      });
-
-      backBtn?.addEventListener('click', () => {
-        signupStep = 1;
-        slider?.classList.remove('-translate-x-1/2');
-        slider?.classList.add('translate-x-0');
-        setStep2Interactable(false);
-        hideMsg();
-      });
-
-      pwToggle?.addEventListener('click', () => {
-        if (!pw || pw.disabled) return;
-        const show = pw.type === 'password';
-        pw.type = show ? 'text' : 'password';
-        eyeOpen?.classList.toggle('hidden', show);
-        eyeOff?.classList.toggle('hidden', !show);
-      });
-
-      form?.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter' || signupStep !== 1) return;
-        const step1Root = document.getElementById('signup-step-panel-1');
-        if (!step1Root || !e.target || typeof e.target.closest !== 'function') return;
-        if (step1Root.contains(e.target) && !(e.target instanceof HTMLButtonElement)) {
-          e.preventDefault();
-          continueBtn?.click();
-        }
-      });
-
-      form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (signupStep !== 2) return;
-        hideMsg();
-        const fd = new FormData(form);
-        const p1 = String(fd.get('password') || '');
-        const p2 = String(fd.get('confirm_password') || '');
-        if (p1 !== p2) {
-          showMsg('Passwords do not match');
-          return;
-        }
-        btn.disabled = true;
-        pwToggle.disabled = true;
-        btnLabel.innerHTML = '<span class="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>';
-        try {
-          await sendJsonWithError('/api/auth/register/', 'POST', {
-            username: fd.get('username'),
-            email: fd.get('email'),
-            password: fd.get('password'),
-            region_id: fd.get('region_id') ? Number(fd.get('region_id')) : null,
-            province_id: fd.get('province_id') ? Number(fd.get('province_id')) : null,
-            city_id: fd.get('city_id') ? Number(fd.get('city_id')) : null
-          });
-          window.location.href = '/login/';
-        } catch (err) {
-          showMsg(err.message || 'Sign up failed');
-          btn.disabled = false;
-          pwToggle.disabled = false;
-        } finally {
-          btnLabel.innerHTML = 'Create Account<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>';
-        }
-      });
-
-      function setSelectOptions(select, items, placeholder) {
-        select.innerHTML = `<option value="">${placeholder}</option>` +
-          items.map((x) => `<option value="${x.id}">${x.name}</option>`).join('');
-      }
-
-      async function loadRegions() {
-        const regions = await fetchJsonSimple('/api/auth/locations/regions/');
-        setSelectOptions(regionSel, regions, 'Select Region');
-      }
-
-      regionSel?.addEventListener('change', async () => {
-        const rid = regionSel.value;
-        provinceSel.disabled = !rid;
-        citySel.disabled = true;
-        setSelectOptions(provinceSel, [], 'Select Province');
-        setSelectOptions(citySel, [], 'Select City');
-        if (!rid) return;
-        const provinces = await fetchJsonSimple(`/api/auth/locations/provinces/${rid}/`);
-        setSelectOptions(provinceSel, provinces, 'Select Province');
-      });
-
-      provinceSel?.addEventListener('change', async () => {
-        const pid = provinceSel.value;
-        citySel.disabled = !pid;
-        setSelectOptions(citySel, [], 'Select City');
-        if (!pid) return;
-        const cities = await fetchJsonSimple(`/api/auth/locations/cities/${pid}/`);
-        setSelectOptions(citySel, cities, 'Select City');
-      });
-
-      setStep2Interactable(false);
-      loadRegions().catch(() => {
-        showMsg('Could not load regions. Check that the API is running.');
-      });
-    })();
-    {% endif %}
-  </script>
+    {% include "app/scripts/_auth_pages_script.html" %}
   {% endif %}
 </body>
 </html>
