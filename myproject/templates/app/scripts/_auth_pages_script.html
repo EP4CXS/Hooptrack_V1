@@ -98,7 +98,6 @@
     const eyeOff = document.getElementById('signup-eye-off');
     const regionSel = document.getElementById('region-select');
     const provinceSel = document.getElementById('province-select');
-    const citySel = document.getElementById('city-select');
     let signupStep = 1;
 
     function showMsg(text, ok = false) {
@@ -142,11 +141,6 @@
       if (provinceSel.disabled || !provinceSel.value) {
         showMsg('Please select a barangay');
         provinceSel.focus();
-        return false;
-      }
-      if (citySel.disabled || !citySel.value) {
-        showMsg('Please select a city');
-        citySel.focus();
         return false;
       }
       return true;
@@ -208,7 +202,8 @@
           password: fd.get('password'),
           region_id: fd.get('region_id') ? Number(fd.get('region_id')) : null,
           province_id: fd.get('province_id') ? Number(fd.get('province_id')) : null,
-          city_id: fd.get('city_id') ? Number(fd.get('city_id')) : null
+          region_name: regionSel.options[regionSel.selectedIndex]?.text || '',
+          province_name: provinceSel.options[provinceSel.selectedIndex]?.text || ''
         });
         window.location.href = '/login/';
       } catch (err) {
@@ -233,21 +228,10 @@
     regionSel?.addEventListener('change', async () => {
       const rid = regionSel.value;
       provinceSel.disabled = !rid;
-      citySel.disabled = true;
       setSelectOptions(provinceSel, [], 'Select Barangay');
-      setSelectOptions(citySel, [], 'Select City');
       if (!rid) return;
       const provinces = await fetchJsonSimple(`/api/auth/locations/provinces/${rid}/`);
       setSelectOptions(provinceSel, provinces, 'Select Barangay');
-    });
-
-    provinceSel?.addEventListener('change', async () => {
-      const pid = provinceSel.value;
-      citySel.disabled = !pid;
-      setSelectOptions(citySel, [], 'Select City');
-      if (!pid) return;
-      const cities = await fetchJsonSimple(`/api/auth/locations/cities/${pid}/`);
-      setSelectOptions(citySel, cities, 'Select City');
     });
 
     setStep2Interactable(false);

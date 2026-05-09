@@ -20,6 +20,7 @@ from .models import (
     PlayerGameStat,
     Team,
     TeamStanding,
+    UserProfile,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     'Game',
     'PlayerGameStat',
     'GameEvent',
+    'UserProfile',
 ]

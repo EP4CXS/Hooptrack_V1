@@ -41,14 +41,23 @@
     }
 
     async function fetchJson(path, opts) {
-      const res = await fetch(path, opts);
+      const token = localStorage.getItem('accessToken');
+      const headers = {
+        ...(opts?.headers || {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      };
+      const res = await fetch(path, { ...(opts || {}), headers });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       return res.json();
     }
     async function sendJson(path, method, payload) {
+      const token = localStorage.getItem('accessToken');
       const res = await fetch(path, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -435,7 +444,14 @@
       });
     }
 
-    function renderSettingsPage() {
+    function renderSettingsPage(meData) {
+      const name = (meData?.username || '').trim() || 'Hoop Track User';
+      const email = (meData?.email || '').trim() || 'user@hooptrack.com';
+      const role = (meData?.role || 'Administrator').trim() || 'Administrator';
+      const municipality = (meData?.municipality || '').trim();
+      const organization = (meData?.organization || '').trim() || (municipality ? `${municipality} Basketball League Ops` : 'Basketball League Ops');
+      const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]?.toUpperCase() || '').join('') || 'HT';
+
       contentEl.innerHTML = `
         <div class="space-y-5">
           <div class="rounded-2xl bg-gradient-to-r from-[#102C57] to-[#163E72] text-white p-6 shadow">
@@ -447,22 +463,22 @@
           <div class="grid lg:grid-cols-3 gap-4">
             <div class="bg-gradient-to-br from-[#102C57] to-[#163E72] rounded-2xl p-5 text-white shadow relative overflow-hidden">
               <div class="absolute -right-3 -top-5 text-[100px] font-black text-white/10">23</div>
-              <div class="w-16 h-16 rounded-full bg-orange-500 text-white flex items-center justify-center text-2xl font-black">HT</div>
-              <div class="mt-4 text-2xl font-extrabold">Hoop Track User</div>
-              <div class="text-slate-200">Administrator</div>
+              <div class="w-16 h-16 rounded-full bg-orange-500 text-white flex items-center justify-center text-2xl font-black">${initials}</div>
+              <div class="mt-4 text-2xl font-extrabold">${name}</div>
+              <div class="text-slate-200">${role}</div>
               <div class="mt-4 text-sm text-slate-200">Basketball operations profile</div>
             </div>
 
             <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <h3 class="text-2xl font-bold mb-4 text-[#0d2c59]">Profile Settings</h3>
               <div class="grid md:grid-cols-2 gap-4">
-                <div><label class="text-sm font-semibold block mb-1">Full Name</label><input class="w-full border rounded-xl px-3 py-2" value="Hoop Track User" /></div>
-                <div><label class="text-sm font-semibold block mb-1">Role</label><select class="w-full border rounded-xl px-3 py-2"><option>Administrator</option><option>Scout</option><option>Coach</option></select></div>
-                <div class="md:col-span-2"><label class="text-sm font-semibold block mb-1">Email Address</label><input class="w-full border rounded-xl px-3 py-2" value="user@hooptrack.com" /></div>
-                <div><label class="text-sm font-semibold block mb-1">Organization</label><input class="w-full border rounded-xl px-3 py-2" value="HoopTrack League Ops" /></div>
+                <div><label class="text-sm font-semibold block mb-1">Full Name</label><input class="w-full border rounded-xl px-3 py-2 bg-slate-50" value="${name}" readonly /></div>
+                <div><label class="text-sm font-semibold block mb-1">Role</label><input class="w-full border rounded-xl px-3 py-2 bg-slate-50" value="${role}" readonly /></div>
+                <div class="md:col-span-2"><label class="text-sm font-semibold block mb-1">Email Address</label><input class="w-full border rounded-xl px-3 py-2 bg-slate-50" value="${email}" readonly /></div>
+                <div><label class="text-sm font-semibold block mb-1">Organization</label><input class="w-full border rounded-xl px-3 py-2 bg-slate-50" value="${organization}" readonly /></div>
                 <div><label class="text-sm font-semibold block mb-1">Timezone</label><input class="w-full border rounded-xl px-3 py-2" value="UTC+8" /></div>
               </div>
-              <button class="mt-5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-5 py-2.5 font-bold">Save Profile</button>
+              <p class="mt-5 text-sm text-slate-500">Profile values are synced from your sign up details.</p>
             </div>
           </div>
         </div>
@@ -638,7 +654,8 @@
           window.location.href = '/dashboard/';
           return;
         } else if (page === 'settings') {
-          renderSettingsPage();
+          const meResp = await fetchJson('/api/auth/me/');
+          renderSettingsPage(meResp?.data || {});
         } else if (page === 'help') {
           renderHelpPage();
         } else {

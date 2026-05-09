@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 class Player(models.Model):
@@ -20,6 +21,19 @@ class Player(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.jersey_number})"
+
+
+class UserProfile(models.Model):
+    """Profile fields captured during signup for account settings."""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    municipality = models.CharField(max_length=100, blank=True, default="")
+    barangay = models.CharField(max_length=100, blank=True, default="")
+    organization = models.CharField(max_length=200, blank=True, default="")
+    role = models.CharField(max_length=50, default="Administrator")
+
+    def __str__(self):
+        return f"{self.user.username} profile"
 
 
 class Team(models.Model):
