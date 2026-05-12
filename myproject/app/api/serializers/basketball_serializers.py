@@ -15,6 +15,7 @@ from app.models.basketball.models import (
 
 class TeamSerializer(serializers.ModelSerializer):
     playerCount = serializers.IntegerField(source="player_count", read_only=True)
+    logo = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Team
@@ -24,6 +25,7 @@ class TeamSerializer(serializers.ModelSerializer):
 class PlayerSerializer(serializers.ModelSerializer):
     team = serializers.CharField(source="team.name", allow_null=True, required=False)
     contactNumber = serializers.CharField(source="contact_number", allow_null=True, required=False, allow_blank=True)
+    seasonYear = serializers.IntegerField(source="season_year", required=False)
 
     class Meta:
         model = Player
@@ -39,6 +41,7 @@ class PlayerSerializer(serializers.ModelSerializer):
             "address",
             "contactNumber",
             "email",
+            "seasonYear",
         ]
 
     jerseyNumber = serializers.CharField(source="jersey_number")
@@ -152,7 +155,12 @@ class GamePredictionSerializer(serializers.ModelSerializer):
 class PlayerGameStatSerializer(serializers.ModelSerializer):
     playerName = serializers.CharField(source="player.name", read_only=True)
     jerseyNumber = serializers.CharField(source="player.jersey_number", read_only=True)
+    playerPosition = serializers.CharField(source="player.position", read_only=True)
+    playerAddress = serializers.CharField(source="player.address", read_only=True)
     teamName = serializers.CharField(source="team_name")
+    tournamentName = serializers.CharField(source="tournament_name", read_only=True)
+    gameCompletedAt = serializers.DateTimeField(source="game_completed_at", read_only=True)
+    seasonYear = serializers.IntegerField(source="season_year", read_only=True)
 
     class Meta:
         model = PlayerGameStat
@@ -161,7 +169,12 @@ class PlayerGameStatSerializer(serializers.ModelSerializer):
             "player",
             "playerName",
             "jerseyNumber",
+            "playerPosition",
+            "playerAddress",
             "teamName",
+            "tournamentName",
+            "gameCompletedAt",
+            "seasonYear",
             "fgm2",
             "fga2",
             "fgm3",
@@ -204,6 +217,10 @@ class GameEventSerializer(serializers.ModelSerializer):
 class GameSerializer(serializers.ModelSerializer):
     team1Name = serializers.CharField(source="team1_name")
     team2Name = serializers.CharField(source="team2_name")
+    seasonYear = serializers.IntegerField(source="season_year", required=False)
+    tournamentName = serializers.CharField(source="tournament_name", read_only=True)
+    completedAt = serializers.DateTimeField(source="completed_at", read_only=True)
+    quarterDisplay = serializers.CharField(source="quarter_display", read_only=True)
     playerStats = PlayerGameStatSerializer(source="player_stats", many=True, read_only=True)
     events = GameEventSerializer(many=True, read_only=True)
 
@@ -218,10 +235,16 @@ class GameSerializer(serializers.ModelSerializer):
             "score1",
             "score2",
             "quarter",
+            "quarterDisplay",
             "clock",
+            "seasonYear",
+            "tournamentName",
+            "completedAt",
             "status",
             "playerStats",
             "events",
             "created_at",
             "updated_at",
         ]
+
+

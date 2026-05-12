@@ -25,8 +25,8 @@
 
 .sidebar-wrap {
   background:
-    radial-gradient(1200px 600px at -15% -20%, rgba(255, 122, 26, 0.22), transparent 55%),
-    linear-gradient(180deg, #0d2447 0%, #0a1a36 100%);
+    radial-gradient(1200px 600px at -15% -20%, rgba(239, 68, 68, 0.20), transparent 55%),
+    linear-gradient(180deg, #1f242d 0%, #171b22 100%);
 }
 
 .nav-item {
@@ -36,36 +36,36 @@
 }
 
 .nav-item:hover {
-  background: linear-gradient(90deg, #ff7a1a 0%, #ff5f0f 100%);
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.08);
   transform: translateX(2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 24, 0.35);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.30);
 }
 
 .nav-item.active {
-  background: linear-gradient(90deg, #ff7a1a 0%, #ff5f0f 100%);
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 12px rgba(255, 107, 24, 0.35);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.30);
 }
 
 .team-banner {
-  background: linear-gradient(135deg, #102c57 0%, #1d4a85 100%);
+  background: linear-gradient(135deg, #2a303a 0%, #1f242d 100%);
 }
 
 .app-shell-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.10);
   background:
-    radial-gradient(900px 400px at 100% -30%, rgba(16, 44, 87, 0.04), transparent 60%),
-    #ffffff;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    radial-gradient(900px 400px at 100% -30%, rgba(239, 68, 68, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(31, 36, 45, 0.94) 0%, rgba(23, 27, 34, 0.96) 100%);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
 }
 
 .dashboard-pro-card {
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.08));
+  background: linear-gradient(145deg, rgba(42, 48, 58, 0.85), rgba(31, 36, 45, 0.75));
   backdrop-filter: blur(2px);
 }
 
@@ -83,4 +83,284 @@
   height: 1px;
   margin: 0.5rem 0.5rem;
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* Player management: dark premium table look */
+.player-mgmt-panel {
+  background:
+    radial-gradient(1000px 420px at 0% -20%, rgba(239, 68, 68, 0.12), transparent 60%),
+    radial-gradient(800px 360px at 100% 120%, rgba(148, 163, 184, 0.08), transparent 58%),
+    linear-gradient(180deg, rgba(31, 36, 45, 0.96) 0%, rgba(23, 27, 34, 0.95) 100%);
+  box-shadow: 0 18px 45px rgba(2, 6, 23, 0.42);
+}
+
+.player-filter-control {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.55);
+  color: #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  outline: none;
+}
+
+.player-filter-control:focus {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+.player-table-wrap {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(2, 6, 23, 0.45);
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.player-table thead th {
+  color: #9fb1c7;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.player-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.player-table tbody tr:hover td {
+  background: rgba(50, 58, 71, 0.45);
+}
+
+.player-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(71, 85, 105, 0.20);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+}
+
+.player-action-btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.45rem;
+}
+
+.player-chip {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(15, 23, 42, 0.55);
+  color: #cbd5e1;
+  border-radius: 9999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.player-chip.active {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(37, 99, 235, 0.18);
+  color: #dbeafe;
+}
+
+.player-trade-btn {
+  border: 1px solid rgba(249, 115, 22, 0.38);
+  background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
+  color: #fff;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0.3rem 0.9rem;
+  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.28);
+}
+
+/* Basketball AI chatbot vibe */
+#chatbot-panel {
+  width: 22rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(31, 36, 45, 0.98) 0%, rgba(23, 27, 34, 0.98) 100%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+#chatbot-messages {
+  background:
+    radial-gradient(900px 300px at 0% 0%, rgba(239, 68, 68, 0.08), transparent 60%),
+    rgba(15, 23, 42, 0.45);
+}
+
+.chatbot-bubble-user {
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.chatbot-bubble-bot {
+  background: rgba(31, 41, 55, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #e2e8f0;
+}
+
+/* Synchronized theme layer for authenticated pages */
+.ht-theme {
+  background:
+    radial-gradient(1200px 600px at 15% 0%, rgba(239, 68, 68, 0.12), transparent 58%),
+    radial-gradient(900px 520px at 100% -20%, rgba(100, 116, 139, 0.10), transparent 56%),
+    linear-gradient(180deg, #1e222a 0%, #171b22 55%, #14181f 100%);
+  color: #e2e8f0;
+}
+
+.ht-theme #status {
+  color: #cbd5e1 !important;
+}
+
+.ht-theme .app-shell-card {
+  background:
+    radial-gradient(900px 420px at 95% -25%, rgba(239, 68, 68, 0.10), transparent 60%),
+    linear-gradient(180deg, rgba(31, 36, 45, 0.96) 0%, rgba(23, 27, 34, 0.98) 100%);
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.ht-theme #content .bg-white {
+  background-color: rgba(31, 36, 45, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  color: #e2e8f0 !important;
+}
+
+.ht-theme #content .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+
+.ht-theme #content .text-slate-700,
+.ht-theme #content .text-slate-600,
+.ht-theme #content .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+.ht-theme #content .bg-slate-50 {
+  background-color: rgba(42, 48, 58, 0.55) !important;
+}
+
+.ht-theme #content .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.ht-theme #content table thead {
+  background: rgba(42, 48, 58, 0.75) !important;
+}
+
+.ht-theme #content table th {
+  color: #aebdce !important;
+}
+
+.ht-theme #content table tbody tr:hover td {
+  background: rgba(61, 70, 85, 0.36) !important;
+}
+
+/* Shared controls to keep features synchronized */
+.ht-pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .ht-pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.ht-fieldLabel {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.ht-input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(17, 24, 39, 0.72);
+  color: #e2e8f0;
+  border-radius: 0.85rem;
+  padding: 0.72rem 0.9rem;
+  outline: none;
+}
+
+.ht-input:focus {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+.team-add-btn {
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
+  color: #fff;
+  border-radius: 0.9rem;
+  padding: 0.62rem 1rem;
+  font-weight: 800;
+  box-shadow: 0 12px 22px rgba(249, 115, 22, 0.28);
+}
+
+.team-add-btn:hover {
+  filter: brightness(1.05);
+}
+
+.team-qf-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(17, 24, 39, 0.58);
+  color: #cbd5e1;
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.team-qf-btn:hover {
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #f8fafc;
+}
+
+.team-qf-btn.active {
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+  border-color: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.28);
+}
+
+/* Synchronize authenticated inputs/selects/textareas */
+.ht-theme input,
+.ht-theme select,
+.ht-theme textarea {
+  background: rgba(17, 24, 39, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+
+.ht-theme input::placeholder,
+.ht-theme textarea::placeholder {
+  color: #94a3b8;
+}
+
+.ht-theme input:focus,
+.ht-theme select:focus,
+.ht-theme textarea:focus {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+  outline: none;
+}
+
+/* Dark pop-up surfaces for in-app overlays */
+.ht-theme .fixed.inset-0 > div[class*="bg-white"] {
+  background: linear-gradient(180deg, rgba(31, 36, 45, 0.98) 0%, rgba(23, 27, 34, 0.98) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }

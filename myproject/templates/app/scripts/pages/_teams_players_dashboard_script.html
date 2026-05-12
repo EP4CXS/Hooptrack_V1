@@ -1,56 +1,58 @@
-    function openTeamRegistrationModal({ onSave, onCancel } = {}) {
+    function openTeamRegistrationModal({ onSave, onCancel, teamData = null } = {}) {
+      const isEdit = !!(teamData && teamData.id);
       const overlay = document.createElement('div');
       overlay.className = 'fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
       overlay.innerHTML = `
-        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-          <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white flex items-center justify-between">
-            <div class="font-bold text-xl">🛡 Add New Team</div>
+        <div class="w-full max-w-2xl rounded-2xl shadow-2xl border border-white/15 bg-[#1f242d] overflow-hidden">
+          <div class="px-5 py-4 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white flex items-center justify-between border-b border-white/10">
+            <div class="font-bold text-lg">${isEdit ? 'Edit Team Credentials' : 'Add New Team'}</div>
             <button type="button" data-close class="w-8 h-8 rounded-lg hover:bg-white/10">✕</button>
           </div>
           <form id="team-modal-form" class="p-5 space-y-4">
             <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">Team Name *</label>
-              <input name="name" required class="w-full border border-slate-300 rounded-xl px-3 py-2" placeholder="e.g., Golden State Warriors" />
+              <label class="text-sm font-semibold text-slate-300 block mb-1">Team Name *</label>
+              <input name="name" required class="ht-input" placeholder="e.g., Golden State Warriors" value="${teamData?.name || ''}" />
             </div>
             <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">City *</label>
-              <input name="city" required class="w-full border border-slate-300 rounded-xl px-3 py-2" placeholder="e.g., San Francisco" />
+              <label class="text-sm font-semibold text-slate-300 block mb-1">City *</label>
+              <input name="city" required class="ht-input" placeholder="e.g., San Francisco" value="${teamData?.city || ''}" />
             </div>
             <div class="grid md:grid-cols-2 gap-4">
               <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Conference *</label>
-                <select name="conference" required class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                <label class="text-sm font-semibold text-slate-300 block mb-1">Conference *</label>
+                <select name="conference" required class="ht-input">
                   <option value="">Select conference</option>
-                  <option value="Eastern">Eastern</option>
-                  <option value="Western">Western</option>
+                  <option value="Eastern" ${String(teamData?.conference || '') === 'Eastern' ? 'selected' : ''}>Eastern</option>
+                  <option value="Western" ${String(teamData?.conference || '') === 'Western' ? 'selected' : ''}>Western</option>
                 </select>
               </div>
               <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Division *</label>
-                <select name="division" required class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                <label class="text-sm font-semibold text-slate-300 block mb-1">Division *</label>
+                <select name="division" required class="ht-input">
                   <option value="">Select division</option>
-                  <option value="midget">Midget</option>
-                  <option value="senior">Senior</option>
-                  <option value="junior">Junior</option>
-                  <option value="U13">U13</option>
-                  <option value="U14">U14</option>
-                  <option value="U15">U15</option>
-                  <option value="U16">U16</option>
-                  <option value="U17">U17</option>
-                  <option value="U18">U18</option>
-                  <option value="U19">U19</option>
-                  <option value="U20">U20</option>
-                  <option value="U21">U21</option>
+                  <option value="midget" ${String(teamData?.division || '').toLowerCase() === 'midget' ? 'selected' : ''}>Midget</option>
+                  <option value="senior" ${String(teamData?.division || '').toLowerCase() === 'senior' ? 'selected' : ''}>Senior</option>
+                  <option value="junior" ${String(teamData?.division || '').toLowerCase() === 'junior' ? 'selected' : ''}>Junior</option>
+                  <option value="U13" ${String(teamData?.division || '') === 'U13' ? 'selected' : ''}>U13</option>
+                  <option value="U14" ${String(teamData?.division || '') === 'U14' ? 'selected' : ''}>U14</option>
+                  <option value="U15" ${String(teamData?.division || '') === 'U15' ? 'selected' : ''}>U15</option>
+                  <option value="U16" ${String(teamData?.division || '') === 'U16' ? 'selected' : ''}>U16</option>
+                  <option value="U17" ${String(teamData?.division || '') === 'U17' ? 'selected' : ''}>U17</option>
+                  <option value="U18" ${String(teamData?.division || '') === 'U18' ? 'selected' : ''}>U18</option>
+                  <option value="U19" ${String(teamData?.division || '') === 'U19' ? 'selected' : ''}>U19</option>
+                  <option value="U20" ${String(teamData?.division || '') === 'U20' ? 'selected' : ''}>U20</option>
+                  <option value="U21" ${String(teamData?.division || '') === 'U21' ? 'selected' : ''}>U21</option>
                 </select>
               </div>
             </div>
             <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">Team Picture URL (Optional)</label>
-              <input name="logo" class="w-full border border-slate-300 rounded-xl px-3 py-2" placeholder="https://example.com/logo.jpg" />
+              <label class="text-sm font-semibold text-slate-300 block mb-1">Team picture (optional)</label>
+              <input type="file" name="logo" accept="image/*" class="w-full text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-[#f97316] file:px-3 file:py-2 file:text-white file:font-semibold hover:file:bg-[#ea580c]" />
+              <p class="text-xs text-slate-400 mt-1">Choose an image from your device (PNG, JPG, WebP, etc.).</p>
             </div>
             <div class="flex justify-end gap-2 pt-2">
-              <button type="button" data-close class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
-              <button class="px-4 py-2 rounded-xl bg-[#0b264e] hover:bg-[#12386b] text-white font-semibold">Create Team</button>
+              <button type="button" data-close class="px-4 py-2 rounded-xl border border-white/15 text-slate-200 hover:bg-white/10">Cancel</button>
+              <button class="px-4 py-2 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white font-semibold">${isEdit ? 'Save Team' : 'Create Team'}</button>
             </div>
           </form>
         </div>
@@ -67,14 +69,16 @@
       const form = overlay.querySelector('#team-modal-form');
       form?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const fd = new FormData(form);
-        await sendJson(`${apiBase}/teams/`, 'POST', {
-          name: fd.get('name'),
-          city: fd.get('city'),
-          conference: fd.get('conference'),
-          division: fd.get('division'),
-          logo: fd.get('logo') || null
-        });
+        const fd = new FormData();
+        fd.append('name', String(form.querySelector('[name="name"]')?.value || '').trim());
+        fd.append('city', String(form.querySelector('[name="city"]')?.value || '').trim());
+        fd.append('conference', String(form.querySelector('[name="conference"]')?.value || '').trim());
+        fd.append('division', String(form.querySelector('[name="division"]')?.value || '').trim());
+        const logoInput = form.querySelector('input[type="file"][name="logo"]');
+        const logoFile = logoInput?.files?.[0];
+        if (logoFile) fd.append('logo', logoFile);
+        if (isEdit) await sendFormData(`${apiBase}/teams/${teamData.id}/`, 'PUT', fd);
+        else await sendFormData(`${apiBase}/teams/`, 'POST', fd);
         overlay.remove();
         if (typeof onSave === 'function') await onSave();
       });
@@ -94,58 +98,62 @@
         overlay.className = 'fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
         const teamOptions = teams.map((t) => `<option value="${t.name}" ${player.team === t.name ? 'selected' : ''}>${t.name}</option>`).join('');
         overlay.innerHTML = `
-          <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white">
-              <div class="font-bold text-xl">🏀 Update Player</div>
+          <div class="w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/20 bg-[#202631]">
+            <div class="px-5 py-4 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white border-b border-white/10">
+              <div class="font-bold text-lg">Update Player</div>
             </div>
             <form id="player-edit-form" class="p-5 space-y-4">
               <div class="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Name</label>
-                  <input name="name" class="w-full border rounded-xl px-3 py-2" value="${player.name || ''}" required />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Name</label>
+                  <input name="name" class="ht-input" value="${player.name || ''}" required />
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Position</label>
-                  <select name="position" class="w-full border rounded-xl px-3 py-2">
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Position</label>
+                  <select name="position" class="ht-input">
                     ${['PG','SG','SF','PF','C','TBD'].map((pos) => `<option value="${pos}" ${String(player.position || 'TBD') === pos ? 'selected' : ''}>${pos}</option>`).join('')}
                   </select>
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Jersey Number</label>
-                  <input name="jerseyNumber" class="w-full border rounded-xl px-3 py-2" value="${player.jerseyNumber || ''}" />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Jersey Number</label>
+                  <input name="jerseyNumber" class="ht-input" value="${player.jerseyNumber || ''}" />
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Contact Number</label>
-                  <input name="contactNumber" class="w-full border rounded-xl px-3 py-2" value="${player.contactNumber || ''}" />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Contact Number</label>
+                  <input name="contactNumber" class="ht-input" value="${player.contactNumber || ''}" />
                 </div>
                 <div class="md:col-span-2">
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Address</label>
-                  <input name="address" class="w-full border rounded-xl px-3 py-2" value="${player.address || ''}" />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Address</label>
+                  <input name="address" class="ht-input" value="${player.address || ''}" />
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Email (Optional)</label>
-                  <input name="email" type="email" class="w-full border rounded-xl px-3 py-2" value="${player.email || ''}" />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Email (Optional)</label>
+                  <input name="email" type="email" class="ht-input" value="${player.email || ''}" />
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Team</label>
-                  <select name="team" class="w-full border rounded-xl px-3 py-2" ${lockTeam ? 'disabled' : ''}>
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Team</label>
+                  <select name="team" class="ht-input" ${lockTeam ? 'disabled' : ''}>
                     <option value="">Unassigned</option>
                     ${teamOptions}
                   </select>
                   ${lockTeam ? `<input type="hidden" name="teamLocked" value="${fixedTeamName || player.team || ''}" />` : ''}
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Height</label>
-                  <input name="height" class="w-full border rounded-xl px-3 py-2" value="${player.height || ''}" />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Height</label>
+                  <input name="height" class="ht-input" value="${player.height || ''}" />
                 </div>
                 <div>
-                  <label class="text-sm font-semibold text-slate-700 block mb-1">Weight</label>
-                  <input name="weight" class="w-full border rounded-xl px-3 py-2" value="${player.weight || ''}" />
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Weight</label>
+                  <input name="weight" class="ht-input" value="${player.weight || ''}" />
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-slate-100 block mb-1">Season Year</label>
+                  <input name="seasonYear" type="number" min="2025" max="2100" class="ht-input" value="${player.seasonYear || new Date().getFullYear()}" />
                 </div>
               </div>
               <div class="flex justify-end gap-2 pt-2">
-                <button type="button" data-cancel class="px-5 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
-                <button type="submit" class="px-5 py-2 rounded-xl bg-[#0d2c59] text-white hover:bg-[#163d74] font-semibold">Save</button>
+                <button type="button" data-cancel class="px-5 py-2 rounded-xl border border-white/15 text-slate-200 hover:bg-white/10">Cancel</button>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-[#f97316] text-white hover:bg-[#ea580c] font-semibold">Save</button>
               </div>
             </form>
           </div>
@@ -170,6 +178,7 @@
             email: String(fd.get('email') || '').trim() || null,
             height: String(fd.get('height') || '').trim(),
             weight: String(fd.get('weight') || '').trim(),
+            seasonYear: Number(fd.get('seasonYear') || new Date().getFullYear()),
             team: lockTeam ? String(fd.get('teamLocked') || fixedTeamName || player.team || '').trim() : String(fd.get('team') || '').trim()
           });
         });
@@ -178,11 +187,95 @@
       });
     }
 
-    function renderDashboardLikeUI(players, teams, brackets) {
-      const topPlayers = players.slice(0, 8);
-      const leader = topPlayers[0];
+    let dashboardClockIntervalId = null;
+    let dashboardLeaderboardIntervalId = null;
+    let nbaLiveModalIntervalId = null;
+
+    function formatDashboardUpdatedTime(date) {
+      return date.toLocaleString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+    }
+
+    function extractMunicipalityFromAddress(address) {
+      const raw = String(address || '').trim();
+      if (!raw) return '';
+      const parts = raw.split(',').map((x) => x.trim()).filter(Boolean);
+      return parts.length ? parts[parts.length - 1] : raw;
+    }
+
+    function aggregateSeasonPlayerLeaders(games, seasonYear, _playerById) {
+      const acc = new Map();
+      (games || []).forEach((g) => {
+        const gameSeason = Number(g?.seasonYear || g?.season_year || 0);
+        if (gameSeason !== seasonYear) return;
+        const gameId = String(g?.id || g?.gameId || '');
+        (g.playerStats || []).forEach((s) => {
+          const pid = String(s.player || '');
+          if (!pid) return;
+          const current = acc.get(pid) || {
+            id: pid,
+            name: s.playerName || 'Unknown Player',
+            team: s.teamName || '',
+            position: s.playerPosition || 'TBD',
+            municipality: extractMunicipalityFromAddress(s.playerAddress),
+            points: 0,
+            rebounds: 0,
+            assists: 0,
+            gamesPlayed: 0,
+            _gameIds: new Set(),
+          };
+          current.points += Number(s.points || 0);
+          current.rebounds += Number(s.oreb || 0) + Number(s.dreb || 0);
+          current.assists += Number(s.assists || 0);
+          if (gameId) current._gameIds.add(gameId);
+          current.gamesPlayed = current._gameIds.size || current.gamesPlayed;
+          acc.set(pid, current);
+        });
+      });
+      return Array.from(acc.values())
+        .map((p) => ({
+          ...p,
+          gamesPlayed: p._gameIds ? p._gameIds.size : (p.gamesPlayed || 0),
+          ppg: p.gamesPlayed ? (p.points / p.gamesPlayed) : 0,
+          rpg: p.gamesPlayed ? (p.rebounds / p.gamesPlayed) : 0,
+          apg: p.gamesPlayed ? (p.assists / p.gamesPlayed) : 0,
+        }))
+        .sort((a, b) => (b.points - a.points) || (b.ppg - a.ppg) || (b.apg - a.apg) || a.name.localeCompare(b.name));
+    }
+
+    function getNbaAbbreviation(teamName) {
+      const key = String(teamName || '').toLowerCase();
+      const map = {
+        hawks: 'atl', celtics: 'bos', nets: 'bkn', hornets: 'cha', bulls: 'chi', cavaliers: 'cle',
+        mavericks: 'dal', nuggets: 'den', pistons: 'det', warriors: 'gsw', rockets: 'hou', pacers: 'ind',
+        clippers: 'lac', lakers: 'lal', grizzlies: 'mem', heat: 'mia', bucks: 'mil', timberwolves: 'min',
+        pelicans: 'nop', knicks: 'nyk', thunder: 'okc', magic: 'orl', sixers: 'phi', suns: 'phx',
+        blazers: 'por', kings: 'sac', spurs: 'sas', raptors: 'tor', jazz: 'uta', wizards: 'wsh',
+      };
+      const hit = Object.keys(map).find((k) => key.includes(k));
+      return hit ? map[hit] : null;
+    }
+
+    function getTeamLogoUrl(teamName) {
+      const abbr = getNbaAbbreviation(teamName);
+      return abbr ? `https://a.espncdn.com/i/teamlogos/nba/500/${abbr}.png` : '/media/img/chatbot-ball.svg';
+    }
+
+    function renderDashboardLikeUI(players, teams, brackets, games = []) {
+      const playerById = new Map((players || []).map((p) => [String(p.id), p]));
       const totalGames = brackets.reduce((acc, b) => acc + (b.matchups?.length || 0), 0);
       const activeGames = brackets.filter((b) => b.status === "active").length;
+      const seasonYears = [2025, 2026];
+      const nowYear = new Date().getFullYear();
+      const defaultSeason = seasonYears.includes(nowYear) ? nowYear : seasonYears[seasonYears.length - 1];
+      let selectedSeason = defaultSeason;
+      let seasonLeaders = aggregateSeasonPlayerLeaders(games, selectedSeason, playerById);
+      let topPlayers = seasonLeaders.slice(0, 10);
+      let leader = topPlayers[0];
       const nbaLiveCards = [];
       brackets.forEach((b) => {
         (b.matchups || []).forEach((m) => {
@@ -204,109 +297,386 @@
         <div class="space-y-5">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <p class="text-4xl font-black tracking-tight text-slate-900">Dashboard</p>
-              <p class="text-slate-500 mt-1">Professional basketball analytics and live command center</p>
+              <p class="text-3xl font-black tracking-tight text-white">Dashboard</p>
+              <p class="text-slate-400 mt-1">Pro basketball command center</p>
             </div>
-            <div class="bg-[#132D57] text-white rounded-xl px-4 py-3 shadow border border-orange-300/40">
-              <div class="text-xs text-slate-300">Last Updated</div>
-              <div class="text-sm font-bold">Today, 3:45 PM</div>
+            <div class="rounded-xl px-4 py-3 border border-white/10 bg-[#1f242d] text-slate-200">
+              <div class="text-[11px] uppercase tracking-widest text-slate-500">Last Updated</div>
+              <div id="dashboard-last-updated" class="text-sm font-bold">${formatDashboardUpdatedTime(new Date())}</div>
             </div>
           </div>
 
           <div class="grid md:grid-cols-3 gap-4">
-            <div class="dashboard-pro-card text-white p-5 shadow bg-gradient-to-r from-[#102C57] to-[#163E72]">
-              <div class="text-xs text-slate-200 font-semibold tracking-wider">TOTAL PLAYERS</div>
-              <div class="text-4xl font-extrabold mt-2">${players.length}</div>
-              <div class="text-sm text-slate-200 mt-1">Active roster</div>
+            <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-8 h-8 rounded-lg bg-[#2a303a] border border-white/10 flex items-center justify-center text-orange-400">👥</div>
+                <span class="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">+12%</span>
+              </div>
+              <p class="text-[11px] tracking-wider uppercase text-slate-500">Total Players</p>
+              <p class="text-4xl font-black text-white mt-2">${players.length}</p>
+              <p class="text-xs text-slate-400">Active roster</p>
             </div>
-            <div class="dashboard-pro-card text-white p-5 shadow bg-gradient-to-r from-[#102C57] to-[#163E72]">
-              <div class="text-xs text-slate-200 font-semibold tracking-wider">TOTAL GAMES</div>
-              <div class="text-4xl font-extrabold mt-2">${totalGames}</div>
-              <div class="text-sm text-slate-200 mt-1">This season</div>
+            <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-8 h-8 rounded-lg bg-[#2a303a] border border-white/10 flex items-center justify-center text-cyan-300">📅</div>
+                <span class="text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">+5%</span>
+              </div>
+              <p class="text-[11px] tracking-wider uppercase text-slate-500">Total Games</p>
+              <p class="text-4xl font-black text-white mt-2">${totalGames}</p>
+              <p class="text-xs text-slate-400">This season</p>
             </div>
-            <div class="dashboard-pro-card text-white p-5 shadow bg-gradient-to-r from-[#102C57] to-[#163E72]">
-              <div class="flex items-center justify-between">
-                <div class="text-xs text-slate-200 font-semibold tracking-wider">NBA LIVE</div>
-                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold">
-                  <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
-                  ${Math.max(1, activeGames)} live
+            <div id="nba-live-card" role="button" tabindex="0" class="rounded-2xl border border-white/10 bg-[#1f242d] p-4 cursor-pointer">
+              <div class="flex items-center justify-between mb-3">
+                <div class="w-8 h-8 rounded-lg bg-[#2a303a] border border-white/10 flex items-center justify-center text-emerald-300">🏀</div>
+                <div id="nba-live-count" class="inline-flex items-center gap-1.5 text-[11px] text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>${Math.max(1, activeGames)} live
                 </div>
               </div>
               ${(() => {
                 const g = (nbaLiveCards.length ? nbaLiveCards[0] : { team1: "Lakers", team2: "Warriors", score1: 102, score2: 98, status: "in-progress", quarter: "Q4" });
                 return `
-                  <div class="mt-3 space-y-1.5">
-                    <div class="flex items-center justify-between">
-                      <span class="font-semibold">${g.team1}</span>
-                      <span class="text-2xl font-black">${g.score1}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <span class="font-semibold">${g.team2}</span>
-                      <span class="text-2xl font-black">${g.score2}</span>
-                    </div>
-                    <div class="text-xs text-slate-200 mt-1">${g.status === "completed" ? "Final" : g.quarter}</div>
-                  </div>
+                  <div class="text-sm text-white font-semibold truncate">${g.team1} <span class="text-slate-400">vs</span> ${g.team2}</div>
+                  <div class="mt-2 text-2xl font-black text-white">${g.score1} - ${g.score2}</div>
+                  <div id="nba-live-quarter" class="text-xs text-slate-400 mt-1">${g.status === "completed" ? "Final" : g.quarter}</div>
                 `;
               })()}
             </div>
           </div>
 
           <div class="grid lg:grid-cols-3 gap-4">
-            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-              <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white flex items-center justify-between">
+            <div class="lg:col-span-2 rounded-2xl border border-white/10 bg-[#1f242d] overflow-hidden">
+              <div class="px-5 py-4 border-b border-white/10 bg-[#20252f] flex items-center justify-between">
                 <div>
-                  <div class="text-xl font-bold">Top Performers</div>
-                  <div class="text-sm text-slate-200">Season Leaders 2024</div>
+                  <div class="text-xl font-bold text-white">Top Performers</div>
+                  <div class="text-sm text-slate-400">Season Leaders <span id="season-leaders-label">${selectedSeason}</span></div>
                 </div>
-                <div class="px-3 py-1 rounded-full bg-black/20 text-sm font-semibold">${topPlayers.length} Players</div>
+                <div class="flex items-center gap-2">
+                  <label for="season-filter" class="text-xs text-slate-400">Season</label>
+                  <select id="season-filter" class="px-2 py-1 rounded-lg bg-[#171b22] border border-white/10 text-sm text-slate-200">
+                    ${seasonYears.map((y) => `<option value="${y}" ${y === selectedSeason ? 'selected' : ''}>${y}</option>`).join('')}
+                  </select>
+                  <div id="season-player-count" class="px-3 py-1 rounded-full bg-[#2a303a] border border-white/10 text-xs font-semibold text-slate-300">${topPlayers.length} Players</div>
+                </div>
               </div>
               <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                  <thead class="bg-slate-50 text-slate-600">
+                  <thead class="bg-[#20252f] text-slate-400">
                     <tr>
-                      <th class="text-left px-4 py-3">RANK</th>
-                      <th class="text-left px-4 py-3">PLAYER</th>
-                      <th class="text-left px-4 py-3">POS</th>
+                      <th class="text-left px-4 py-3">#</th>
+                      <th class="text-left px-4 py-3">Player</th>
+                      <th class="text-left px-4 py-3">Pos</th>
                       <th class="text-left px-4 py-3">PPG</th>
                       <th class="text-left px-4 py-3">RPG</th>
                       <th class="text-left px-4 py-3">APG</th>
-                      <th class="text-left px-4 py-3">TREND</th>
+                      <th class="text-left px-4 py-3">Trend</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody id="top-performers-body">
                     ${topPlayers.map((p, i) => `
-                      <tr class="border-t">
-                        <td class="px-4 py-3 font-bold text-orange-500">${i + 1}</td>
-                        <td class="px-4 py-3 font-semibold text-slate-900">${p.name}</td>
-                        <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs">${p.position || "SG"}</span></td>
-                        <td class="px-4 py-3 text-slate-400 font-bold">—</td>
-                        <td class="px-4 py-3 text-slate-400">—</td>
-                        <td class="px-4 py-3 text-slate-400">—</td>
-                        <td class="px-4 py-3 text-slate-400 font-semibold">—</td>
+                      <tr class="border-t border-white/5 hover:bg-white/[0.02]">
+                        <td class="px-4 py-3 font-bold text-orange-400">${i + 1}</td>
+                        <td class="px-4 py-3 font-semibold text-white">
+                          <button type="button" data-player-profile="${p.id}" class="text-left hover:underline hover:text-cyan-300">
+                            ${p.name}
+                          </button>
+                        </td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 bg-[#2a303a] border border-white/10 rounded text-xs text-slate-300">${p.position || "TBD"}</span></td>
+                        <td class="px-4 py-3 text-orange-300 font-bold">${p.ppg.toFixed(1)}</td>
+                        <td class="px-4 py-3 text-cyan-300 font-semibold">${p.rpg.toFixed(1)}</td>
+                        <td class="px-4 py-3 text-emerald-300 font-semibold">${p.apg.toFixed(1)}</td>
+                        <td class="px-4 py-3 text-emerald-400 text-xs">↗ +2.3</td>
                       </tr>
-                    `).join("") || `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-500">No player data yet.</td></tr>`}
+                    `).join("") || `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-500">No player performance stats for ${selectedSeason} yet.</td></tr>`}
                   </tbody>
                 </table>
               </div>
             </div>
 
-            <div class="bg-gradient-to-br from-[#102C57] to-[#163E72] rounded-2xl p-5 text-white shadow relative overflow-hidden">
-              <div class="absolute -right-3 -top-5 text-[120px] font-black text-white/10">1</div>
-              <div class="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center text-3xl font-black">
-                ${leader?.name ? leader.name.split(" ").map((x) => x[0]).slice(0, 2).join("") : "MJ"}
+            <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-5 text-white relative overflow-hidden">
+              <div class="absolute -right-3 -top-5 text-[120px] font-black text-white/5">1</div>
+              <div class="w-16 h-16 rounded-2xl bg-orange-500 text-white flex items-center justify-center text-3xl font-black">
+                <span id="leader-avatar">${leader?.name ? leader.name.split(" ").map((x) => x[0]).slice(0, 2).join("") : "—"}</span>
               </div>
-              <div class="mt-4 text-3xl font-extrabold">${leader?.name || "Michael Jordan"}</div>
-              <div class="text-slate-300">${leader?.team || "Chicago Bulls"}</div>
+              <button type="button" id="leader-name" data-leader-profile="${leader?.id || ''}" class="mt-4 text-3xl font-extrabold text-left hover:underline">
+                ${leader?.name || "No stats yet"}
+              </button>
+              <div id="leader-team" class="text-slate-400">${leader?.team || "Record player game stats to rank leaders"}</div>
               <div class="mt-5 grid grid-cols-2 gap-3">
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">PPG</div><div class="text-2xl font-bold">—</div></div>
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">RPG</div><div class="text-2xl font-bold">—</div></div>
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">APG</div><div class="text-2xl font-bold">—</div></div>
-                <div class="bg-white/10 rounded-lg p-3"><div class="text-xs text-slate-300">TREND</div><div class="text-2xl font-bold">—</div></div>
+                <div class="bg-[#20252f] border border-white/10 rounded-lg p-3"><div class="text-xs text-slate-400">PPG</div><div id="leader-ppg" class="text-2xl font-bold text-orange-300">${leader ? leader.ppg.toFixed(1) : "—"}</div></div>
+                <div class="bg-[#20252f] border border-white/10 rounded-lg p-3"><div class="text-xs text-slate-400">RPG</div><div id="leader-rpg" class="text-2xl font-bold text-cyan-300">${leader ? leader.rpg.toFixed(1) : "—"}</div></div>
+                <div class="bg-[#20252f] border border-white/10 rounded-lg p-3"><div class="text-xs text-slate-400">APG</div><div id="leader-apg" class="text-2xl font-bold text-emerald-300">${leader ? leader.apg.toFixed(1) : "—"}</div></div>
+                <div class="bg-[#20252f] border border-white/10 rounded-lg p-3"><div class="text-xs text-slate-400">Trend</div><div id="leader-trend" class="text-2xl font-bold text-slate-200">${leader ? `${leader.gamesPlayed} GP` : "—"}</div></div>
               </div>
             </div>
           </div>
         </div>
       `;
+
+      if (dashboardClockIntervalId) clearInterval(dashboardClockIntervalId);
+      dashboardClockIntervalId = setInterval(() => {
+        const lastUpdatedEl = document.getElementById('dashboard-last-updated');
+        if (lastUpdatedEl) lastUpdatedEl.textContent = formatDashboardUpdatedTime(new Date());
+      }, 1000);
+
+      const seasonFilterEl = document.getElementById('season-filter');
+      const seasonLabelEl = document.getElementById('season-leaders-label');
+      const playerCountEl = document.getElementById('season-player-count');
+      const topPerformersBodyEl = document.getElementById('top-performers-body');
+      const leaderAvatarEl = document.getElementById('leader-avatar');
+      const leaderNameEl = document.getElementById('leader-name');
+      const leaderTeamEl = document.getElementById('leader-team');
+      const leaderPpgEl = document.getElementById('leader-ppg');
+      const leaderRpgEl = document.getElementById('leader-rpg');
+      const leaderApgEl = document.getElementById('leader-apg');
+      const leaderTrendEl = document.getElementById('leader-trend');
+
+      function openPlayerProfileModal({ player, seasonSummary }) {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[140] bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center';
+        const close = () => overlay.remove();
+        const safe = (v) => (v === null || v === undefined || v === '') ? '—' : String(v);
+        overlay.innerHTML = `
+          <div class="w-full max-w-2xl max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl border border-slate-200">
+            <div class="px-6 py-5 bg-gradient-to-r from-[#0d2c59] via-[#163d74] to-[#ff6b35] text-white flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-[11px] uppercase tracking-[0.25em] text-blue-100">Player Profile</div>
+                <div class="text-2xl font-extrabold truncate">${safe(player?.name)}</div>
+                <div class="text-sm text-blue-100/90 mt-1 truncate">${safe(player?.team)} • ${safe(player?.position)} • Jersey ${safe(player?.jerseyNumber)}</div>
+              </div>
+              <button type="button" data-close class="w-10 h-10 rounded-xl hover:bg-white/10 text-white text-2xl leading-none">×</button>
+            </div>
+            <div class="p-6 overflow-auto max-h-[calc(90vh-92px)] bg-gradient-to-b from-white to-slate-50/70 space-y-5">
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div class="text-[11px] uppercase tracking-wider text-slate-500">Season Year</div>
+                  <div class="text-xl font-extrabold text-slate-900 mt-1">${safe(player?.seasonYear)}</div>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div class="text-[11px] uppercase tracking-wider text-slate-500">Height</div>
+                  <div class="text-xl font-extrabold text-slate-900 mt-1">${safe(player?.height)} <span class="text-sm text-slate-500 font-semibold">cm</span></div>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div class="text-[11px] uppercase tracking-wider text-slate-500">Weight</div>
+                  <div class="text-xl font-extrabold text-slate-900 mt-1">${safe(player?.weight)} <span class="text-sm text-slate-500 font-semibold">kg</span></div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white p-5">
+                <div class="text-sm font-bold text-slate-900 mb-3">Season Summary (${safe(seasonSummary?.seasonYear)})</div>
+                <div class="grid sm:grid-cols-4 gap-3">
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-[11px] text-slate-500 uppercase tracking-wider">PPG</div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-1">${Number(seasonSummary?.ppg || 0).toFixed(1)}</div>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-[11px] text-slate-500 uppercase tracking-wider">RPG</div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-1">${Number(seasonSummary?.rpg || 0).toFixed(1)}</div>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-[11px] text-slate-500 uppercase tracking-wider">APG</div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-1">${Number(seasonSummary?.apg || 0).toFixed(1)}</div>
+                  </div>
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-3">
+                    <div class="text-[11px] text-slate-500 uppercase tracking-wider">GP</div>
+                    <div class="text-2xl font-extrabold text-slate-900 mt-1">${safe(seasonSummary?.gamesPlayed || 0)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white p-5">
+                <div class="text-sm font-bold text-slate-900 mb-3">Contact</div>
+                <div class="grid sm:grid-cols-2 gap-3 text-sm">
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><span class="text-slate-500">Contact:</span> <span class="font-semibold text-slate-900">${safe(player?.contactNumber)}</span></div>
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><span class="text-slate-500">Email:</span> <span class="font-semibold text-slate-900">${safe(player?.email)}</span></div>
+                  <div class="sm:col-span-2 rounded-xl bg-slate-50 border border-slate-200 p-3"><span class="text-slate-500">Address:</span> <span class="font-semibold text-slate-900">${safe(player?.address)}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        overlay.querySelector('[data-close]')?.addEventListener('click', close);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        document.body.appendChild(overlay);
+      }
+
+      function openProfileByPlayerId(playerId) {
+        const pid = String(playerId || '');
+        if (!pid) return;
+        const player = players.find((x) => String(x.id) === pid);
+        if (!player) return;
+        const seasonSummary = (seasonLeaders || []).find((x) => String(x.id) === pid) || { seasonYear: selectedSeason, ppg: 0, rpg: 0, apg: 0, gamesPlayed: 0 };
+        openPlayerProfileModal({ player, seasonSummary: { ...seasonSummary, seasonYear: selectedSeason } });
+      }
+
+      function renderNbaLiveRows(games) {
+        if (!Array.isArray(games) || !games.length) {
+          return `<div class="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">No NBA games available right now.</div>`;
+        }
+        return games.slice(0, 8).map((g) => {
+          const team1Logo = getTeamLogoUrl(g.team1);
+          const team2Logo = getTeamLogoUrl(g.team2);
+          const phaseLabel = g.status === 'completed' ? 'Final' : (g.quarter || 'Live');
+          const clockLabel = g.clock ? ` • ${g.clock}` : '';
+          return `
+            <div class="rounded-2xl border border-slate-200 bg-white p-3">
+              <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 border border-slate-200">
+                <div class="flex items-center gap-2 min-w-0">
+                  <img src="${team1Logo}" alt="${g.team1}" class="w-9 h-9 rounded-full bg-white object-contain p-0.5 border border-slate-200" />
+                  <span class="font-semibold text-slate-900 truncate">${g.team1}</span>
+                </div>
+                <span class="text-xl font-black text-slate-900">${Number(g.score1 || 0)}</span>
+              </div>
+              <div class="mt-2 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 border border-slate-200">
+                <div class="flex items-center gap-2 min-w-0">
+                  <img src="${team2Logo}" alt="${g.team2}" class="w-9 h-9 rounded-full bg-white object-contain p-0.5 border border-slate-200" />
+                  <span class="font-semibold text-slate-900 truncate">${g.team2}</span>
+                </div>
+                <span class="text-xl font-black text-slate-900">${Number(g.score2 || 0)}</span>
+              </div>
+              <div class="mt-2 text-xs text-slate-600 font-semibold">${phaseLabel}${clockLabel}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function openNbaLiveModal() {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[145] bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center';
+        overlay.innerHTML = `
+          <div class="w-full max-w-3xl max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl border border-slate-200">
+            <div class="px-6 py-5 bg-gradient-to-r from-[#0d2c59] via-[#163d74] to-[#ff6b35] text-white flex items-start justify-between gap-3">
+              <div>
+                <div class="text-[11px] uppercase tracking-[0.25em] text-blue-100">Realtime Feed</div>
+                <div class="text-2xl font-extrabold">NBA Live Scoreboard</div>
+                <div id="nba-modal-updated" class="text-xs text-blue-100/90 mt-1">Updating...</div>
+              </div>
+              <button type="button" data-close class="w-10 h-10 rounded-xl hover:bg-white/10 text-white text-2xl leading-none">×</button>
+            </div>
+            <div id="nba-modal-body" class="p-6 overflow-auto max-h-[calc(90vh-102px)] bg-gradient-to-b from-white to-slate-50/80 space-y-3">
+              <div class="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">Loading NBA games...</div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const close = () => {
+          if (nbaLiveModalIntervalId) {
+            clearInterval(nbaLiveModalIntervalId);
+            nbaLiveModalIntervalId = null;
+          }
+          overlay.remove();
+        };
+
+        overlay.querySelector('[data-close]')?.addEventListener('click', close);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+        const bodyEl = overlay.querySelector('#nba-modal-body');
+        const updatedEl = overlay.querySelector('#nba-modal-updated');
+
+        const refreshNbaLive = async () => {
+          try {
+            const resp = await fetchJson(`${apiBase}/nba/live/`);
+            const payload = resp?.data || {};
+            const games = Array.isArray(payload.games) ? payload.games : [];
+            if (bodyEl) bodyEl.innerHTML = renderNbaLiveRows(games);
+            if (updatedEl) updatedEl.textContent = `Updated ${formatDashboardUpdatedTime(new Date())}`;
+            const liveCountEl = document.getElementById('nba-live-count');
+            if (liveCountEl) {
+              const liveCount = Number(payload.live_count || 0);
+              liveCountEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>${Math.max(1, liveCount)} live`;
+            }
+            const quarterEl = document.getElementById('nba-live-quarter');
+            if (quarterEl && games[0]) quarterEl.textContent = games[0].status === 'completed' ? 'Final' : (games[0].quarter || 'Live');
+          } catch (_err) {
+            if (bodyEl) {
+              bodyEl.innerHTML = `<div class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">Could not load realtime NBA feed right now.</div>`;
+            }
+            if (updatedEl) updatedEl.textContent = 'Update failed. Retrying...';
+          }
+        };
+
+        refreshNbaLive();
+        nbaLiveModalIntervalId = setInterval(refreshNbaLive, 15000);
+      }
+
+      const renderSeasonLeaders = () => {
+        selectedSeason = Number(seasonFilterEl?.value || selectedSeason);
+        seasonLeaders = aggregateSeasonPlayerLeaders(games, selectedSeason, playerById);
+        topPlayers = seasonLeaders.slice(0, 10);
+        leader = topPlayers[0];
+
+        if (seasonLabelEl) seasonLabelEl.textContent = String(selectedSeason);
+        if (playerCountEl) playerCountEl.textContent = `${topPlayers.length} Players`;
+
+        if (topPerformersBodyEl) {
+          topPerformersBodyEl.innerHTML = topPlayers.map((p, i) => `
+            <tr class="border-t border-white/5 hover:bg-white/[0.02]">
+              <td class="px-4 py-3 font-bold text-orange-400">${i + 1}</td>
+              <td class="px-4 py-3 font-semibold text-white">
+                <button type="button" data-player-profile="${p.id}" class="text-left hover:underline hover:text-cyan-300">
+                  ${p.name}
+                </button>
+              </td>
+              <td class="px-4 py-3"><span class="px-2 py-1 bg-[#2a303a] border border-white/10 rounded text-xs text-slate-300">${p.position || "TBD"}</span></td>
+              <td class="px-4 py-3 text-orange-300 font-bold">${p.ppg.toFixed(1)}</td>
+              <td class="px-4 py-3 text-cyan-300 font-semibold">${p.rpg.toFixed(1)}</td>
+              <td class="px-4 py-3 text-emerald-300 font-semibold">${p.apg.toFixed(1)}</td>
+              <td class="px-4 py-3 text-emerald-400 text-xs">↗ +2.3</td>
+            </tr>
+          `).join("") || `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-500">No player performance stats for ${selectedSeason} yet.</td></tr>`;
+        }
+
+        if (leaderAvatarEl) leaderAvatarEl.textContent = leader?.name ? leader.name.split(" ").map((x) => x[0]).slice(0, 2).join("") : "—";
+        if (leaderNameEl) {
+          leaderNameEl.textContent = leader?.name || "No stats yet";
+          leaderNameEl.setAttribute('data-leader-profile', String(leader?.id || ''));
+        }
+        if (leaderTeamEl) leaderTeamEl.textContent = leader?.team || "Record player game stats to rank leaders";
+        if (leaderPpgEl) leaderPpgEl.textContent = leader ? leader.ppg.toFixed(1) : "—";
+        if (leaderRpgEl) leaderRpgEl.textContent = leader ? leader.rpg.toFixed(1) : "—";
+        if (leaderApgEl) leaderApgEl.textContent = leader ? leader.apg.toFixed(1) : "—";
+        if (leaderTrendEl) leaderTrendEl.textContent = leader ? `${leader.gamesPlayed} GP` : "—";
+      };
+
+      seasonFilterEl?.addEventListener('change', renderSeasonLeaders);
+
+      const nbaLiveCardEl = document.getElementById('nba-live-card');
+      nbaLiveCardEl?.addEventListener('click', openNbaLiveModal);
+      nbaLiveCardEl?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openNbaLiveModal();
+        }
+      });
+
+      // Initial bindings for the first render
+      contentEl.querySelectorAll('[data-player-profile]').forEach((btn) => {
+        btn.addEventListener('click', () => openProfileByPlayerId(btn.getAttribute('data-player-profile')));
+      });
+      leaderNameEl?.addEventListener('click', () => openProfileByPlayerId(leaderNameEl.getAttribute('data-leader-profile')));
+
+      // Rebind after season changes
+      const oldRenderSeasonLeaders = renderSeasonLeaders;
+      const wrappedRender = () => {
+        oldRenderSeasonLeaders();
+        contentEl.querySelectorAll('[data-player-profile]').forEach((btn) => {
+          btn.addEventListener('click', () => openProfileByPlayerId(btn.getAttribute('data-player-profile')));
+        });
+        leaderNameEl?.addEventListener('click', () => openProfileByPlayerId(leaderNameEl.getAttribute('data-leader-profile')));
+      };
+      seasonFilterEl?.removeEventListener('change', renderSeasonLeaders);
+      seasonFilterEl?.addEventListener('change', wrappedRender);
+
+      if (dashboardLeaderboardIntervalId) clearInterval(dashboardLeaderboardIntervalId);
+      dashboardLeaderboardIntervalId = setInterval(async () => {
+        try {
+          const refreshedGames = await fetchJson(`${apiBase}/games/`);
+          games = Array.isArray(refreshedGames) ? refreshedGames : [];
+          wrappedRender();
+        } catch (_err) {
+          // keep current leaderboard if refresh fails
+        }
+      }, 8000);
     }
 
     function renderTeamRosterPage(team, roster) {
@@ -315,34 +685,39 @@
       const centers = roster.filter(p => p.position === 'C').length;
       const undetermined = roster.length - guards - forwards - centers;
       contentEl.innerHTML = `
-        <a href="/teams/" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-3">← Back to Teams</a>
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="p-4 border-b">
+        <a href="/teams/" class="inline-flex items-center gap-2 text-slate-300 hover:text-white mb-3">← Back to Teams</a>
+        <div class="rounded-2xl border border-white/10 bg-[#1f242d] shadow-2xl overflow-hidden">
+          <div class="p-4 border-b border-white/10">
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-200">${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-cover" />` : ''}</div>
+                <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-700/50 border border-white/10">${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-cover" />` : ''}</div>
                 <div>
-                  <h3 class="text-4xl font-extrabold text-[#0d2c59]">${team?.name || 'Team Not Found'}</h3>
-                  <p class="text-slate-600">${team?.city || ''} • ${team?.conference || ''} Conference • ${team?.division || ''} Division</p>
+                  <h3 class="text-4xl font-extrabold text-white">${team?.name || 'Team Not Found'}</h3>
+                  <p class="text-slate-400">${team?.city || ''} • ${team?.conference || ''} Conference • ${team?.division || ''} Division</p>
                 </div>
               </div>
-              ${team ? '<button id="add-roster-player" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-4 py-2 text-sm font-medium">Add Player</button>' : ''}
+              ${team ? `
+                <div class="flex items-center gap-2">
+                  <button id="edit-team-credentials" class="rounded-xl px-3 py-2 text-sm font-semibold border border-white/15 text-slate-100 bg-white/5 hover:bg-white/10">Edit Team</button>
+                  <button id="add-roster-player" class="team-add-btn !text-sm !px-4 !py-2">Add Player</button>
+                </div>
+              ` : ''}
             </div>
           </div>
-          <div class="bg-[#eef3fb] p-4">
+          <div class="bg-[#171b22] p-4 border-b border-white/10">
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-              <div><div class="text-slate-500">Total Players</div><div class="text-3xl font-bold text-[#0d2c59]">${roster.length}<span class="text-base text-slate-500"> / 15</span></div></div>
-              <div><div class="text-slate-500">Guards</div><div class="text-2xl font-bold">${guards}</div></div>
-              <div><div class="text-slate-500">Forwards</div><div class="text-2xl font-bold">${forwards}</div></div>
-              <div><div class="text-slate-500">Centers</div><div class="text-2xl font-bold">${centers}</div></div>
-              <div><div class="text-slate-500">Undetermined</div><div class="text-2xl font-bold">${undetermined}</div></div>
+              <div><div class="text-slate-400">Total Players</div><div class="text-3xl font-bold text-orange-300">${roster.length}<span class="text-base text-slate-400"> / 15</span></div></div>
+              <div><div class="text-slate-400">Guards</div><div class="text-2xl font-bold text-white">${guards}</div></div>
+              <div><div class="text-slate-400">Forwards</div><div class="text-2xl font-bold text-white">${forwards}</div></div>
+              <div><div class="text-slate-400">Centers</div><div class="text-2xl font-bold text-white">${centers}</div></div>
+              <div><div class="text-slate-400">Undetermined</div><div class="text-2xl font-bold text-white">${undetermined}</div></div>
             </div>
           </div>
           <div class="p-4">
-            <h4 class="text-xl font-bold text-[#0d2c59] mb-3">Team Players</h4>
-            <div class="overflow-x-auto">
+            <h4 class="text-xl font-bold text-white mb-3">Team Players</h4>
+            <div class="overflow-x-auto rounded-xl border border-white/10 bg-[#151a22]">
               <table class="w-full text-sm">
-                <thead class="bg-slate-50 text-slate-600">
+                <thead class="bg-white/5 text-slate-300">
                   <tr>
                     <th class="text-left p-2">Name</th>
                     <th class="text-left p-2">Position</th>
@@ -354,18 +729,18 @@
                 </thead>
                 <tbody>
                   ${roster.map((p) => `
-                    <tr class="border-b">
-                      <td class="p-2 font-semibold text-slate-900">${p.name}</td>
+                    <tr class="border-b border-white/10 text-slate-200">
+                      <td class="p-2 font-semibold text-white">${p.name}</td>
                       <td class="p-2">${p.position || "TBD"}</td>
                       <td class="p-2">${p.jerseyNumber || "-"}</td>
                       <td class="p-2">${p.height || "-"}</td>
                       <td class="p-2">${p.weight || "-"}</td>
                       <td class="p-2 text-right space-x-2">
-                        <button data-roster-edit="${p.id}" class="text-blue-600 hover:text-blue-800">✎</button>
-                        <button data-roster-del="${p.id}" class="text-rose-600 hover:text-rose-800">🗑</button>
+                        <button data-roster-edit="${p.id}" class="w-8 h-8 rounded-lg border border-orange-300/50 bg-gradient-to-b from-[#fb923c] to-[#f97316] hover:brightness-105 text-white shadow-[0_6px_14px_rgba(249,115,22,0.35)]">✎</button>
+                        <button data-roster-del="${p.id}" class="w-8 h-8 rounded-lg border border-rose-400/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300">🗑</button>
                       </td>
                     </tr>
-                  `).join("") || `<tr><td colspan="6" class="p-4 text-center text-slate-500">No players in this team yet.</td></tr>`}
+                  `).join("") || `<tr><td colspan="6" class="p-4 text-center text-slate-400">No players in this team yet.</td></tr>`}
                 </tbody>
               </table>
             </div>
@@ -385,20 +760,20 @@
         const overlay = document.createElement('div');
         overlay.className = 'fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
         overlay.innerHTML = `
-          <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            <div class="px-5 py-4 bg-gradient-to-r from-[#102C57] to-[#163E72] text-white">
+          <div class="w-full max-w-2xl rounded-2xl shadow-2xl border border-white/15 bg-[#1f242d] overflow-hidden">
+            <div class="px-5 py-4 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white border-b border-white/10">
               <div class="font-bold text-lg">Add Registered Player to ${team?.name || 'Team'}</div>
             </div>
             <div class="p-5 space-y-3">
-              <input id="team-player-search" class="w-full border rounded-xl px-3 py-2" placeholder="Type player name to search..." />
-              <div class="flex items-center justify-between text-sm text-slate-600">
+              <input id="team-player-search" class="ht-input" placeholder="Type player name to search..." />
+              <div class="flex items-center justify-between text-sm text-slate-400">
                 <span id="team-player-selected-count">0 selected</span>
-                <button type="button" id="team-player-clear" class="text-[#0d2c59] font-semibold hover:underline">Clear Selection</button>
+                <button type="button" id="team-player-clear" class="text-orange-300 font-semibold hover:text-orange-200">Clear Selection</button>
               </div>
-              <div id="team-player-list" class="max-h-[340px] overflow-auto border border-slate-200 rounded-xl divide-y"></div>
+              <div id="team-player-list" class="max-h-[340px] overflow-auto border border-white/15 rounded-xl divide-y divide-white/10 bg-[#151a22]"></div>
               <div class="flex justify-end gap-2">
-                <button type="button" id="team-player-add-selected" class="px-4 py-2 rounded-xl bg-[#0d2c59] text-white hover:bg-[#163d74] disabled:opacity-50 disabled:cursor-not-allowed" disabled>Add Selected</button>
-                <button type="button" id="team-player-close" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Close</button>
+                <button type="button" id="team-player-add-selected" class="px-4 py-2 rounded-xl bg-[#f97316] text-white hover:bg-[#ea580c] disabled:opacity-50 disabled:cursor-not-allowed" disabled>Add Selected</button>
+                <button type="button" id="team-player-close" class="px-4 py-2 rounded-xl border border-white/15 text-slate-200 hover:bg-white/10">Close</button>
               </div>
             </div>
           </div>
@@ -419,14 +794,14 @@
         const renderList = (q = '') => {
           const filtered = eligiblePlayers.filter((p) => String(p.name || '').toLowerCase().includes(String(q).toLowerCase().trim()));
           listEl.innerHTML = filtered.map((p) => `
-            <button type="button" data-assign-player="${p.id}" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between gap-3">
+            <button type="button" data-assign-player="${p.id}" class="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center justify-between gap-3">
               <div class="flex items-start gap-3">
                 <input type="checkbox" data-player-checkbox="${p.id}" class="mt-1 w-4 h-4" ${selectedIds.has(String(p.id)) ? 'checked' : ''} />
-                <div class="font-semibold text-slate-900">${p.name}</div>
+                <div class="font-semibold text-slate-100">${p.name}</div>
               </div>
-              <div class="text-xs text-slate-500">${p.position || 'TBD'} • Jersey ${p.jerseyNumber || '-'} • ${p.team || 'Unassigned'}</div>
+              <div class="text-xs text-slate-400">${p.position || 'TBD'} • Jersey ${p.jerseyNumber || '-'} • ${p.team || 'Unassigned'}</div>
             </button>
-          `).join('') || '<div class="px-3 py-6 text-center text-slate-500 text-sm">No matching registered player.</div>';
+          `).join('') || '<div class="px-3 py-6 text-center text-slate-400 text-sm">No matching registered player.</div>';
           listEl.querySelectorAll('[data-assign-player]').forEach((btn) => {
             btn.addEventListener('click', (e) => {
               const id = String(btn.getAttribute('data-assign-player') || '');
@@ -481,6 +856,13 @@
         renderList('');
         updateSelectionUI();
       });
+      document.getElementById('edit-team-credentials')?.addEventListener('click', () => {
+        if (!team?.id) return;
+        openTeamRegistrationModal({
+          teamData: team,
+          onSave: loadPage
+        });
+      });
 
       document.querySelectorAll('[data-roster-del]').forEach((btn) => {
         btn.addEventListener('click', async () => {
@@ -516,22 +898,44 @@
 
     function renderPlayersPage(players, teams) {
       const teamOptions = teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+      const seasonYears = Array.from(
+        new Set(
+          players
+            .map((p) => Number(p.seasonYear))
+            .filter((y) => Number.isFinite(y) && y > 0)
+        )
+      ).sort((a, b) => b - a);
+      const defaultSeason = seasonYears.includes(2026) ? 2026 : (seasonYears[0] || '');
       contentEl.innerHTML = `
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-3xl font-extrabold text-[#0d2c59]">Player Management</h2>
-          <button id="add-player-btn" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-4 py-2">Add Player</button>
+        <div class="space-y-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <h2 class="text-3xl font-black text-white">Player Management</h2>
+              <p class="text-sm text-slate-300">Roster records, profiles, and team assignments.</p>
+            </div>
+            <button id="add-player-btn" class="team-add-btn">+ Add Player</button>
+          </div>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <div class="player-mgmt-panel rounded-2xl p-4 border border-white/10">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div class="inline-flex items-center gap-2 text-xs text-slate-400">
+              <label for="player-season" class="text-slate-400 font-semibold">Season</label>
+              <select id="player-season" class="player-filter-control !w-auto !py-1.5 !px-3">
+                <option value="">All Years</option>
+                ${seasonYears.map((y) => `<option value="${y}" ${String(defaultSeason) === String(y) ? 'selected' : ''}>${y}</option>`).join('')}
+              </select>
+            </div>
+          </div>
           <div class="grid md:grid-cols-3 gap-3 mb-4">
-            <input id="player-search" class="border rounded px-3 py-2" placeholder="Search players..." />
-            <select id="player-position" class="border rounded px-3 py-2">
+            <input id="player-search" class="player-filter-control" placeholder="Search players..." />
+            <select id="player-position" class="player-filter-control">
               <option value="">All Positions</option><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option><option>TBD</option>
             </select>
-            <select id="player-team" class="border rounded px-3 py-2"><option value="">All Teams</option>${teamOptions}</select>
+            <select id="player-team" class="player-filter-control"><option value="">All Teams</option>${teamOptions}</select>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-50 text-slate-600"><tr><th class="text-left p-2">ID</th><th class="text-left p-2">Name</th><th class="text-left p-2">Position</th><th class="text-left p-2">Jersey</th><th class="text-left p-2">Contact</th><th class="text-left p-2">Address</th><th class="text-left p-2">Email</th><th class="text-left p-2">Team</th><th class="text-right p-2">Actions</th></tr></thead>
+          <div class="overflow-x-auto player-table-wrap rounded-xl">
+            <table class="w-full text-sm player-table">
+            <thead><tr><th class="text-left p-3">Name</th><th class="text-left p-3">Year</th><th class="text-left p-3">Pos</th><th class="text-left p-3">Jersey</th><th class="text-left p-3">Contact</th><th class="text-left p-3">Address</th><th class="text-left p-3">Email</th><th class="text-left p-3">Team</th><th class="text-right p-3">Action</th></tr></thead>
               <tbody id="players-body"></tbody>
             </table>
           </div>
@@ -542,23 +946,39 @@
         const q = (document.getElementById('player-search').value || '').toLowerCase();
         const pos = document.getElementById('player-position').value;
         const team = document.getElementById('player-team').value;
-        const filtered = players.filter(p => (!q || p.name.toLowerCase().includes(q)) && (!pos || p.position === pos) && (!team || p.team === team));
-        body.innerHTML = filtered.map(p => `
-          <tr class="border-b">
-            <td class="p-2">${p.id}</td>
-            <td class="p-2 font-semibold text-slate-900">${p.name}</td>
-            <td class="p-2">${p.position || 'TBD'}</td>
-            <td class="p-2">${p.jerseyNumber || '-'}</td>
-            <td class="p-2">${p.contactNumber || '-'}</td>
-            <td class="p-2">${p.address || '-'}</td>
-            <td class="p-2">${p.email || '-'}</td>
-            <td class="p-2">${p.team || ''}</td>
-            <td class="p-2 text-right space-x-2">
-              <button data-p-edit="${p.id}" class="text-blue-600 hover:text-blue-800">✎</button>
-              <button data-p-del="${p.id}" class="text-rose-600 hover:text-rose-800">🗑</button>
+        const season = String(document.getElementById('player-season')?.value || '');
+        const filtered = players.filter(p =>
+          (!q || p.name.toLowerCase().includes(q)) &&
+          (!pos || p.position === pos) &&
+          (!team || p.team === team) &&
+          (!season || String(p.seasonYear || '') === season)
+        );
+        body.innerHTML = filtered.map(p => {
+          const initials = String(p.name || '').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]?.toUpperCase() || '').join('') || 'P';
+          return `
+          <tr>
+            <td class="p-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-[#173250] border border-white/10 text-[11px] font-bold text-cyan-300 flex items-center justify-center">${initials}</div>
+                <div>
+                  <div class="font-semibold text-white">${p.name}</div>
+                  <div class="text-[11px] text-slate-400">ID ${p.id}</div>
+                </div>
+              </div>
+            </td>
+            <td class="p-3 text-slate-300">${p.seasonYear || '-'}</td>
+            <td class="p-3"><span class="player-badge">${p.position || 'TBD'}</span></td>
+            <td class="p-3 text-slate-300">${p.jerseyNumber || '-'}</td>
+            <td class="p-3 text-slate-300">${p.contactNumber || '-'}</td>
+            <td class="p-3 text-slate-300">${p.address || '-'}</td>
+            <td class="p-3 text-slate-300">${p.email || '-'}</td>
+            <td class="p-3 text-slate-300">${p.team || ''}</td>
+            <td class="p-3 text-right space-x-2">
+              <button data-p-edit="${p.id}" class="player-trade-btn">Edit</button>
+              <button data-p-del="${p.id}" class="player-action-btn text-rose-300 hover:text-rose-200">🗑</button>
             </td>
           </tr>
-        `).join('') || `<tr><td colspan="9" class="p-4 text-center text-slate-500">No players found.</td></tr>`;
+        `}).join('') || `<tr><td colspan="9" class="p-6 text-center text-slate-400">No players found.</td></tr>`;
 
         document.querySelectorAll('[data-p-del]').forEach((btn) => {
           btn.addEventListener('click', async () => {
@@ -586,7 +1006,7 @@
           });
         });
       };
-      ['player-search', 'player-position', 'player-team'].forEach(id => document.getElementById(id)?.addEventListener('input', renderRows));
+      ['player-search', 'player-position', 'player-team', 'player-season'].forEach(id => document.getElementById(id)?.addEventListener('input', renderRows));
       document.getElementById('add-player-btn')?.addEventListener('click', () => openPlayerModal({ teams, defaultTeamName: null, onSave: loadPage }));
       renderRows();
     }

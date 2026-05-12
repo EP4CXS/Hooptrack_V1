@@ -1,0 +1,1 @@
+from app.api.views.chatbot.chatbot_request_view import ChatbotRequestActionView as ChatbotRequestView

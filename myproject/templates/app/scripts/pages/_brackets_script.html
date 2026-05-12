@@ -120,15 +120,18 @@
         const overlay = document.createElement("div");
         overlay.className = "fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center";
         overlay.innerHTML = `
-          <div class="w-full max-w-5xl max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-2xl border border-slate-200">
-            <div class="px-5 py-4 border-b border-slate-200 flex items-start justify-between gap-3">
-              <div>
-                <p class="text-lg font-bold text-slate-900">${escapeHtml(title)}</p>
-                <p class="text-sm text-slate-500 mt-0.5">${escapeHtml(subtitle)}</p>
+          <div class="w-full max-w-6xl max-h-[92vh] overflow-hidden bg-white rounded-3xl shadow-2xl border border-slate-200">
+            <div class="px-6 py-5 bg-gradient-to-r from-[#0d2c59] via-[#163d74] to-[#ff6b35] text-white flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-[11px] uppercase tracking-[0.25em] text-blue-100">Bracket View</div>
+                <p class="text-2xl font-extrabold leading-tight truncate">${escapeHtml(title)}</p>
+                <p class="text-sm text-blue-100/90 mt-1 truncate">${escapeHtml(subtitle)}</p>
               </div>
-              <button type="button" data-modal-close class="w-9 h-9 rounded-lg hover:bg-slate-100 text-slate-600 text-xl leading-none">×</button>
+              <button type="button" data-modal-close class="w-10 h-10 rounded-xl hover:bg-white/10 text-white text-2xl leading-none">×</button>
             </div>
-            <div class="p-5 overflow-auto max-h-[calc(90vh-80px)]">${bodyHtml}</div>
+            <div class="p-6 overflow-auto max-h-[calc(92vh-92px)] bg-gradient-to-b from-white to-slate-50/70">
+              ${bodyHtml}
+            </div>
           </div>
         `;
         const close = () => overlay.remove();
@@ -142,8 +145,8 @@
           const overlay = document.createElement("div");
           overlay.className = "fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4";
           overlay.innerHTML = `
-            <div class="w-full max-w-lg rounded-2xl bg-white border-2 border-[#1f4f94] shadow-2xl overflow-hidden">
-              <div class="px-5 py-4 border-b border-slate-200 bg-gradient-to-r from-[#0d2c59] to-[#163d74] text-white">
+            <div class="w-full max-w-lg rounded-2xl bg-[#1f242d] border border-white/15 shadow-2xl overflow-hidden">
+              <div class="px-5 py-4 border-b border-white/10 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white">
                 <div class="flex items-center gap-3">
                   <div class="w-9 h-9 rounded-full bg-[#0d2c59] text-white flex items-center justify-center text-base">🏀</div>
                   <p class="text-lg font-bold">Generate Bracket</p>
@@ -151,26 +154,26 @@
               </div>
               <form id="generate-bracket-form" class="p-5 space-y-4">
                 <div>
-                  <label for="generate-bracket-name" class="block text-sm font-semibold text-slate-700 mb-1">Bracket name:</label>
+                  <label for="generate-bracket-name" class="ht-fieldLabel mb-1">Bracket name:</label>
                   <input
                     id="generate-bracket-name"
                     name="name"
-                    class="w-full border border-slate-300 rounded-xl px-3 py-2"
+                    class="ht-input"
                     value="${escapeHtml(String(defaultName || ""))}"
                     required
                   />
                 </div>
                 <div>
-                  <label for="generate-bracket-format" class="block text-sm font-semibold text-slate-700 mb-1">Format:</label>
-                  <select id="generate-bracket-format" name="format" class="w-full border border-slate-300 rounded-xl px-3 py-2">
+                  <label for="generate-bracket-format" class="ht-fieldLabel mb-1">Format:</label>
+                  <select id="generate-bracket-format" name="format" class="ht-input">
                     <option value="single-elimination" ${defaultFormat === "single-elimination" ? "selected" : ""}>Single Elimination</option>
                     <option value="double-elimination" ${defaultFormat === "double-elimination" ? "selected" : ""}>Double Elimination</option>
                     <option value="round-robin" ${defaultFormat === "round-robin" ? "selected" : ""}>Round Robin</option>
                   </select>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                  <button type="button" data-generate-cancel class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
-                  <button type="submit" class="px-4 py-2 rounded-lg bg-[#0d2c59] text-white hover:bg-[#163d74]">Save</button>
+                  <button type="button" data-generate-cancel class="px-4 py-2 rounded-lg border border-white/15 text-slate-200 hover:bg-white/10">Cancel</button>
+                  <button type="submit" class="px-4 py-2 rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c]">Save</button>
                 </div>
               </form>
             </div>
@@ -203,6 +206,53 @@
         });
       };
 
+      const openBracketEditModal = ({ bracket }) => {
+        return new Promise((resolve) => {
+          const overlay = document.createElement("div");
+          overlay.className = "fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4";
+          overlay.innerHTML = `
+            <div class="w-full max-w-lg rounded-2xl bg-[#1f242d] border border-white/15 shadow-2xl overflow-hidden">
+              <div class="px-5 py-4 border-b border-white/10 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white">
+                <p class="text-lg font-bold">Edit Bracket Credentials</p>
+              </div>
+              <form id="edit-bracket-form" class="p-5 space-y-3">
+                <div>
+                  <label class="ht-fieldLabel mb-1">Bracket Name</label>
+                  <input name="name" class="ht-input" value="${escapeHtml(String(bracket?.name || ""))}" required />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="ht-fieldLabel mb-1">Start Date</label>
+                    <input name="startDate" type="date" class="ht-input" value="${escapeHtml(String(bracket?.startDate || ""))}" />
+                  </div>
+                  <div>
+                    <label class="ht-fieldLabel mb-1">Location</label>
+                    <input name="location" class="ht-input" value="${escapeHtml(String(bracket?.location || ""))}" />
+                  </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                  <button type="button" data-edit-cancel class="px-4 py-2 rounded-lg border border-white/15 text-slate-200 hover:bg-white/10">Cancel</button>
+                  <button type="submit" class="px-4 py-2 rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c]">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          const close = (value) => { overlay.remove(); resolve(value); };
+          overlay.querySelector("[data-edit-cancel]")?.addEventListener("click", () => close(null));
+          overlay.addEventListener("click", (e) => { if (e.target === overlay) close(null); });
+          overlay.querySelector("#edit-bracket-form")?.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            close({
+              name: String(fd.get("name") || "").trim(),
+              startDate: String(fd.get("startDate") || "").trim() || null,
+              location: String(fd.get("location") || "").trim() || null,
+            });
+          });
+        });
+      };
+
       contentEl.innerHTML = `
         <div class="flex flex-col gap-6">
           <div>
@@ -220,74 +270,74 @@
                   </div>
                   <button type="button" id="show-bracket-options" class="bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-xl px-4 py-2.5 font-semibold text-sm">Add Bracket</button>
                 </div>
-                <div id="bracket-create-options" class="p-4 hidden border-b border-slate-200 bg-slate-50">
+                <div id="bracket-create-options" class="p-4 hidden border-b border-white/10 bg-white/5">
                   <div class="grid md:grid-cols-2 gap-3">
-                    <button type="button" id="open-manual-bracket" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-left hover:bg-slate-50">
-                      <div class="font-semibold text-slate-900">Manual Bracket</div>
-                      <div class="text-xs text-slate-500 mt-0.5">Choose teams and bracket options manually.</div>
+                    <button type="button" id="open-manual-bracket" class="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-left hover:bg-white/10">
+                      <div class="font-semibold text-white">Manual Bracket</div>
+                      <div class="text-xs text-slate-400 mt-0.5">Choose teams and bracket options manually.</div>
                     </button>
-                    <button type="button" id="auto-generate-bracket" class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left hover:bg-emerald-100">
-                      <div class="font-semibold text-emerald-800">Generate Balanced Bracket</div>
-                      <div class="text-xs text-emerald-700 mt-0.5">Auto-seed teams based on performance profile.</div>
+                    <button type="button" id="auto-generate-bracket" class="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-left hover:bg-emerald-500/20">
+                      <div class="font-semibold text-emerald-300">Generate Balanced Bracket</div>
+                      <div class="text-xs text-emerald-200 mt-0.5">Auto-seed teams based on performance profile.</div>
                     </button>
                   </div>
                 </div>
                 <form id="bracket-form" class="p-5 space-y-5 hidden">
                   <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Bracket Name <span class="text-rose-500">*</span></label>
-                      <input name="name" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="e.g., Spring Championship 2024" required />
+                      <label class="ht-fieldLabel mb-1">Bracket Name <span class="text-rose-500">*</span></label>
+                      <input name="name" class="ht-input !py-2" placeholder="e.g., Spring Championship 2024" required />
                     </div>
                     <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Number of Teams</label>
-                      <input id="bracket-team-count" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 bg-slate-50 text-slate-600" value="0" readonly />
+                      <label class="ht-fieldLabel mb-1">Number of Teams</label>
+                      <input id="bracket-team-count" class="ht-input !py-2 !bg-white/5 text-slate-300" value="0" readonly />
                     </div>
                     <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Start Date (Optional)</label>
-                      <input name="startDate" type="date" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                      <label class="ht-fieldLabel mb-1">Start Date (Optional)</label>
+                      <input name="startDate" type="date" class="ht-input !py-2" />
                     </div>
                     <div>
-                      <label class="block text-sm font-semibold text-slate-700 mb-1">Location (Optional)</label>
-                      <input name="location" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="e.g., City Sports Arena" />
+                      <label class="ht-fieldLabel mb-1">Location (Optional)</label>
+                      <input name="location" class="ht-input !py-2" placeholder="e.g., City Sports Arena" />
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Bracket Format <span class="text-rose-500">*</span></label>
+                    <label class="ht-fieldLabel mb-2">Bracket Format <span class="text-rose-500">*</span></label>
                     <div class="grid md:grid-cols-3 gap-3">
                       ${["single-elimination","double-elimination","round-robin"].map((f, idx) => `
-                        <label class="cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 hover:border-slate-300 transition-colors">
+                        <label class="cursor-pointer rounded-2xl border border-white/12 bg-white/5 p-4 hover:border-orange-300/60 transition-colors">
                           <input type="radio" name="format" value="${f}" class="sr-only" ${idx === 0 ? "checked" : ""} />
-                          <div class="font-bold text-slate-900">${formatLabel(f)}</div>
-                          <div class="text-xs text-slate-500 mt-1 leading-snug">${formatDesc(f)}</div>
+                          <div class="font-bold text-white">${formatLabel(f)}</div>
+                          <div class="text-xs text-slate-400 mt-1 leading-snug">${formatDesc(f)}</div>
                         </label>
                       `).join("")}
                     </div>
                   </div>
 
-                  <label class="flex items-start gap-3 p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                  <label class="flex items-start gap-3 p-4 rounded-2xl bg-white/5 border border-white/10">
                     <input name="includeBronzeMatch" type="checkbox" class="mt-1 w-4 h-4" />
                     <div>
-                      <div class="font-semibold text-slate-900">Include Bronze Match</div>
-                      <div class="text-sm text-slate-600">Add a 3rd place match between semifinal losers.</div>
+                      <div class="font-semibold text-slate-100">Include Bronze Match</div>
+                      <div class="text-sm text-slate-400">Add a 3rd place match between semifinal losers.</div>
                     </div>
                   </label>
 
                   <div>
                     <div class="flex items-center justify-between">
-                      <label class="block text-sm font-semibold text-slate-700">Select Teams <span class="text-rose-500">*</span></label>
+                      <label class="ht-fieldLabel">Select Teams <span class="text-rose-500">*</span></label>
                       <div id="selected-count" class="text-sm text-slate-500">0 selected</div>
                     </div>
                     <div class="mt-3 grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                       ${teams.map((t) => `
-                        <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors cursor-pointer">
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-white/12 bg-white/5 hover:border-orange-300/60 transition-colors cursor-pointer">
                           <input type="checkbox" name="team" value="${t.name}" class="w-4 h-4" />
-                          <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
-                            ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-cover" alt="${t.name}" />` : `<span class="text-slate-500 text-xs font-bold">${String(t.name || "").slice(0,2).toUpperCase()}</span>`}
+                          <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800/80 flex items-center justify-center shrink-0">
+                            ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-cover" alt="${t.name}" />` : `<span class="text-slate-300 text-xs font-bold">${String(t.name || "").slice(0,2).toUpperCase()}</span>`}
                           </div>
                           <div class="min-w-0">
-                            <div class="font-semibold text-slate-900 text-sm truncate">${t.name}</div>
-                            <div class="text-xs text-slate-500 truncate">${t.city || ""}</div>
+                            <div class="font-semibold text-slate-100 text-sm truncate">${t.name}</div>
+                            <div class="text-xs text-slate-400 truncate">${t.city || ""}</div>
                           </div>
                         </label>
                       `).join("")}
@@ -295,7 +345,7 @@
                   </div>
 
                   <div class="pt-2">
-                    <button type="submit" class="w-full bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-xl px-4 py-3 font-bold">Save Bracket</button>
+                    <button type="submit" class="w-full bg-[#f97316] hover:bg-[#ea580c] text-white rounded-xl px-4 py-2.5 font-bold">Save Bracket</button>
                   </div>
                 </form>
               </div>
@@ -321,7 +371,7 @@
                       </div>
                       <div class="mt-3 flex items-center gap-2">
                         <button type="button" data-bracket-select="${b.id}" class="flex-1 text-xs font-semibold rounded-lg px-3 py-2 bg-[#0d2c59] text-white hover:bg-[#163d74]">View</button>
-                        <button type="button" data-bracket-edit="${b.id}" data-bracket-name="${escapeHtml(b.name)}" class="text-xs font-semibold rounded-lg px-3 py-2 border border-slate-300 text-slate-700 hover:bg-slate-50">Update</button>
+                        <button type="button" data-bracket-edit="${b.id}" data-bracket-name="${escapeHtml(b.name)}" class="text-xs font-semibold rounded-lg px-3 py-2 border border-white/15 text-slate-200 hover:bg-white/10">Update</button>
                         <button type="button" data-bracket-delete="${b.id}" data-bracket-name="${escapeHtml(b.name)}" class="text-xs font-semibold rounded-lg px-3 py-2 border border-rose-200 text-rose-700 hover:bg-rose-50">Delete</button>
                       </div>
                     </div>
@@ -451,7 +501,8 @@
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-bracket-select");
           const b = await fetchJson(`${apiBase}/brackets/${id}/`);
-          const standings = (b.standings && b.standings.length) ? b.standings : computeStandingsFromMatchups(b);
+          const hasCompleted = (b.matchups || []).some((m) => String(m.status || "").trim().toLowerCase() === "completed");
+          const standings = hasCompleted ? computeStandingsFromMatchups(b) : ((b.standings && b.standings.length) ? b.standings : computeStandingsFromMatchups(b));
           const byRound = {};
           (b.matchups || []).forEach((m) => {
             byRound[m.round] = byRound[m.round] || [];
@@ -461,52 +512,86 @@
           rounds.forEach((r) => byRound[r].sort((a, c) => (a.matchNumber || 0) - (c.matchNumber || 0)));
 
           const bodyHtml = `
-            <div class="space-y-5">
-              <div>
-                <p class="font-bold text-slate-900 mb-3">Status Updates</p>
-                <div class="grid sm:grid-cols-3 gap-3">
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><div class="text-xs text-slate-500 uppercase">Status</div><div class="font-semibold text-slate-900 mt-1">${escapeHtml((b.status || "active").toUpperCase())}</div></div>
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><div class="text-xs text-slate-500 uppercase">Current Round</div><div class="font-semibold text-slate-900 mt-1">${escapeHtml(String(b.currentRound || 1))}</div></div>
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><div class="text-xs text-slate-500 uppercase">Total Rounds</div><div class="font-semibold text-slate-900 mt-1">${escapeHtml(String(b.totalRounds || 1))}</div></div>
-                </div>
-              </div>
-              <div>
-                <p class="font-bold text-slate-900 mb-3">Standings</p>
-                ${renderStandingsTable(standings)}
-              </div>
-              <div>
-                <p class="font-bold text-slate-900 mb-3">Bracket Structure</p>
-                ${rounds.length ? `
-                  <div class="overflow-x-auto">
-                    <div class="min-w-[720px] grid gap-4" style="grid-template-columns: repeat(${rounds.length}, minmax(220px, 1fr));">
-                      ${rounds.map((r) => `
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                          <div class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Round ${r}</div>
-                          <div class="space-y-2">
-                            ${byRound[r].map((m) => `
-                              <div class="rounded-xl bg-white border border-slate-200 p-3">
-                                <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
-                                  <div>Match #${m.matchNumber}</div>
-                                  <div class="${m.status === "completed" ? "text-emerald-700" : m.status === "in-progress" ? "text-orange-700" : "text-slate-500"}">${m.status}</div>
-                                </div>
-                                <div class="space-y-1 text-sm">
-                                  <div class="flex items-center justify-between">
-                                    <span class="font-semibold ${m.winner === m.team1 ? "text-emerald-700" : "text-slate-900"}">${m.team1 || "TBD"}</span>
-                                    <span class="text-slate-700">${m.score1 ?? ""}</span>
-                                  </div>
-                                  <div class="flex items-center justify-between">
-                                    <span class="font-semibold ${m.winner === m.team2 ? "text-emerald-700" : "text-slate-900"}">${m.team2 || "TBD"}</span>
-                                    <span class="text-slate-700">${m.score2 ?? ""}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            `).join("")}
-                          </div>
-                        </div>
-                      `).join("")}
+            <div class="space-y-6">
+              <div class="grid lg:grid-cols-12 gap-5">
+                <div class="lg:col-span-5 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                  <div class="px-5 py-4 bg-gradient-to-r from-[#0d2c59] to-[#163d74] text-white">
+                    <div class="text-xs uppercase tracking-[0.2em] text-blue-100">Status Updates</div>
+                    <div class="text-lg font-bold mt-1">Tournament Snapshot</div>
+                  </div>
+                  <div class="p-5 grid sm:grid-cols-3 lg:grid-cols-1 gap-3">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <div class="text-[11px] text-slate-500 uppercase tracking-wider">Status</div>
+                      <div class="font-extrabold text-slate-900 mt-1">${escapeHtml((b.status || "active").toUpperCase())}</div>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <div class="text-[11px] text-slate-500 uppercase tracking-wider">Current Round</div>
+                      <div class="font-extrabold text-slate-900 mt-1">${escapeHtml(String(b.currentRound || 1))}</div>
+                    </div>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <div class="text-[11px] text-slate-500 uppercase tracking-wider">Total Rounds</div>
+                      <div class="font-extrabold text-slate-900 mt-1">${escapeHtml(String(b.totalRounds || 1))}</div>
                     </div>
                   </div>
-                ` : `<p class="text-slate-500 text-sm">No matchups yet.</p>`}
+                </div>
+
+                <div class="lg:col-span-7 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                  <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                      <div class="text-xs uppercase tracking-[0.2em] text-slate-500">Standings</div>
+                      <div class="text-lg font-bold text-slate-900 mt-1">Current Table</div>
+                    </div>
+                  </div>
+                  <div class="p-5 overflow-x-auto">
+                    ${renderStandingsTable(standings)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div class="text-xs uppercase tracking-[0.2em] text-slate-500">Bracket Structure</div>
+                    <div class="text-lg font-bold text-slate-900 mt-1">Matchups by Round</div>
+                  </div>
+                  <div class="text-xs text-slate-500">${rounds.length ? `${rounds.length} round(s)` : ''}</div>
+                </div>
+                <div class="p-5">
+                  ${rounds.length ? `
+                    <div class="overflow-x-auto">
+                      <div class="min-w-[860px] grid gap-4" style="grid-template-columns: repeat(${rounds.length}, minmax(260px, 1fr));">
+                        ${rounds.map((r) => `
+                          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <div class="flex items-center justify-between mb-3">
+                              <div class="text-xs font-black uppercase tracking-wider text-slate-700">Round ${r}</div>
+                              <div class="text-[11px] text-slate-500">${(byRound[r] || []).length} match(es)</div>
+                            </div>
+                            <div class="space-y-3">
+                              ${byRound[r].map((m) => `
+                                <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+                                  <div class="flex items-center justify-between text-xs text-slate-500 mb-3">
+                                    <div class="font-semibold">Match #${m.matchNumber}</div>
+                                    <div class="px-2 py-1 rounded-full border ${m.status === "completed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : m.status === "in-progress" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-slate-50 text-slate-600 border-slate-200"}">${m.status}</div>
+                                  </div>
+                                  <div class="space-y-2 text-sm">
+                                    <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                      <span class="font-bold ${m.winner === m.team1 ? "text-emerald-700" : "text-slate-900"}">${m.team1 || "TBD"}</span>
+                                      <span class="text-slate-800 font-extrabold">${m.score1 ?? ""}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                                      <span class="font-bold ${m.winner === m.team2 ? "text-emerald-700" : "text-slate-900"}">${m.team2 || "TBD"}</span>
+                                      <span class="text-slate-800 font-extrabold">${m.score2 ?? ""}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              `).join("")}
+                            </div>
+                          </div>
+                        `).join("")}
+                      </div>
+                    </div>
+                  ` : `<p class="text-slate-500 text-sm">No matchups yet.</p>`}
+                </div>
               </div>
             </div>
           `;
@@ -521,16 +606,14 @@
       document.querySelectorAll("[data-bracket-edit]").forEach((btn) => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-bracket-edit");
-          const currentName = btn.getAttribute("data-bracket-name") || "";
-          const nextName = await uiPrompt("Update bracket name:", currentName, "Update Bracket");
-          if (nextName === null) return;
-          const name = String(nextName).trim();
-          if (!name) {
+          const fresh = await fetchJson(`${apiBase}/brackets/${id}/`);
+          const updates = await openBracketEditModal({ bracket: fresh });
+          if (!updates) return;
+          if (!updates.name) {
             await uiAlert("Bracket name cannot be empty.", "Update Bracket");
             return;
           }
-          const fresh = await fetchJson(`${apiBase}/brackets/${id}/`);
-          await sendJson(`${apiBase}/brackets/${id}/`, "PUT", { ...fresh, name });
+          await sendJson(`${apiBase}/brackets/${id}/`, "PUT", { ...fresh, ...updates, name: updates.name });
           setStatus("Bracket updated.");
           await loadPage();
         });

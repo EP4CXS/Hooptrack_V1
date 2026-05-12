@@ -5,7 +5,6 @@ Overrides base settings for local development.
 """
 
 from .base import *
-from decouple import config
 
 # Development-specific settings
 DEBUG = True

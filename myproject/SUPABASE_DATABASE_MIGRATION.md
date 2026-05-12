@@ -78,6 +78,15 @@ Manual verification checklist:
 - Teams CRUD works.
 - Players CRUD works.
 - Brackets create/update/delete works.
+
+## Player performance history (per game)
+
+After migration `0013_game_performance_history`, PostgreSQL (including Supabase) stores:
+
+- **`app_game`**: `tournament_name` (bracket/tournament label), `completed_at` (when the game was marked completed), plus existing `season_year` and bracket/matchup links.
+- **`app_playergamestat`**: each row is one player's box score for one game, with denormalized **`tournament_name`**, **`game_completed_at`**, and **`season_year`** for analytics and exports without extra joins.
+
+Completing a game from the Games UI (save / end game) updates the game to `completed`, stamps `completed_at`, syncs stats, and writes these context fields on every `PlayerGameStat` row.
 - Games and predictions pages load and save data.
 
 ## 6) Production Hardening Checklist

@@ -67,7 +67,15 @@ class BasketballService:
     @staticmethod
     def create_player(data):
         team_name = BasketballService.extract_team_name(data.pop("team", None))
-        team = Team.objects.filter(name=team_name).first() if team_name else None
+        owner = data.get("created_by")
+        if owner and not (data.get("municipality") or "").strip():
+            profile = getattr(owner, "profile", None)
+            if profile and (profile.municipality or "").strip():
+                data["municipality"] = profile.municipality.strip()
+        team_qs = Team.objects.filter(name=team_name) if team_name else Team.objects.none()
+        if owner:
+            team_qs = team_qs.filter(created_by=owner)
+        team = team_qs.first() if team_name else None
         return Player.objects.create(team=team, **data)
 
     @staticmethod
@@ -75,7 +83,10 @@ class BasketballService:
         had_team = "team" in data
         team_name = BasketballService.extract_team_name(data.pop("team", None))
         if had_team or team_name is not None:
-            instance.team = Team.objects.filter(name=team_name).first() if team_name else None
+            team_qs = Team.objects.filter(name=team_name) if team_name else Team.objects.none()
+            if instance.created_by_id:
+                team_qs = team_qs.filter(created_by_id=instance.created_by_id)
+            instance.team = team_qs.first() if team_name else None
         for key, value in data.items():
             setattr(instance, key, value)
         instance.save()

@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -16,6 +17,14 @@ from app.api.serializers.basketball_serializers import (
 )
 from app.models.basketball.models import Bracket, Game, GameEvent, GamePrediction, Matchup, Player, PlayerGameStat, Team
 from app.controllers.basketball_controller import BasketballController
+from app.controllers.basketball import (
+    bracket_generator_action,
+    bracket_update_action,
+    player_create_action,
+    player_update_action,
+    prediction_generate_ai_action,
+    prediction_upsert_action,
+)
 from app.http.requests.basketball_requests import GeneratePredictionRequest, UpsertPredictionRequest
 from app.utils.debug_agent_log import agent_debug_log
 from app.utils.responses import success_response
@@ -24,26 +33,37 @@ from app.utils.responses import success_response
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all().order_by("name")
     serializer_class = TeamSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["conference", "division"]
     search_fields = ["name", "city"]
     pagination_class = None
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(created_by=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
 
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.select_related("team").all().order_by("name")
     serializer_class = PlayerSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["position", "team__name"]
+    filterset_fields = ["position", "team__name", "season_year"]
     search_fields = ["name", "team__name", "jersey_number"]
     pagination_class = None
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(created_by=self.request.user)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        player = BasketballController.create_player(serializer.validated_data)
+        player = player_create_action({**serializer.validated_data, "created_by": request.user})
         return Response(PlayerSerializer(player).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -51,23 +71,28 @@ class PlayerViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        player = BasketballController.update_player(instance, serializer.validated_data)
+        player = player_update_action(instance, serializer.validated_data)
         return Response(PlayerSerializer(player).data, status=status.HTTP_200_OK)
 
 
 class BracketViewSet(viewsets.ModelViewSet):
     queryset = Bracket.objects.all().prefetch_related("matchup_set", "teamstanding_set")
     serializer_class = BracketSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     pagination_class = None
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(created_by=self.request.user)
 
     def create(self, request, *args, **kwargs):
         payload = request.data
-        bracket = BasketballController.create_bracket_with_relations(
+        bracket = bracket_generator_action(
             {
                 **payload,
                 "matchups": payload.get("matchups", []),
                 "standings": payload.get("standings", []),
+                "created_by": request.user,
             }
         )
         return Response(BracketSerializer(bracket).data, status=status.HTTP_201_CREATED)
@@ -76,7 +101,7 @@ class BracketViewSet(viewsets.ModelViewSet):
         kwargs.pop("partial", False)
         instance = self.get_object()
         payload = request.data
-        instance = BasketballController.update_bracket_with_relations(instance, payload)
+        instance = bracket_update_action(instance, payload)
         return Response(BracketSerializer(instance).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.AllowAny])
@@ -85,9 +110,7 @@ class BracketViewSet(viewsets.ModelViewSet):
         confidence = request.data.get("confidence")
         matchup_id = request.data.get("matchupId")
         bracket_id = request.data.get("bracketId") or pk
-        prediction = BasketballService.upsert_prediction(
-            matchup_id, predicted_winner, confidence, bracket_id=bracket_id
-        )
+        prediction = prediction_upsert_action(matchup_id, predicted_winner, confidence, bracket_id=bracket_id)
         return success_response(GamePredictionSerializer(prediction).data, "Prediction saved")
 
 
@@ -106,7 +129,7 @@ class GamePredictionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         dto = UpsertPredictionRequest.from_request_data(request.data)
-        prediction = BasketballController.upsert_prediction(
+        prediction = prediction_upsert_action(
             dto.matchup_id,
             dto.predicted_winner,
             dto.confidence,
@@ -158,7 +181,7 @@ class GamePredictionViewSet(viewsets.ModelViewSet):
         )
         # #endregion
         try:
-            prediction = BasketballController.generate_ai_prediction(matchup_id=matchup_id, bracket_id=bracket_id)
+            prediction = prediction_generate_ai_action(matchup_id=matchup_id, bracket_id=bracket_id)
         except Exception as exc:
             # #region agent log
             agent_debug_log(
@@ -203,6 +226,12 @@ class GameViewSet(viewsets.ModelViewSet):
             if matchup_obj is None:
                 raise ValidationError({"matchup": f"Invalid matchup reference: {matchup_ref}"})
 
+        tournament_name = ""
+        if bracket_id:
+            br = Bracket.objects.filter(pk=bracket_id).only("name").first()
+            if br and (br.name or "").strip():
+                tournament_name = br.name.strip()
+
         game = Game.objects.create(
             bracket_id=bracket_id,
             matchup=matchup_obj,
@@ -212,15 +241,39 @@ class GameViewSet(viewsets.ModelViewSet):
             score2=payload.get("score2", 0),
             quarter=payload.get("quarter", 1),
             clock=payload.get("clock", "12:00"),
+            season_year=payload.get("seasonYear") or payload.get("season_year") or timezone.now().year,
             status=payload.get("status", "in-progress"),
+            tournament_name=tournament_name,
         )
         return Response(GameSerializer(game).data, status=status.HTTP_201_CREATED)
+
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        new_status = serializer.validated_data.get("status", instance.status)
+        extras = {}
+        if new_status == "completed":
+            extras["completed_at"] = instance.completed_at or timezone.now()
+            if instance.bracket_id:
+                br = Bracket.objects.filter(pk=instance.bracket_id).only("name").first()
+                if br and (br.name or "").strip():
+                    extras["tournament_name"] = br.name.strip()
+        serializer.save(**extras)
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.AllowAny])
     def sync_stats(self, request, pk=None):
         game = self.get_object()
+        game.refresh_from_db()
         rows = request.data.get("playerStats", [])
         seen_ids = set()
+        ctx = {
+            "tournament_name": (game.tournament_name or "").strip(),
+            "game_completed_at": game.completed_at,
+            "season_year": game.season_year,
+        }
+        if not ctx["tournament_name"] and game.bracket_id:
+            br = Bracket.objects.filter(pk=game.bracket_id).only("name").first()
+            if br and (br.name or "").strip():
+                ctx["tournament_name"] = br.name.strip()
         for row in rows:
             player_id = row.get("player")
             if not player_id:
@@ -230,6 +283,9 @@ class GameViewSet(viewsets.ModelViewSet):
                 player_id=player_id,
                 defaults={
                     "team_name": row.get("teamName") or row.get("team_name") or "",
+                    "tournament_name": ctx["tournament_name"],
+                    "game_completed_at": ctx["game_completed_at"],
+                    "season_year": ctx["season_year"],
                     "fgm2": row.get("fgm2", 0),
                     "fga2": row.get("fga2", 0),
                     "fgm3": row.get("fgm3", 0),

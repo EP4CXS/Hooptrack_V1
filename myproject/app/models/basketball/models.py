@@ -3,9 +3,16 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
+def get_current_year():
+    return timezone.now().year
+
+
 class Player(models.Model):
     """Model for basketball players"""
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="players")
+    municipality = models.CharField(max_length=100, blank=True, default="")
     name = models.CharField(max_length=100)
+    season_year = models.IntegerField(default=get_current_year)
     height = models.CharField(max_length=10, null=True, blank=True)  # e.g., "206" cm
     weight = models.CharField(max_length=10, null=True, blank=True)  # e.g., "113" kg
     position = models.CharField(max_length=10)  # e.g., "SF", "PG", "C"
@@ -58,15 +65,19 @@ class Team(models.Model):
         ('U21', 'U21'),
     ]
 
-    name = models.CharField(max_length=100, unique=True)
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="teams")
+    name = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     conference = models.CharField(max_length=20, choices=CONFERENCE_CHOICES)
     division = models.CharField(max_length=20, choices=DIVISION_CHOICES)
-    logo = models.URLField(null=True, blank=True)
+    logo = models.ImageField(upload_to="team_logos", null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['name']
+        constraints = [
+            models.UniqueConstraint(fields=['created_by', 'name'], name='uniq_team_name_per_owner'),
+        ]
 
     def __str__(self):
         return f"{self.city} {self.name}"
@@ -89,6 +100,7 @@ class Bracket(models.Model):
         ('completed', 'Completed'),
     ]
 
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="brackets")
     name = models.CharField(max_length=200)
     format = models.CharField(max_length=20, choices=FORMAT_CHOICES)
     teams = models.JSONField()  # List of team names
@@ -229,12 +241,25 @@ class Game(models.Model):
     score2 = models.IntegerField(default=0)
     quarter = models.IntegerField(default=1)
     clock = models.CharField(max_length=16, default="12:00")
+    season_year = models.IntegerField(default=get_current_year)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in-progress")
+    # Bracket/tournament label copied for history & analytics (typically Bracket.name).
+    tournament_name = models.CharField(max_length=200, blank=True, default="")
+    completed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-updated_at"]
+
+    @property
+    def quarter_display(self):
+        if self.quarter <= 4:
+            return f"Q{self.quarter}"
+        elif self.quarter == 5:
+            return "OT"
+        else:
+            return f"{self.quarter - 4}OT"
 
     def __str__(self):
         return f"{self.team1_name} vs {self.team2_name} ({self.status})"
@@ -245,6 +270,9 @@ class PlayerGameStat(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="player_stats")
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     team_name = models.CharField(max_length=100)
+    tournament_name = models.CharField(max_length=200, blank=True, default="")
+    game_completed_at = models.DateTimeField(null=True, blank=True)
+    season_year = models.IntegerField(null=True, blank=True)
 
     fgm2 = models.IntegerField(default=0)
     fga2 = models.IntegerField(default=0)

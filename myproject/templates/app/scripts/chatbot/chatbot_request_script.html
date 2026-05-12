@@ -1,0 +1,184 @@
+<script>
+  const chatbotToggle = document.getElementById('chatbot-toggle');
+  const chatbotPanel = document.getElementById('chatbot-panel');
+  const chatbotForm = document.getElementById('chatbot-form');
+  const chatbotInput = document.getElementById('chatbot-input');
+  const chatbotMessages = document.getElementById('chatbot-messages');
+  const chatbotHistory = [];
+  const userProfile = { name: 'Coach', avatar: 'CO' };
+  const botProfile = { name: 'Court AI', avatarImage: '/media/img/chatbot-ball.svg' };
+  let typingStyleMounted = false;
+
+  function ensureTypingStyle() {
+    if (typingStyleMounted || document.getElementById('chatbot-typing-style')) return;
+    const style = document.createElement('style');
+    style.id = 'chatbot-typing-style';
+    style.textContent = `
+      @keyframes chatbot-dot-wave {
+        0%, 60%, 100% { transform: translateY(0); opacity: .35; }
+        30% { transform: translateY(-5px); opacity: 1; }
+      }
+      .chatbot-wave-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 9999px;
+        background: #64748b;
+        display: inline-block;
+        animation: chatbot-dot-wave 1.05s infinite ease-in-out;
+      }
+    `;
+    document.head.appendChild(style);
+    typingStyleMounted = true;
+  }
+
+  function createAvatar(who = 'bot') {
+    if (who === 'user') {
+      const avatar = document.createElement('div');
+      avatar.className = 'w-6 h-6 rounded-full bg-[#1f2937] border border-white/10 text-slate-200 text-[10px] font-bold flex items-center justify-center';
+      avatar.textContent = userProfile.avatar;
+      return avatar;
+    }
+    const avatar = document.createElement('img');
+    avatar.className = 'w-6 h-6 rounded-full object-cover';
+    avatar.src = botProfile.avatarImage;
+    avatar.alt = botProfile.name;
+    return avatar;
+  }
+
+  function groqViaLine(model) {
+    const m = String(model || '').trim();
+    if (!m) return '';
+    if (m === 'fallback-rules') return 'Offline rules — set GROQ_API_KEY in myproject/.env and restart';
+    if (/^(db-|guard-)/.test(m)) return '';
+    return `Groq · ${m}`;
+  }
+
+  function addChatMessage(text, who = 'bot', opts = {}) {
+    if (!chatbotMessages) return;
+    const row = document.createElement('div');
+    row.className = who === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+    const shell = document.createElement('div');
+    shell.className = 'max-w-[88%]';
+
+    const meta = document.createElement('div');
+    meta.className = who === 'user'
+      ? 'flex items-center justify-end gap-2 mb-1'
+      : 'flex items-center gap-2 mb-1';
+
+    const avatar = createAvatar(who);
+
+    const name = document.createElement('div');
+    name.className = 'text-[11px] text-slate-400 font-medium';
+    name.textContent = who === 'user' ? userProfile.name : botProfile.name;
+
+    if (who === 'user') {
+      meta.appendChild(name);
+      meta.appendChild(avatar);
+    } else {
+      meta.appendChild(avatar);
+      meta.appendChild(name);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = who === 'user'
+      ? 'chatbot-bubble-user rounded-xl px-3 py-2'
+      : 'chatbot-bubble-bot rounded-xl px-3 py-2';
+    bubble.textContent = text;
+
+    shell.appendChild(meta);
+    shell.appendChild(bubble);
+    const via = who === 'bot' ? (opts.via || '') : '';
+    if (via) {
+      const foot = document.createElement('div');
+      foot.className = 'text-[10px] text-slate-500 mt-1 pl-8';
+      foot.textContent = via;
+      shell.appendChild(foot);
+    }
+    row.appendChild(shell);
+    chatbotMessages.appendChild(row);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  }
+
+  function showTypingIndicator() {
+    if (!chatbotMessages) return null;
+    ensureTypingStyle();
+    const row = document.createElement('div');
+    row.className = 'flex justify-start';
+
+    const shell = document.createElement('div');
+    shell.className = 'max-w-[88%]';
+
+    const meta = document.createElement('div');
+    meta.className = 'flex items-center gap-2 mb-1';
+
+    const avatar = createAvatar('bot');
+    meta.appendChild(avatar);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chatbot-bubble-bot rounded-xl px-3 py-2';
+    bubble.innerHTML = `
+      <div class="flex items-center gap-1.5">
+        <span class="chatbot-wave-dot" style="animation-delay:0ms"></span>
+        <span class="chatbot-wave-dot" style="animation-delay:140ms"></span>
+        <span class="chatbot-wave-dot" style="animation-delay:280ms"></span>
+      </div>
+    `;
+
+    shell.appendChild(meta);
+    shell.appendChild(bubble);
+    row.appendChild(shell);
+    chatbotMessages.appendChild(row);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+    return { row };
+  }
+
+  function hideTypingIndicator(indicator) {
+    if (!indicator) return;
+    indicator.row.remove();
+  }
+
+  async function fetchChatbotReply(input) {
+    const token = localStorage.getItem('accessToken');
+    const res = await fetch('/api/chatbot/request/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        message: input,
+        history: chatbotHistory.slice(-6),
+      }),
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const body = await res.json();
+    const data = body?.data || {};
+    return {
+      reply: data.reply || 'No response from chatbot.',
+      model: data.model || '',
+    };
+  }
+
+  chatbotToggle?.addEventListener('click', () => chatbotPanel?.classList.toggle('hidden'));
+  chatbotForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = String(chatbotInput.value || '').trim();
+    if (!text) return;
+    addChatMessage(text, 'user');
+    chatbotHistory.push({ role: 'user', content: text });
+    chatbotInput.value = '';
+    const typingIndicator = showTypingIndicator();
+    try {
+      const { reply, model } = await fetchChatbotReply(text);
+      hideTypingIndicator(typingIndicator);
+      addChatMessage(reply, 'bot', { via: groqViaLine(model) });
+      chatbotHistory.push({ role: 'assistant', content: reply });
+    } catch (_err) {
+      hideTypingIndicator(typingIndicator);
+      addChatMessage('Chatbot is temporarily unavailable. Please try again in a moment.', 'bot');
+    }
+  });
+</script>
+.

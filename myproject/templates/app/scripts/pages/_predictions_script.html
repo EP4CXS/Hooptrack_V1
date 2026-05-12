@@ -161,7 +161,7 @@
           ${reasoningBlock}
 
           <div class="mt-auto pt-3">
-            <button type="button" data-generate="${escapeHtml(matchup.id)}" data-bracket-id="${escapeHtml(String(bracketId))}" class="w-full inline-flex items-center justify-center gap-2 bg-[#0d2c59] hover:bg-[#163d74] text-white font-semibold rounded-xl px-3 py-2.5 text-sm transition-colors">
+            <button type="button" data-generate="${escapeHtml(matchup.id)}" data-bracket-id="${escapeHtml(String(bracketId))}" class="w-full ht-button ht-button--primary">
               ${buttonLabel}
             </button>
           </div>
@@ -176,20 +176,12 @@
       ]);
 
       const headerHTML = `
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-              </div>
-              <h2 class="text-2xl font-extrabold text-[#0d2c59] tracking-tight">AI Game Predictions</h2>
-            </div>
-            <p class="text-sm text-slate-500">Win streak, player performance, and roster height analyzed for each upcoming matchup.</p>
-          </div>
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs font-semibold self-start md:self-auto">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            ${brackets.length} bracket${brackets.length === 1 ? '' : 's'} available
-          </div>
+        <div class="ht-container">
+          ${window.HTUI?.renderPageHeader({
+            title: 'AI Game Predictions',
+            subtitle: 'Win streak, player performance, and roster height analyzed for each upcoming matchup.',
+            badgeHtml: `<div class="ht-badge ht-badge--live">${brackets.length} bracket${brackets.length === 1 ? '' : 's'} available</div>`,
+          }) || ''}
         </div>
       `;
 
@@ -216,23 +208,25 @@
         || bracketOptions[0];
 
       contentEl.innerHTML = headerHTML + `
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-4">
-          <div class="grid gap-3 md:grid-cols-12">
-            <div class="md:col-span-6">
-              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Bracket</label>
-              <select id="prediction-bracket-filter" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 bg-white">
-                <option value="all">All Brackets</option>
-                ${bracketOptions.map((b) => `<option value="${escapeHtml(b.id)}" ${b.id === defaultBracket.id ? 'selected' : ''}>${escapeHtml(b.name)} (${escapeHtml(b.status)})</option>`).join('')}
-              </select>
+        <div class="ht-container space-y-4">
+          ${window.HTUI?.renderToolbar(`
+            <div class="grid gap-3 md:grid-cols-12 items-end">
+              <div class="md:col-span-6">
+                <div class="ht-fieldLabel mb-1">Bracket</div>
+                <select id="prediction-bracket-filter" class="ht-select">
+                  <option value="all">All Brackets</option>
+                  ${bracketOptions.map((b) => `<option value="${escapeHtml(b.id)}" ${b.id === defaultBracket.id ? 'selected' : ''}>${escapeHtml(b.name)} (${escapeHtml(b.status)})</option>`).join('')}
+                </select>
+              </div>
+              <div class="md:col-span-6">
+                <div class="ht-fieldLabel mb-1">Team Search</div>
+                <input id="prediction-team-search" class="ht-input" placeholder="Search team..." />
+              </div>
             </div>
-            <div class="md:col-span-6">
-              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Team Search</label>
-              <input id="prediction-team-search" class="w-full border border-slate-300 rounded-xl px-3 py-2.5" placeholder="Search team..." />
-            </div>
-          </div>
-          <div id="prediction-filter-meta" class="mt-3 text-xs text-slate-500"></div>
+            <div id="prediction-filter-meta" class="mt-3 text-xs text-slate-500"></div>
+          `) || ''}
+          <div id="prediction-cards" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
-        <div id="prediction-cards" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       `;
 
       const bracketSelect = document.getElementById('prediction-bracket-filter');
@@ -290,7 +284,7 @@
               btn.innerHTML = originalHTML;
               btn.disabled = false;
               btn.classList.remove('opacity-70', 'cursor-not-allowed');
-              setStatus(`AI prediction failed: ${err.message}. Make sure Ollama is running with llama3.2 pulled.`, true);
+              setStatus(`AI prediction failed: ${err.message}. Set GROQ_API_KEY on the server and check Groq model names.`, true);
             }
           });
         });

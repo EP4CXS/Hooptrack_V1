@@ -19,3 +19,9 @@ Usage pattern:
 
 # Import request validators for convenient access
 # from core.requests.auth.login_request import LoginRequest
+
+from .chatbot_request import ChatbotRequest
+from .auth import RegisterUserRequest, LogoutUserRequest
+from .frontend import RenderPageRequest
+
+__all__ = ["ChatbotRequest", "RegisterUserRequest", "LogoutUserRequest", "RenderPageRequest"]

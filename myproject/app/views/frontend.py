@@ -1,32 +1,15 @@
 from django.shortcuts import render
 
+from app.controllers.frontend.render_page_controller import render_page_action_controller
+from app.http.requests.frontend.render_page_request import RenderPageRequest
+
 
 def page_view(request, page_name="dashboard", entity_id=None):
-    title_map = {
-        "home": "Hoop Track Basketball Dashboard",
-        "login": "Log In",
-        "signup": "Create Account",
-        "dashboard": "Dashboard",
-        "analytics": "Analytics",
-        "players": "Players",
-        "player-profile": "Player Profile",
-        "teams": "Teams",
-        "add-team": "Add Team",
-        "team-roster": "Team Roster",
-        "bracket": "Bracket Generator",
-        "games": "Game Tracking",
-        "predictions": "Predictions",
-        "reports": "Reports",
-        "settings": "Settings",
-        "help": "Help",
-    }
+    dto = RenderPageRequest.from_route_params(page_name=page_name, entity_id=entity_id)
+    context = render_page_action_controller(page_name=dto.page_name, entity_id=dto.entity_id)
     return render(
         request,
         "app/index.html",
-        {
-            "page_name": page_name,
-            "page_title": title_map.get(page_name, "HoopTrack"),
-            "entity_id": entity_id,
-        },
+        context,
     )
 

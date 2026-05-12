@@ -18,3 +18,9 @@ Usage pattern:
 # Import services for convenient access
 # from core.services.auth.login_service import LoginService
 # from core.services.auth.register_service import RegisterService
+
+from .basketball_service import BasketballService
+from .chatbot_service import ChatbotService
+from .prediction_service import PredictionAIService
+
+__all__ = ["BasketballService", "PredictionAIService", "ChatbotService"]

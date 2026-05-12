@@ -1,0 +1,13 @@
+﻿    class Meta:
+        ordering = ["-updated_at"]
+
+    @property
+    def quarter_display(self):
+        if self.quarter <= 4:
+            return f"Q{self.quarter}"
+        elif self.quarter == 5:
+            return "OT"
+        else:
+            return f"{self.quarter - 4}OT"
+
+    def __str__(self):

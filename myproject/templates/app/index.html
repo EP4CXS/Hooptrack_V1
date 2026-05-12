@@ -11,18 +11,18 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{% static 'app/css/main.css' %}" />
 </head>
-<body class="{% if page_name == 'home' or page_name == 'login' or page_name == 'signup' %}min-h-screen bg-[#0a0e1a] text-white overflow-x-hidden selection:bg-[#ff6b35] selection:text-white{% else %}bg-slate-50 text-slate-900{% endif %}">
+<body class="{% if page_name == 'home' or page_name == 'login' or page_name == 'signup' %}min-h-screen bg-[#0a0e1a] text-white overflow-x-hidden selection:bg-[#ff6b35] selection:text-white{% else %}ht-theme min-h-screen text-slate-100{% endif %}">
 {% if page_name == 'home' %}
-  {% include "app/pages/_home.html" %}
+  {% include "app/pages/home/render_home_page.html" %}
 
 {% elif page_name == 'login' %}
-  {% include "app/pages/_login.html" %}
+  {% include "app/pages/auth/login_email_page.html" %}
 
 {% elif page_name == 'signup' %}
-  {% include "app/pages/_signup.html" %}
+  {% include "app/pages/auth/register_user_page.html" %}
 
 {% else %}
-  {% include "app/pages/_app_shell.html" %}
+  {% include "app/pages/dashboard/render_dashboard_shell_page.html" %}
 {% endif %}
 
   <script src="{% static 'app/js/main.js' %}"></script>
@@ -36,8 +36,14 @@
 
     function setStatus(text, isError = false) {
       if (!statusEl) return;
-      statusEl.textContent = text;
-      statusEl.className = isError ? 'mb-4 text-sm text-red-600' : 'mb-4 text-sm text-slate-600';
+      const value = String(text || '').trim();
+      if (!value) {
+        statusEl.textContent = '';
+        statusEl.className = 'hidden';
+        return;
+      }
+      statusEl.textContent = value;
+      statusEl.className = isError ? 'mb-4 text-sm text-red-400' : 'mb-4 text-sm text-slate-300';
     }
 
     async function fetchJson(path, opts) {
@@ -63,6 +69,35 @@
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       if (res.status === 204) return null;
       return res.json();
+    }
+
+    async function sendFormData(path, method, formData) {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(path, {
+        method,
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: formData
+      });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    async function deleteJson(path) {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch(path, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      if (res.status === 204) return null;
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) return res.json();
+      return null;
     }
 
     function openSystemModal({ title, message, mode = 'alert', defaultValue = '', confirmText = 'OK', cancelText = 'Cancel', tone = 'info', promptOptions = [] }) {
@@ -93,17 +128,17 @@
         const overlay = document.createElement('div');
         overlay.className = 'fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
         overlay.innerHTML = `
-          <div class="w-full max-w-lg rounded-2xl bg-white border-2 ${theme.ring} shadow-2xl overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-200 bg-gradient-to-r from-[#0d2c59] to-[#163d74] text-white">
+          <div class="w-full max-w-lg rounded-2xl bg-[#1f242d] border ${theme.ring} shadow-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/10 bg-gradient-to-r from-[#171b22] via-[#1f242d] to-[#2a303a] text-white">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full ${theme.chip} flex items-center justify-center text-base">${theme.icon}</div>
                 <p class="text-lg font-bold">${title}</p>
               </div>
             </div>
             <div class="p-5 space-y-4">
-              <p class="text-sm text-slate-700 whitespace-pre-line">${message || ''}</p>
+              <p class="text-sm text-slate-200 whitespace-pre-line">${message || ''}</p>
               ${mode === 'prompt' ? (Array.isArray(promptOptions) && promptOptions.length
-                ? `<select id="system-modal-input" class="w-full border border-slate-300 rounded-xl px-3 py-2">
+                ? `<select id="system-modal-input" class="w-full border border-white/10 bg-[#171b22] text-slate-100 rounded-xl px-3 py-2">
                     ${promptOptions.map((opt) => {
                       const value = String(opt?.value ?? '');
                       const label = String(opt?.label ?? value);
@@ -111,11 +146,11 @@
                       return `<option value="${value.replace(/"/g, '&quot;')}" ${selected}>${label}</option>`;
                     }).join('')}
                   </select>`
-                : `<input id="system-modal-input" class="w-full border border-slate-300 rounded-xl px-3 py-2" value="${String(defaultValue ?? '').replace(/"/g, '&quot;')}" />`)
+                : `<input id="system-modal-input" class="w-full border border-white/10 bg-[#171b22] text-slate-100 rounded-xl px-3 py-2" value="${String(defaultValue ?? '').replace(/"/g, '&quot;')}" />`)
               : ''}
               <div class="flex justify-end gap-2 pt-2">
-                ${mode !== 'alert' ? `<button type="button" data-modal-cancel class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">${cancelText}</button>` : ''}
-                <button type="button" data-modal-confirm class="px-4 py-2 rounded-lg bg-[#0d2c59] text-white hover:bg-[#163d74]">${confirmText}</button>
+                ${mode !== 'alert' ? `<button type="button" data-modal-cancel class="px-4 py-2 rounded-lg border border-white/12 text-slate-200 hover:bg-white/5">${cancelText}</button>` : ''}
+                <button type="button" data-modal-confirm class="px-4 py-2 rounded-lg bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white hover:opacity-95">${confirmText}</button>
               </div>
             </div>
           </div>
@@ -158,6 +193,72 @@
       return openSystemModal({ title, message, mode: 'prompt', defaultValue, confirmText: 'Save', cancelText: 'Cancel', tone, promptOptions });
     }
 
+    // ---------------------------------------------------------------------
+    // Shared UI helpers for JS-rendered authenticated pages.
+    // These return HTML strings so existing render functions can stay simple.
+    // ---------------------------------------------------------------------
+    window.HTUI = window.HTUI || {};
+
+    window.HTUI.escapeHtml = function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    };
+
+    window.HTUI.renderPageHeader = function renderPageHeader({ title, subtitle = '', badgeHtml = '', actionsHtml = '' }) {
+      const esc = window.HTUI.escapeHtml;
+      return `
+        <div class="ht-pageHeader">
+          <div>
+            <div class="text-3xl md:text-4xl ht-pageTitle">${esc(title)}</div>
+            ${subtitle ? `<div class="mt-1 ht-pageSubtitle">${esc(subtitle)}</div>` : ''}
+            ${badgeHtml ? `<div class="mt-3">${badgeHtml}</div>` : ''}
+          </div>
+          ${actionsHtml ? `<div class="shrink-0">${actionsHtml}</div>` : ''}
+        </div>
+      `;
+    };
+
+    window.HTUI.renderEmptyState = function renderEmptyState({ title, message, ctaHtml = '' }) {
+      const esc = window.HTUI.escapeHtml;
+      return `
+        <div class="ht-emptyState">
+          <div class="mx-auto w-14 h-14 rounded-2xl bg-orange-100 text-orange-700 flex items-center justify-center mb-4">
+            <span class="text-2xl font-black">🏀</span>
+          </div>
+          <div class="text-lg ht-emptyStateTitle">${esc(title)}</div>
+          <div class="ht-emptyStateText">${esc(message)}</div>
+          ${ctaHtml ? `<div class="mt-5 flex items-center justify-center">${ctaHtml}</div>` : ''}
+        </div>
+      `;
+    };
+
+    window.HTUI.renderToolbar = function renderToolbar(innerHtml) {
+      return `<div class="ht-toolbar">${innerHtml}</div>`;
+    };
+
+    window.HTUI.renderTableWrap = function renderTableWrap(tableHtml) {
+      return `<div class="ht-tableWrap">${tableHtml}</div>`;
+    };
+
+    window.HTUI.toast = function toast(message, { tone = 'info', timeoutMs = 2400 } = {}) {
+      let host = document.getElementById('ht-toast-host');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'ht-toast-host';
+        host.className = 'ht-toastHost';
+        document.body.appendChild(host);
+      }
+      const el = document.createElement('div');
+      el.className = `ht-toast ${tone === 'error' ? 'ht-toast--error' : ''}`;
+      el.textContent = String(message ?? '');
+      host.appendChild(el);
+      window.setTimeout(() => { el.remove(); }, Math.max(800, Number(timeoutMs || 0)));
+    };
+
     function renderList(title, items, fields) {
       const rows = items.map(item => `
         <tr class="border-b">
@@ -179,75 +280,107 @@
       const overlay = document.createElement('div');
       overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
       overlay.innerHTML = `
-        <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div class="px-5 py-4 border-b flex items-center justify-between">
-            <div class="font-bold text-slate-900">Add New Player</div>
-            <button type="button" data-modal-close class="w-9 h-9 rounded-lg hover:bg-slate-100 text-slate-600">✕</button>
+        <div class="w-full max-w-2xl bg-[#1f242d] rounded-3xl shadow-2xl overflow-hidden border border-white/15">
+          <div class="px-5 py-4 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] text-white border-b border-white/10">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs uppercase tracking-[0.2em] text-blue-100">Player Registration</div>
+                <div class="font-extrabold text-xl">Add New Player</div>
+              </div>
+              <button type="button" data-modal-close class="w-9 h-9 rounded-lg hover:bg-white/10 text-white">✕</button>
+            </div>
+            <div class="mt-3 flex items-center gap-2 text-xs">
+              <span class="px-2 py-1 rounded-full bg-white/15 border border-white/25">🏀 Scout</span>
+              <span class="px-2 py-1 rounded-full bg-white/15 border border-white/25">📋 Profile</span>
+              <span class="px-2 py-1 rounded-full bg-white/15 border border-white/25">✅ Season Ready</span>
+            </div>
           </div>
-          <form id="player-modal-form" class="p-5 space-y-4">
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">Name</label>
-              <input name="name" class="w-full border rounded-xl px-3 py-2" placeholder="Player name" required />
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Jersey Number</label>
-                <input name="jerseyNumber" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 23" required />
+          <form id="player-modal-form" class="p-5 md:p-6 space-y-4 bg-gradient-to-b from-[#1f242d] to-[#171b22]">
+            <div class="relative w-full overflow-hidden">
+              <div id="player-modal-slider" class="flex w-[200%] transition-transform duration-300 translate-x-0">
+                <div class="w-1/2 shrink-0 pr-1.5 box-border space-y-4">
+                  <div class="rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-xs text-slate-300">
+                    Step 1 of 2: Basic profile and contact info.
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Name</label>
+                    <input name="name" class="step-1-field ht-input" placeholder="Player name" required />
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Jersey Number</label>
+                      <input name="jerseyNumber" class="step-1-field ht-input" placeholder="e.g., 23" required />
+                    </div>
+                    <div>
+                      <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Age</label>
+                      <input name="age" type="number" class="step-1-field ht-input" placeholder="e.g., 28" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Contact Number</label>
+                    <input name="contactNumber" class="step-1-field ht-input" placeholder="e.g., +63 9XX XXX XXXX" required />
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Municipality</label>
+                    <select id="player-municipality-select" name="municipality" class="step-1-field ht-input" required>
+                      <option value="">Select Municipality</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Email</label>
+                    <input name="email" type="email" class="step-1-field ht-input" placeholder="player@email.com" />
+                  </div>
+                  <div class="flex justify-end pt-2">
+                    <button type="button" id="player-step-next" class="px-4 py-2 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white font-semibold">Continue →</button>
+                  </div>
+                </div>
+                <div class="w-1/2 shrink-0 pl-1.5 box-border space-y-4">
+                  <div class="rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-xs text-slate-300">
+                    Step 2 of 2: Athletic details and season assignment.
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Position</label>
+                    <select name="position" class="step-2-field ht-input" required disabled>
+                      <option value="">Select position</option>
+                      <option value="PG">PG (Point Guard)</option>
+                      <option value="SG">SG (Shooting Guard)</option>
+                      <option value="SF">SF (Small Forward)</option>
+                      <option value="PF">PF (Power Forward)</option>
+                      <option value="C">C (Center)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Season Year</label>
+                    <input name="seasonYear" type="number" min="2025" max="2100" class="step-2-field ht-input" value="${new Date().getFullYear()}" required disabled />
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Height (cm)</label>
+                      <input name="height" type="number" class="step-2-field ht-input" placeholder="e.g., 201" required disabled />
+                    </div>
+                    <div>
+                      <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Weight (kg)</label>
+                      <input name="weight" type="number" class="step-2-field ht-input" placeholder="e.g., 104" required disabled />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="text-xs font-bold tracking-wide text-slate-300 uppercase block mb-1">Team</label>
+                    <select name="team" class="step-2-field ht-input" ${defaultTeamName ? 'disabled' : 'disabled'}>
+                      <option value="">Select team</option>
+                      ${teams.map(t => `<option value="${t.name}" ${defaultTeamName && t.name === defaultTeamName ? 'selected' : ''}>${t.name}</option>`).join('')}
+                    </select>
+                    ${defaultTeamName ? `<input type="hidden" name="teamLocked" value="${defaultTeamName}" />` : ''}
+                  </div>
+                  <div class="bg-white/5 text-slate-300 rounded-xl p-3 text-sm border border-white/10">
+                    <span class="font-semibold">Player Registration:</span> Fill Step 1 then continue to complete athletic profile.
+                  </div>
+                  <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" id="player-step-back" class="px-4 py-2 rounded-xl border border-white/15 text-slate-200 hover:bg-white/10">← Back</button>
+                    <button type="button" data-modal-close class="px-4 py-2 rounded-xl border border-white/15 text-slate-200 hover:bg-white/10">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-[#f97316] hover:bg-[#ea580c] text-white font-semibold">Add Player</button>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Contact Number</label>
-                <input name="contactNumber" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., +63 9XX XXX XXXX" required />
-              </div>
-            </div>
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">Position</label>
-              <select name="position" class="w-full border rounded-xl px-3 py-2" required>
-                <option value="">Select position</option>
-                <option value="PG">PG (Point Guard)</option>
-                <option value="SG">SG (Shooting Guard)</option>
-                <option value="SF">SF (Small Forward)</option>
-                <option value="PF">PF (Power Forward)</option>
-                <option value="C">C (Center)</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">Address</label>
-              <input name="address" class="w-full border rounded-xl px-3 py-2" placeholder="Street, Barangay, City" required />
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Email (Optional)</label>
-                <input name="email" type="email" class="w-full border rounded-xl px-3 py-2" placeholder="player@email.com" />
-              </div>
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Age (Optional)</label>
-                <input name="age" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 28" />
-              </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Height (cm)</label>
-                <input name="height" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 201" required />
-              </div>
-              <div>
-                <label class="text-sm font-semibold text-slate-700 block mb-1">Weight (kg)</label>
-                <input name="weight" type="number" class="w-full border rounded-xl px-3 py-2" placeholder="e.g., 104" required />
-              </div>
-            </div>
-            <div>
-              <label class="text-sm font-semibold text-slate-700 block mb-1">Team</label>
-              <select name="team" class="w-full border rounded-xl px-3 py-2" ${defaultTeamName ? 'disabled' : ''}>
-                <option value="">Select team</option>
-                ${teams.map(t => `<option value="${t.name}" ${defaultTeamName && t.name === defaultTeamName ? 'selected' : ''}>${t.name}</option>`).join('')}
-              </select>
-              ${defaultTeamName ? `<input type="hidden" name="teamLocked" value="${defaultTeamName}" />` : ''}
-            </div>
-            <div class="bg-blue-50 text-blue-900 rounded-xl p-3 text-sm">
-              <span class="font-semibold">Player Registration:</span> Name, position, jersey number, address, and contact number are required.
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-2">
-              <button type="button" data-modal-close class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
-              <button type="submit" class="px-4 py-2 rounded-xl bg-[#0d2c59] hover:bg-[#163d74] text-white font-semibold">Add Player</button>
             </div>
           </form>
         </div>
@@ -264,6 +397,45 @@
       });
 
       const form = overlay.querySelector('#player-modal-form');
+      const slider = overlay.querySelector('#player-modal-slider');
+      const step1Fields = Array.from(overlay.querySelectorAll('.step-1-field'));
+      const step2Fields = Array.from(overlay.querySelectorAll('.step-2-field'));
+      const nextBtn = overlay.querySelector('#player-step-next');
+      const backBtn = overlay.querySelector('#player-step-back');
+      const municipalitySel = overlay.querySelector('#player-municipality-select');
+
+      async function loadMunicipalities() {
+        try {
+          const regions = await fetchJson('/api/auth/locations/regions/');
+          const opts = (regions || []).map((r) => `<option value="${r.id}">${r.name}</option>`).join('');
+          municipalitySel.innerHTML = `<option value="">Select Municipality</option>${opts}`;
+        } catch (_err) {
+          municipalitySel.innerHTML = `<option value="">Could not load municipalities</option>`;
+          uiAlert('Could not load municipality list. Please check API.', 'Location Error', 'warning');
+        }
+      }
+
+      function setStep(step) {
+        const isStep2 = step === 2;
+        if (slider) slider.classList.toggle('-translate-x-1/2', isStep2);
+        step2Fields.forEach((el) => { el.disabled = !isStep2; });
+      }
+
+      nextBtn?.addEventListener('click', () => {
+        const valid = step1Fields.every((field) => {
+          if (field.hasAttribute('required') && !String(field.value || '').trim()) return false;
+          return true;
+        });
+        if (!valid) {
+          uiAlert('Please complete required fields in Step 1.', 'Incomplete Form', 'warning');
+          return;
+        }
+        setStep(2);
+      });
+      backBtn?.addEventListener('click', () => setStep(1));
+      setStep(1);
+      loadMunicipalities();
+
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
@@ -275,7 +447,8 @@
           jerseyNumber: fd.get('jerseyNumber') || '',
           age: fd.get('age') || null,
           position: fd.get('position') || 'TBD',
-          address: fd.get('address') || '',
+          seasonYear: Number(fd.get('seasonYear') || new Date().getFullYear()),
+          address: municipalitySel?.options?.[municipalitySel.selectedIndex]?.text || '',
           contactNumber: fd.get('contactNumber') || '',
           email: fd.get('email') || null,
           team: teamName || null
@@ -574,7 +747,7 @@
             });
             document.querySelectorAll('[data-player-delete]').forEach(btn => {
               btn.addEventListener('click', async () => {
-                await fetch(`${apiBase}/players/${btn.getAttribute('data-player-delete')}/`, { method: 'DELETE' });
+                await deleteJson(`${apiBase}/players/${btn.getAttribute('data-player-delete')}/`);
                 await loadPage();
               });
             });
@@ -589,49 +762,142 @@
             const roster = team ? players.filter(p => p.team === team.name) : [];
             renderTeamRosterPage(team, roster);
           } else {
+            const totalTeams = teams.length;
+            const totalGames = totalTeams;
+            const inactiveTeams = teams.filter((t) => Number(t.playerCount || 0) === 0).length;
+            const avgPerTeam = totalTeams ? ((teams.reduce((sum, t) => sum + Number(t.playerCount || 0), 0)) / totalTeams).toFixed(1) : '0';
             contentEl.innerHTML = `
-              <div class="flex items-center justify-between mb-4">
-                <input id="team-search" class="w-full max-w-md border border-slate-300 rounded-lg px-3 py-2" placeholder="Search teams..." />
-                <button id="add-team-open-modal" type="button" class="ml-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-semibold">Add Team</button>
-              </div>
-              <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                ${teams.map(t => `
-                  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm" data-team-card data-team-name="${(t.name || '').toLowerCase()}">
-                    <div class="h-20 team-banner relative overflow-hidden">
-                      ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-cover opacity-40" alt="${t.name}">` : ''}
-                      <div class="absolute inset-0 flex items-center justify-center text-white/80 text-2xl font-bold">👥</div>
+              <div class="ht-container space-y-6">
+                ${window.HTUI?.renderPageHeader({
+                  title: 'Team Management',
+                  subtitle: 'Manage your organizations and rosters.'
+                }) || ''}
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Total Games</div>
+                    <div class="mt-2 text-3xl font-black text-white">${totalGames}</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Avg Per Team</div>
+                    <div class="mt-2 text-3xl font-black text-white">${avgPerTeam}</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Unactive Teams</div>
+                    <div class="mt-2 text-3xl font-black text-white">${inactiveTeams}</div>
+                  </div>
+                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Active</div>
+                    <div class="mt-2 text-3xl font-black text-white">${totalTeams}</div>
+                  </div>
+                </div>
+
+                ${window.HTUI?.renderToolbar(`
+                  <div class="grid gap-3 md:grid-cols-12 items-end">
+                    <div class="md:col-span-8 lg:col-span-8">
+                      <div class="ht-fieldLabel mb-1">Search</div>
+                      <div class="relative">
+                        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 3a6 6 0 1 0 3.89 10.57l3.77 3.77a1 1 0 0 0 1.42-1.42l-3.77-3.77A6 6 0 0 0 9 3Zm-4 6a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z" clip-rule="evenodd" />
+                          </svg>
+                        </span>
+                        <input id="team-search" class="ht-input pl-10" placeholder="Search teams..." />
+                      </div>
+                      <div class="mt-2 flex flex-wrap items-center justify-start gap-2">
+                        <button type="button" class="team-qf-btn" data-team-quickfilter="">All</button>
+                        <button type="button" class="team-qf-btn" data-team-quickfilter="u20">U20</button>
+                        <button type="button" class="team-qf-btn" data-team-quickfilter="senior">Senior</button>
+                        <button type="button" class="team-qf-btn" data-team-quickfilter="midget">Midget</button>
+                        <button type="button" class="team-qf-btn" data-team-quickfilter="junior">Junior</button>
+                      </div>
                     </div>
-                    <div class="p-4">
-                      <h4 class="text-lg font-bold text-slate-900">${t.name}</h4>
-                      <p class="text-sm text-slate-500">${t.city}</p>
-                      <div class="mt-2 text-sm text-slate-600">${t.conference} - ${t.division}<span class="float-right">${t.playerCount || 0} players</span></div>
-                      <div class="mt-3 flex items-center gap-2">
-                        <a href="/teams/${t.id}/" class="flex-1 text-center bg-[#0d2c59] hover:bg-[#163d74] text-white rounded-lg px-3 py-2 text-sm font-medium">View Roster</a>
-                        <a href="/teams/${t.id}/" class="border border-slate-300 rounded-lg px-2 py-2 text-slate-600 hover:bg-slate-50">✎</a>
-                        <button data-team-delete="${t.id}" class="border border-rose-200 text-rose-500 rounded-lg px-2 py-2 hover:bg-rose-50">🗑</button>
+                    <div class="md:col-span-4 lg:col-span-4">
+                      <div class="ht-fieldLabel mb-1">&nbsp;</div>
+                      <div class="flex items-center justify-start md:justify-end">
+                        <button id="add-team-open-modal-secondary" type="button" class="team-add-btn">+ Add Team</button>
                       </div>
                     </div>
                   </div>
-                `).join('')}
+                `) || ''}
+
+                <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  ${teams.map(t => `
+                    <div class="ht-card overflow-hidden" data-team-card data-team-name="${(t.name || '').toLowerCase()}" data-team-division="${String(t.division || '').toLowerCase()}">
+                      <div class="h-24 team-banner relative overflow-hidden">
+                        ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-cover opacity-35" alt="${t.name}">` : ''}
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#1f242d]/92 via-[#1f242d]/76 to-[#ef4444]/35"></div>
+                        <div class="absolute inset-0 flex items-center justify-between px-4">
+                          <div class="w-10 h-10 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white font-black">
+                            ${(t.name || '').slice(0, 2).toUpperCase() || 'HT'}
+                          </div>
+                          <div class="ht-badge bg-white/10 border-white/15 text-white/95">${t.playerCount || 0} players</div>
+                        </div>
+                      </div>
+                      <div class="p-4">
+                        <div class="flex items-start justify-between gap-3">
+                          <div class="min-w-0">
+                            <h4 class="text-lg font-extrabold text-white truncate">${t.name}</h4>
+                            <p class="text-sm text-slate-400 truncate">${t.city || ''}</p>
+                          </div>
+                          <div class="text-xs text-slate-400 font-semibold text-right">
+                            ${(t.conference || '').toString()}${t.division ? ` • ${t.division}` : ''}
+                          </div>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
+                          <span class="px-2 py-1 rounded-lg bg-white/5 border border-white/10">${(t.conference || 'N/A').toUpperCase()}</span>
+                          <span class="text-orange-300 font-semibold">👥 ${t.playerCount || 0}</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
+                          <a href="/teams/${t.id}/" class="flex-1 text-center rounded-xl px-3 py-2 bg-[#2a374d] hover:bg-[#33445f] text-slate-100 font-semibold border border-white/10 transition-colors">View Roster</a>
+                          <a href="/teams/${t.id}/" class="w-10 h-10 rounded-xl border border-white/12 bg-[#222d41] hover:bg-[#2d3b56] text-slate-200 flex items-center justify-center transition-colors" aria-label="Edit team">✎</a>
+                          <button type="button" data-team-delete="${t.id}" class="w-10 h-10 rounded-xl border border-rose-400/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 flex items-center justify-center transition-colors" aria-label="Delete team">🗑</button>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('') || `
+                    <div class="md:col-span-2 xl:col-span-3">
+                      ${window.HTUI?.renderEmptyState({
+                        title: 'No teams yet',
+                        message: 'Create your first team to start building rosters and generating brackets.'
+                      }) || '<p class=\"text-slate-500\">No teams yet.</p>'}
+                    </div>
+                  `}
+                </div>
               </div>
             `;
-            document.getElementById('team-search')?.addEventListener('input', (e) => {
-              const q = String(e.target.value || '').toLowerCase().trim();
+            let activeQuickFilter = '';
+            const applyTeamFilters = () => {
+              const q = String(document.getElementById('team-search')?.value || '').toLowerCase().trim();
               document.querySelectorAll('[data-team-card]').forEach((card) => {
                 const name = card.getAttribute('data-team-name') || '';
-                card.classList.toggle('hidden', !name.includes(q));
+                const division = card.getAttribute('data-team-division') || '';
+                const hitSearch = !q || name.includes(q);
+                const hitQuick = !activeQuickFilter || division.includes(activeQuickFilter);
+                card.classList.toggle('hidden', !(hitSearch && hitQuick));
+              });
+            };
+            document.getElementById('team-search')?.addEventListener('input', applyTeamFilters);
+            document.querySelectorAll('[data-team-quickfilter]').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                activeQuickFilter = String(btn.getAttribute('data-team-quickfilter') || '').toLowerCase();
+                document.querySelectorAll('[data-team-quickfilter]').forEach((x) => {
+                  x.classList.remove('active');
+                });
+                btn.classList.add('active');
+                applyTeamFilters();
               });
             });
             document.querySelectorAll('[data-team-delete]').forEach(btn => {
               btn.addEventListener('click', async () => {
                 const ok = await uiConfirm('Delete this team? This may affect related players and bracket data.', 'Delete Team', 'danger');
                 if (!ok) return;
-                await fetch(`${apiBase}/teams/${btn.getAttribute('data-team-delete')}/`, { method: 'DELETE' });
+                await deleteJson(`${apiBase}/teams/${btn.getAttribute('data-team-delete')}/`);
                 await uiAlert('Team deleted successfully.', 'Team Deleted', 'success');
                 await loadPage();
               });
             });
-            document.getElementById('add-team-open-modal')?.addEventListener('click', () => {
+            document.getElementById('add-team-open-modal-secondary')?.addEventListener('click', () => {
               openTeamRegistrationModal({ onSave: loadPage });
             });
           }
@@ -642,12 +908,13 @@
         } else if (page === 'predictions') {
           await renderPredictionsPage();
         } else if (page === 'dashboard') {
-          const [teams, players, brackets] = await Promise.all([
+          const [teams, players, brackets, games] = await Promise.all([
             fetchJson(`${apiBase}/teams/`),
             fetchJson(`${apiBase}/players/`),
-            fetchJson(`${apiBase}/brackets/`)
+            fetchJson(`${apiBase}/brackets/`),
+            fetchJson(`${apiBase}/games/`)
           ]);
-          renderDashboardLikeUI(players, teams, brackets);
+          renderDashboardLikeUI(players, teams, brackets, games);
         } else if (page === 'analytics') {
           renderAnalyticsPage();
         } else if (page === 'reports') {
@@ -661,7 +928,7 @@
         } else {
           contentEl.innerHTML = `<p>Page loaded.</p>`;
         }
-        setStatus('Loaded successfully.');
+        setStatus('');
       } catch (err) {
         setStatus(`Failed to load: ${err.message}`, true);
       }
@@ -679,43 +946,8 @@
       window.location.href = '/login/';
     });
 
-    const chatbotToggle = document.getElementById('chatbot-toggle');
-    const chatbotPanel = document.getElementById('chatbot-panel');
-    const chatbotForm = document.getElementById('chatbot-form');
-    const chatbotInput = document.getElementById('chatbot-input');
-    const chatbotMessages = document.getElementById('chatbot-messages');
-
-    function addChatMessage(text, who = 'bot') {
-      if (!chatbotMessages) return;
-      const bubble = document.createElement('div');
-      bubble.className = who === 'user'
-        ? 'bg-[#0d2c59] text-white rounded-lg px-3 py-2 ml-8'
-        : 'bg-white border rounded-lg px-3 py-2 mr-8';
-      bubble.textContent = text;
-      chatbotMessages.appendChild(bubble);
-      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-
-    function getChatReply(input) {
-      const q = input.toLowerCase();
-      if (q.includes('team')) return 'Go to Teams to manage cards, then click View Roster for player management.';
-      if (q.includes('roster') || q.includes('player')) return 'In Team Roster, use Add Player, edit (✎), and delete (🗑) actions.';
-      if (q.includes('bracket')) return 'Bracket page supports creating brackets and submitting match results.';
-      if (q.includes('prediction')) return 'Predictions page lets you pick winners for pending matches.';
-      if (q.includes('dashboard')) return 'Dashboard shows season highlights, KPIs, top performers, and featured player.';
-      return 'I can help with Teams, Players, Brackets, Games, Predictions, and dashboard usage.';
-    }
-
-    chatbotToggle?.addEventListener('click', () => chatbotPanel?.classList.toggle('hidden'));
-    chatbotForm?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = String(chatbotInput.value || '').trim();
-      if (!text) return;
-      addChatMessage(text, 'user');
-      chatbotInput.value = '';
-      setTimeout(() => addChatMessage(getChatReply(text), 'bot'), 200);
-    });
   </script>
+  {% include "app/scripts/chatbot/chatbot_request_script.html" %}
   {% endif %}
 
   {% if page_name == 'login' or page_name == 'signup' %}

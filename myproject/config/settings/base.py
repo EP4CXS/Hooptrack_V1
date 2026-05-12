@@ -12,6 +12,33 @@ from decouple import config, Csv
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+
+def _load_env_file(base_dir: Path) -> None:
+    """Populate ``os.environ`` from ``<base_dir>/.env`` when present.
+
+    Uses ``setdefault`` so real deployment environment variables win. This runs
+    before ``decouple`` reads values, so ``GROQ_API_KEY`` and DB settings load
+    even when ``manage.py`` is started from a directory other than ``myproject/``.
+    """
+    path = base_dir / ".env"
+    if not path.is_file():
+        return
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, rest = line.partition("=")
+        key = key.strip()
+        if not key:
+            continue
+        val = rest.strip()
+        if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
+            val = val[1:-1]
+        os.environ.setdefault(key, val)
+
+
+_load_env_file(BASE_DIR)
+
 # Security settings
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -216,10 +243,15 @@ EMAIL_BACKEND = config(
 )
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@myproject.local')
 
-# Ollama (AI predictions) configuration
-OLLAMA_HOST = config('OLLAMA_HOST', default='http://localhost:11434')
-OLLAMA_MODEL = config('OLLAMA_MODEL', default='llama3.2')
-OLLAMA_TIMEOUT_SECONDS = config('OLLAMA_TIMEOUT_SECONDS', default=60, cast=int)
+# Groq (OpenAI-compatible API) — used for chatbot and AI matchup predictions when GROQ_API_KEY is set
+GROQ_API_KEY = config('GROQ_API_KEY', default='')
+GROQ_BASE_URL = config(
+    'GROQ_BASE_URL',
+    default='https://api.groq.com/openai/v1/chat/completions',
+)
+GROQ_MODEL = config('GROQ_MODEL', default='openai/gpt-oss-20b')
+GROQ_PREDICTION_MODEL = config('GROQ_PREDICTION_MODEL', default='openai/gpt-oss-20b')
+GROQ_TIMEOUT_SECONDS = config('GROQ_TIMEOUT_SECONDS', default=90, cast=int)
 
 # Logging configuration (basic)
 LOGGING = {

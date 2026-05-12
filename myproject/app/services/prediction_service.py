@@ -2,7 +2,7 @@
 PredictionAIService
 
 Computes team features (win streak, win rate, average height, top players)
-and uses Ollama (llama3.2 by default) to predict the winner of a Matchup.
+and uses Groq (when GROQ_API_KEY is set) to predict the winner of a Matchup.
 """
 
 import json
@@ -20,6 +20,7 @@ from app.models.basketball.models import (
     PlayerGameStat,
 )
 from app.services.basketball_service import BasketballService
+from app.services.groq_completion import groq_chat_completion, groq_is_configured
 
 logger = logging.getLogger(__name__)
 
@@ -70,8 +71,29 @@ def _round(value: Optional[float], digits: int = 1) -> Optional[float]:
         return None
 
 
+def _extract_json_object(text: str) -> Dict[str, Any]:
+    """Best-effort JSON object extraction from model output."""
+    raw = (text or "").strip()
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, dict) else {}
+    except Exception:
+        pass
+    # Fallback: grab first {...} block
+    m = re.search(r"\{[\s\S]*\}", raw)
+    if not m:
+        return {}
+    try:
+        parsed = json.loads(m.group(0))
+        return parsed if isinstance(parsed, dict) else {}
+    except Exception:
+        return {}
+
+
 class PredictionAIService:
-    """Generate AI-driven predictions for bracket matchups via Ollama."""
+    """Matchup predictions: Groq when ``groq_is_configured()``; otherwise heuristic fallback."""
 
     @staticmethod
     def compute_team_features(team_name: str) -> Dict[str, Any]:
@@ -119,8 +141,25 @@ class PredictionAIService:
         avg_height_cm = _round(sum(heights) / len(heights)) if heights else None
         tallest_player_cm = _round(max(heights)) if heights else None
 
+        team_stats_qs = PlayerGameStat.objects.filter(team_name=team_name)
+        team_box = team_stats_qs.aggregate(
+            team_ppg=Avg("points"),
+            team_apg=Avg("assists"),
+            team_rpg=Avg(F("oreb") + F("dreb")),
+            team_total_fgm2=Sum("fgm2"),
+            team_total_fga2=Sum("fga2"),
+            team_total_fgm3=Sum("fgm3"),
+            team_total_fga3=Sum("fga3"),
+            team_total_ftm=Sum("ftm"),
+            team_total_fta=Sum("fta"),
+        )
+        total_made = (team_box.get("team_total_fgm2") or 0) + (team_box.get("team_total_fgm3") or 0)
+        total_attempt = (team_box.get("team_total_fga2") or 0) + (team_box.get("team_total_fga3") or 0)
+        team_fg_pct = round((total_made / total_attempt) * 100, 1) if total_attempt else 0.0
+        team_ft_pct = round(((team_box.get("team_total_ftm") or 0) / (team_box.get("team_total_fta") or 0)) * 100, 1) if (team_box.get("team_total_fta") or 0) else 0.0
+
         top_players = (
-            PlayerGameStat.objects.filter(team_name=team_name)
+            team_stats_qs
             .values("player_id", "player__name", "player__jersey_number", "player__position")
             .annotate(
                 games_played=Count("id"),
@@ -132,6 +171,33 @@ class PredictionAIService:
             )
             .order_by("-ppg")[:3]
         )
+
+        player_profiles = []
+        for player in roster:
+            per_player = team_stats_qs.filter(player=player).aggregate(
+                games_played=Count("id"),
+                ppg=Avg("points"),
+                apg=Avg("assists"),
+                rpg=Avg(F("oreb") + F("dreb")),
+            )
+            player_profiles.append(
+                {
+                    "name": player.name,
+                    "position": player.position or "",
+                    "jersey_number": player.jersey_number or "",
+                    "height_cm": _parse_height_cm(player.height),
+                    "games_played": per_player.get("games_played") or 0,
+                    "ppg": _round(per_player.get("ppg"), 1) or 0.0,
+                    "apg": _round(per_player.get("apg"), 1) or 0.0,
+                    "rpg": _round(per_player.get("rpg"), 1) or 0.0,
+                }
+            )
+        # Keep prompt payload small/fast: include only the most impactful players.
+        player_profiles = sorted(
+            player_profiles,
+            key=lambda p: (p.get("ppg") or 0.0, p.get("games_played") or 0),
+            reverse=True,
+        )[:8]
 
         top_players_payload: List[Dict[str, Any]] = []
         for row in top_players:
@@ -160,7 +226,13 @@ class PredictionAIService:
             "avg_height_cm": avg_height_cm,
             "tallest_player_cm": tallest_player_cm,
             "roster_size": len(roster),
+            "team_ppg": _round(team_box.get("team_ppg"), 1) or 0.0,
+            "team_apg": _round(team_box.get("team_apg"), 1) or 0.0,
+            "team_rpg": _round(team_box.get("team_rpg"), 1) or 0.0,
+            "team_fg_pct": team_fg_pct,
+            "team_ft_pct": team_ft_pct,
             "top_players": top_players_payload,
+            "player_profiles": player_profiles,
         }
 
     @staticmethod
@@ -170,9 +242,9 @@ class PredictionAIService:
             "You are a professional basketball analyst. Predict the winner of an upcoming game between "
             f"{team1_features['name']} and {team2_features['name']}.\n\n"
             "Use the following weighting when reasoning:\n"
-            "- Team-level win streak and recent win rate: 40%\n"
-            "- Top players' PPG / FG% / RPG / APG (individual performance): 40%\n"
-            "- Average roster height (rebounding & defense tiebreaker): 20%\n\n"
+            "- Team-level form and efficiency (win streak, win rate, team PPG/APG/RPG, FG%/FT%): 45%\n"
+            "- Individual player impact (top players and full player_profiles): 40%\n"
+            "- Size profile (average/tallest height and lineup height distribution): 15%\n\n"
             f"Inputs (JSON):\n{json.dumps(payload, ensure_ascii=False)}\n\n"
             "Respond with ONLY a single JSON object, no prose, in this exact shape:\n"
             "{\n"
@@ -183,22 +255,46 @@ class PredictionAIService:
         )
 
     @staticmethod
-    def _call_ollama(prompt: str) -> Dict[str, Any]:
-        """Call Ollama and return the parsed JSON dict, or raise on failure."""
-        from ollama import Client  # local import keeps Django bootable without ollama installed
-
-        client = Client(
-            host=getattr(settings, "OLLAMA_HOST", "http://localhost:11434"),
-            timeout=getattr(settings, "OLLAMA_TIMEOUT_SECONDS", 60),
+    def _call_groq(prompt: str) -> Dict[str, Any]:
+        """Call Groq chat completions and return a parsed prediction dict."""
+        model = getattr(
+            settings,
+            "GROQ_PREDICTION_MODEL",
+            getattr(settings, "GROQ_MODEL", "openai/gpt-oss-20b"),
         )
-        response = client.generate(
-            model=getattr(settings, "OLLAMA_MODEL", "llama3.2"),
-            prompt=prompt,
-            format="json",
-            options={"temperature": 0.2},
-        )
-        text = (response or {}).get("response", "")
-        return json.loads(text) if text else {}
+        timeout = int(getattr(settings, "GROQ_TIMEOUT_SECONDS", 90))
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You return ONLY one valid JSON object matching the user's schema. "
+                    "No markdown, no code fences, no commentary."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ]
+        try:
+            out = groq_chat_completion(
+                messages,
+                model=model,
+                temperature=0.2,
+                response_format={"type": "json_object"},
+                timeout=timeout,
+            )
+        except Exception as first_exc:
+            logger.warning("Groq json_object mode failed (%s); retrying without response_format", first_exc)
+            out = groq_chat_completion(
+                messages,
+                model=model,
+                temperature=0.15,
+                response_format=None,
+                timeout=timeout,
+            )
+        parsed = _extract_json_object(out["content"])
+        if parsed:
+            return parsed
+        logger.warning("Groq returned non-JSON. model=%s text=%r", model, (out.get("content") or "")[:500])
+        raise ValueError("Groq returned non-JSON prediction output")
 
     @staticmethod
     def _fallback_prediction(
@@ -275,20 +371,33 @@ class PredictionAIService:
         features1 = PredictionAIService.compute_team_features(team1)
         features2 = PredictionAIService.compute_team_features(team2)
         prompt = PredictionAIService._build_prompt(features1, features2)
-        model_name = getattr(settings, "OLLAMA_MODEL", "llama3.2")
+        use_groq = groq_is_configured()
+        if use_groq:
+            model_name = getattr(
+                settings,
+                "GROQ_PREDICTION_MODEL",
+                getattr(settings, "GROQ_MODEL", "openai/gpt-oss-20b"),
+            )
+        else:
+            model_name = "heuristic-only"
 
         prediction_data: Optional[Dict[str, Any]] = None
-        try:
-            raw = PredictionAIService._call_ollama(prompt)
-            prediction_data = PredictionAIService._validate_prediction(raw, team1, team2)
-            if prediction_data is None:
-                logger.warning("Ollama returned invalid prediction payload: %r", raw)
-        except Exception as exc:  # network, parsing, missing package, etc.
-            logger.warning("Ollama prediction failed, falling back to heuristic: %s", exc)
-            prediction_data = None
+        if use_groq:
+            try:
+                raw = PredictionAIService._call_groq(prompt)
+                prediction_data = PredictionAIService._validate_prediction(raw, team1, team2)
+                if prediction_data is None:
+                    logger.warning("AI returned invalid prediction payload: %r", raw)
+            except Exception as exc:  # noqa: BLE001
+                logger.exception("Groq prediction failed, falling back to heuristic: %s", exc)
+                prediction_data = None
 
         if prediction_data is None:
-            prediction_data = PredictionAIService._fallback_prediction(features1, features2)
+            prediction_data = PredictionAIService._fallback_prediction(
+                features1,
+                features2,
+                reason_suffix="(AI provider unavailable or invalid output)",
+            )
             model_name = f"{model_name} (fallback)"
 
         factors = {"team1": features1, "team2": features2}
