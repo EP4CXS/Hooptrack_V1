@@ -47,7 +47,8 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT', cast=int),
-        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=300, cast=int),
+        # Transaction poolers (e.g., Supabase PgBouncer) work best with short-lived app DB connections.
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=0, cast=int),
         'OPTIONS': {
             'sslmode': config('DB_SSLMODE', default='require'),
             'connect_timeout': config('DB_CONNECT_TIMEOUT', default=10, cast=int),
@@ -68,8 +69,41 @@ STORAGES = {
     },
 }
 
-# Media files - use S3 or similar in production
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# Media files - use Supabase Storage (S3-compatible) when configured.
+SUPABASE_PROJECT_REF = config('SUPABASE_PROJECT_REF', default='').strip()
+SUPABASE_STORAGE_BUCKET = config('SUPABASE_STORAGE_BUCKET', default='').strip()
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='').strip()
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='').strip()
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1').strip()
+
+USE_SUPABASE_STORAGE = all(
+    [
+        SUPABASE_PROJECT_REF,
+        SUPABASE_STORAGE_BUCKET,
+        AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY,
+    ]
+)
+
+if USE_SUPABASE_STORAGE:
+    _supabase_s3_endpoint = f'https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/s3'
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'bucket_name': SUPABASE_STORAGE_BUCKET,
+            'access_key': AWS_ACCESS_KEY_ID,
+            'secret_key': AWS_SECRET_ACCESS_KEY,
+            'endpoint_url': _supabase_s3_endpoint,
+            'region_name': AWS_S3_REGION_NAME,
+            'default_acl': 'public-read',
+            'querystring_auth': False,
+            'file_overwrite': False,
+        },
+    }
+    MEDIA_URL = (
+        f'https://{SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/'
+        f'{SUPABASE_STORAGE_BUCKET}/'
+    )
 
 # CORS - restrict to known origins
 CORS_ALLOW_ALL_ORIGINS = False

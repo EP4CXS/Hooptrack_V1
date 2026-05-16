@@ -27,12 +27,18 @@ class TeamSerializer(serializers.ModelSerializer):
         logo = getattr(obj, "logo", None)
         if not logo:
             return None
+        raw_name = str(getattr(logo, "name", "") or "").strip().replace("\\", "/")
+
+        project_ref = str(getattr(settings, "SUPABASE_PROJECT_REF", "") or "").strip()
+        bucket = str(getattr(settings, "SUPABASE_STORAGE_BUCKET", "") or "").strip()
+        if project_ref and bucket and raw_name and not raw_name.startswith(("http://", "https://", "/")):
+            return f"https://{project_ref}.supabase.co/storage/v1/object/public/{bucket}/{raw_name.lstrip('/')}"
+
         try:
             return logo.url
         except Exception:
             # Legacy rows may still hold raw URL/text values from the old URLField.
-            raw_name = getattr(logo, "name", "") or ""
-            value = str(raw_name).strip().replace("\\", "/")
+            value = raw_name
             if not value:
                 return None
             if value.startswith(("http://", "https://", "/")):
