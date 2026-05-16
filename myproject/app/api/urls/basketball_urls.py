@@ -2,7 +2,15 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from app.api.views.nba_live_view import NbaLiveActionView
-from app.api.views.basketball_views import BracketViewSet, GamePredictionViewSet, GameViewSet, MatchupViewSet, PlayerViewSet, TeamViewSet
+from app.api.views.basketball_views import (
+    BracketViewSet,
+    GamePredictionViewSet,
+    GameViewSet,
+    MatchupViewSet,
+    PlayerViewSet,
+    TeamViewSet,
+    basketball_totals_view,
+)
 
 router = DefaultRouter()
 router.register("players", PlayerViewSet, basename="players")
@@ -14,5 +22,6 @@ router.register("games", GameViewSet, basename="games")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("total/", basketball_totals_view, name="api-basketball-total"),
     path("nba/live/", NbaLiveActionView.as_view(), name="api-nba-live"),
 ]

@@ -15,11 +15,24 @@ from app.models.basketball.models import (
 
 class TeamSerializer(serializers.ModelSerializer):
     playerCount = serializers.IntegerField(source="player_count", read_only=True)
-    logo = serializers.ImageField(required=False, allow_null=True)
+    logo = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
         fields = ["id", "name", "city", "conference", "division", "logo", "playerCount"]
+
+    def get_logo(self, obj):
+        """Return a safe logo URL even for legacy/bad stored values."""
+        logo = getattr(obj, "logo", None)
+        if not logo:
+            return None
+        try:
+            return logo.url
+        except Exception:
+            # Legacy rows may still hold raw URL/text values from the old URLField.
+            raw_name = getattr(logo, "name", "") or ""
+            value = str(raw_name).strip()
+            return value or None
 
 
 class PlayerSerializer(serializers.ModelSerializer):

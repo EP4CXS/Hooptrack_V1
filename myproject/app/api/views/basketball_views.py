@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
@@ -45,6 +45,24 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def basketball_totals_view(request):
+    """Legacy-safe aggregate endpoint used by older dashboard scripts."""
+    owner = request.user
+    owned_brackets = Bracket.objects.filter(created_by=owner)
+    owned_bracket_ids = owned_brackets.values_list("id", flat=True)
+    totals = {
+        "teams": Team.objects.filter(created_by=owner).count(),
+        "players": Player.objects.filter(created_by=owner).count(),
+        "brackets": owned_brackets.count(),
+        "games": Game.objects.filter(bracket_id__in=owned_bracket_ids).count(),
+        "predictions": GamePrediction.objects.filter(matchup__bracket_id__in=owned_bracket_ids).count(),
+    }
+    # Keep both canonical keys and old naming for compatibility.
+    return Response({**totals, "total": totals["teams"], "ok": True}, status=status.HTTP_200_OK)
 
 
 class PlayerViewSet(viewsets.ModelViewSet):
