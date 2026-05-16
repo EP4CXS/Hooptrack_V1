@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.conf import settings
 
 from app.models.basketball.models import (
     Bracket,
@@ -31,8 +32,16 @@ class TeamSerializer(serializers.ModelSerializer):
         except Exception:
             # Legacy rows may still hold raw URL/text values from the old URLField.
             raw_name = getattr(logo, "name", "") or ""
-            value = str(raw_name).strip()
-            return value or None
+            value = str(raw_name).strip().replace("\\", "/")
+            if not value:
+                return None
+            if value.startswith(("http://", "https://", "/")):
+                return value
+            if "/" not in value:
+                # Common legacy case: DB kept only basename.
+                value = f"team_logos/{value}"
+            media_prefix = str(settings.MEDIA_URL or "/media/").rstrip("/")
+            return f"{media_prefix}/{value.lstrip('/')}"
 
 
 class PlayerSerializer(serializers.ModelSerializer):
