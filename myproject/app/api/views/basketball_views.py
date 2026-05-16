@@ -46,6 +46,24 @@ class TeamViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            team = serializer.save(created_by=request.user)
+        except Exception:
+            # Some production environments can reject file writes for logo uploads.
+            # Retry creation without logo so team creation still succeeds.
+            if "logo" not in request.data:
+                raise
+            fallback_data = request.data.copy()
+            fallback_data.pop("logo", None)
+            fallback_serializer = self.get_serializer(data=fallback_data)
+            fallback_serializer.is_valid(raise_exception=True)
+            team = fallback_serializer.save(created_by=request.user)
+        response_serializer = self.get_serializer(team)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
 
 @api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])

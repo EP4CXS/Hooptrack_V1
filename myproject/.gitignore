@@ -42,6 +42,7 @@ db.sqlite3-journal
 !/media/img/
 /media/img/*
 !/media/img/hooptrack_chatbot.png
+!/media/img/hooptrack-logo.png
 /staticfiles
 
 # IDE
