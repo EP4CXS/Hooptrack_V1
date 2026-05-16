@@ -763,9 +763,10 @@
             renderTeamRosterPage(team, roster);
           } else {
             const totalTeams = teams.length;
-            const totalGames = totalTeams;
+            const games = await fetchJson(`${apiBase}/games/`).catch(() => []);
+            const matchupGames = Array.isArray(games) ? games.length : 0;
             const inactiveTeams = teams.filter((t) => Number(t.playerCount || 0) === 0).length;
-            const avgPerTeam = totalTeams ? ((teams.reduce((sum, t) => sum + Number(t.playerCount || 0), 0)) / totalTeams).toFixed(1) : '0';
+            const activeTeams = Math.max(0, totalTeams - inactiveTeams);
             contentEl.innerHTML = `
               <div class="ht-container space-y-6">
                 ${window.HTUI?.renderPageHeader({
@@ -773,23 +774,19 @@
                   subtitle: 'Manage your organizations and rosters.'
                 }) || ''}
 
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
-                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Total Games</div>
-                    <div class="mt-2 text-3xl font-black text-white">${totalGames}</div>
-                  </div>
-                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
-                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Avg Per Team</div>
-                    <div class="mt-2 text-3xl font-black text-white">${avgPerTeam}</div>
-                  </div>
-                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
-                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Unactive Teams</div>
-                    <div class="mt-2 text-3xl font-black text-white">${inactiveTeams}</div>
-                  </div>
-                  <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-4">
-                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Active</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <button id="teams-total-card" type="button" class="text-left rounded-2xl border border-white/10 bg-[#1f242d] p-4 hover:bg-white/5 transition-colors">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Total Teams</div>
                     <div class="mt-2 text-3xl font-black text-white">${totalTeams}</div>
-                  </div>
+                  </button>
+                  <button id="teams-matchup-card" type="button" class="text-left rounded-2xl border border-white/10 bg-[#1f242d] p-4 hover:bg-white/5 transition-colors">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Matchup Game</div>
+                    <div class="mt-2 text-3xl font-black text-white">${matchupGames}</div>
+                  </button>
+                  <button id="teams-active-card" type="button" class="text-left rounded-2xl border border-white/10 bg-[#1f242d] p-4 hover:bg-white/5 transition-colors">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-500">Active Teams</div>
+                    <div class="mt-2 text-3xl font-black text-white">${activeTeams}</div>
+                  </button>
                 </div>
 
                 ${window.HTUI?.renderToolbar(`
@@ -823,7 +820,7 @@
 
                 <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   ${teams.map(t => `
-                    <div class="ht-card overflow-hidden" data-team-card data-team-name="${(t.name || '').toLowerCase()}" data-team-division="${String(t.division || '').toLowerCase()}">
+                    <div class="ht-card overflow-hidden" data-team-card data-team-name="${(t.name || '').toLowerCase()}" data-team-division="${String(t.division || '').toLowerCase()}" data-team-player-count="${Number(t.playerCount || 0)}">
                       <div class="h-24 team-banner relative overflow-hidden">
                         ${t.logo ? `<img src="${t.logo}" class="w-full h-full object-cover opacity-35" alt="${t.name}">` : ''}
                         <div class="absolute inset-0 bg-gradient-to-r from-[#1f242d]/92 via-[#1f242d]/76 to-[#ef4444]/35"></div>
@@ -857,24 +854,43 @@
                     </div>
                   `).join('') || `
                     <div class="md:col-span-2 xl:col-span-3">
-                      ${window.HTUI?.renderEmptyState({
-                        title: 'No teams yet',
-                        message: 'Create your first team to start building rosters and generating brackets.'
-                      }) || '<p class=\"text-slate-500\">No teams yet.</p>'}
+                      <div class="rounded-2xl border border-white/10 bg-[#1f242d] p-6 text-left">
+                        <p class="text-lg font-bold text-white">No teams yet</p>
+                        <p class="text-slate-400 mt-1">Create your first team to start building rosters and generating brackets.</p>
+                      </div>
                     </div>
                   `}
                 </div>
               </div>
             `;
+            document.getElementById('teams-total-card')?.addEventListener('click', () => {
+              window.location.href = '/teams/';
+            });
+            document.getElementById('teams-matchup-card')?.addEventListener('click', () => {
+              window.location.href = '/games/';
+            });
+            document.getElementById('teams-active-card')?.addEventListener('click', () => {
+              window.location.href = '/teams/?view=active';
+            });
             let activeQuickFilter = '';
+            let activeOnly = (() => {
+              try {
+                const params = new URLSearchParams(window.location.search || '');
+                return params.get('view') === 'active';
+              } catch (_err) {
+                return false;
+              }
+            })();
             const applyTeamFilters = () => {
               const q = String(document.getElementById('team-search')?.value || '').toLowerCase().trim();
               document.querySelectorAll('[data-team-card]').forEach((card) => {
                 const name = card.getAttribute('data-team-name') || '';
                 const division = card.getAttribute('data-team-division') || '';
+                const playerCount = Number(card.getAttribute('data-team-player-count') || 0);
                 const hitSearch = !q || name.includes(q);
                 const hitQuick = !activeQuickFilter || division.includes(activeQuickFilter);
-                card.classList.toggle('hidden', !(hitSearch && hitQuick));
+                const hitActive = !activeOnly || playerCount > 0;
+                card.classList.toggle('hidden', !(hitSearch && hitQuick && hitActive));
               });
             };
             document.getElementById('team-search')?.addEventListener('input', applyTeamFilters);
@@ -888,6 +904,12 @@
                 applyTeamFilters();
               });
             });
+            if (activeOnly) {
+              const teamSearchInput = document.getElementById('team-search');
+              if (teamSearchInput && !teamSearchInput.value) {
+                teamSearchInput.placeholder = 'Search active teams...';
+              }
+            }
             document.querySelectorAll('[data-team-delete]').forEach(btn => {
               btn.addEventListener('click', async () => {
                 const ok = await uiConfirm('Delete this team? This may affect related players and bracket data.', 'Delete Team', 'danger');
