@@ -16,38 +16,47 @@ from app.models.basketball.models import (
 
 class TeamSerializer(serializers.ModelSerializer):
     playerCount = serializers.IntegerField(source="player_count", read_only=True)
-    logo = serializers.SerializerMethodField()
+    logo = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Team
         fields = ["id", "name", "city", "conference", "division", "logo", "playerCount"]
 
-    def get_logo(self, obj):
-        """Return a safe logo URL even for legacy/bad stored values."""
-        logo = getattr(obj, "logo", None)
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        logo = getattr(instance, "logo", None)
         if not logo:
-            return None
-        raw_name = str(getattr(logo, "name", "") or "").strip().replace("\\", "/")
+            data["logo"] = None
+            return data
 
+        raw_name = str(getattr(logo, "name", "") or "").strip().replace("\\", "/")
         project_ref = str(getattr(settings, "SUPABASE_PROJECT_REF", "") or "").strip()
         bucket = str(getattr(settings, "SUPABASE_STORAGE_BUCKET", "") or "").strip()
-        if project_ref and bucket and raw_name and not raw_name.startswith(("http://", "https://", "/")):
-            return f"https://{project_ref}.supabase.co/storage/v1/object/public/{bucket}/{raw_name.lstrip('/')}"
 
-        try:
-            return logo.url
-        except Exception:
-            # Legacy rows may still hold raw URL/text values from the old URLField.
-            value = raw_name
-            if not value:
-                return None
-            if value.startswith(("http://", "https://", "/")):
-                return value
-            if "/" not in value:
-                # Common legacy case: DB kept only basename.
-                value = f"team_logos/{value}"
-            media_prefix = str(settings.MEDIA_URL or "/media/").rstrip("/")
-            return f"{media_prefix}/{value.lstrip('/')}"
+        if project_ref and bucket and raw_name and not raw_name.startswith(("http://", "https://", "/")):
+            data["logo"] = (
+                f"https://{project_ref}.supabase.co/storage/v1/object/public/"
+                f"{bucket}/{raw_name.lstrip('/')}"
+            )
+            return data
+
+        value = str(data.get("logo") or "").strip()
+        if value:
+            data["logo"] = value
+            return data
+
+        # Legacy rows may still hold raw URL/text values from the old URLField.
+        if not raw_name:
+            data["logo"] = None
+            return data
+        if raw_name.startswith(("http://", "https://", "/")):
+            data["logo"] = raw_name
+            return data
+        if "/" not in raw_name:
+            raw_name = f"team_logos/{raw_name}"
+        media_prefix = str(settings.MEDIA_URL or "/media/").rstrip("/")
+        data["logo"] = f"{media_prefix}/{raw_name.lstrip('/')}"
+        return data
 
 
 class PlayerSerializer(serializers.ModelSerializer):
